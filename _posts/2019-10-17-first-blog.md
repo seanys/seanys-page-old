@@ -2,8 +2,8 @@
 layout: post
 title: "第一篇博客"
 subtitle: 'My first blog'
-author: "seanys"
-header-img: "https://tva1.sinaimg.cn/large/006y8mN6ly1g81cpq2twzj31400u0npg.jpg"
+author: "sean"
+header-img: ""
 tags:
   - 记录
 ---
