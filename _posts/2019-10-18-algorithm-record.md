@@ -8,39 +8,41 @@ tags:
   - 算法
 ---
 
-##算法大杂烩
-
-### 搜索算法
-
-#### ㊙️局部检索（Local Search）
 
 
+# 算法大杂烩
 
-#### ㊙️变邻域检索（Variable Neighborhood Search）
+## 搜索算法
+
+### ㊙️局部检索（Local Search）
 
 
 
-#### ㊙️迭代邻域检索（Iterated Local Search, ）
+### ㊙️变邻域检索（Variable Neighborhood Search）
 
 
 
-### 精确算法
-
-#### ㊙️分支定界法（Branch and Bound）
+### ㊙️迭代邻域检索（Iterated Local Search, ）
 
 
 
-#### ㊙️割平面算法（Branch and Cut）
+## 精确算法
+
+### ㊙️分支定界法（Branch and Bound）
 
 
 
-#### ㊙️动态规划算法
+### ㊙️割平面算法（Branch and Cut）
 
 
 
-### 近似算法
+### ㊙️动态规划算法
 
-#### ㊙️爬山法（Hill Climbing）
+
+
+## 近似算法
+
+### ㊙️爬山法（Hill Climbing）
 
 Hill climbing finds optimal solutions for convex problems – for other problems it will find only local optima (solutions that cannot be improved upon by any neighboring configurations), which are not necessarily the best possible solution (the global optimum) out of all possible solutions (the search space). 
 
@@ -75,13 +77,13 @@ Continuous Space Hill Climbing Algorithm
          return currentPoint;
 ```
 
-#### ㊙️模拟退火（Simulate Annealing）
+### ㊙️模拟退火（Simulate Annealing）
 
 局部检索算法，
 
 
 
-#### ㊙️禁忌搜索（Taboo Search）
+### ㊙️禁忌搜索（Taboo Search）
 
 局部检索算法，
 
@@ -89,87 +91,87 @@ Continuous Space Hill Climbing Algorithm
 
 
 
-#### ㊙️蚁群算法
+### ㊙️蚁群算法
 
 
 
-#### ㊙️遗传算法
-
-
-
-
-
-
-
-### 超启发式算法（Hyper Heuristic）
+### ㊙️遗传算法
 
 
 
 
 
-### 大规模分解算法
-
-#### ㊙️列生成（Column Generation）
 
 
-
-#### ㊙️Benders Decomposition
+## 超启发式算法（Hyper Heuristic）
 
 
 
 
 
-#### ㊙️Dantzig-Wolfe Decomposition
+## 大规模分解算法
+
+### ㊙️列生成（Column Generation）
+
+
+
+### ㊙️Benders Decomposition
 
 
 
 
 
-#### ㊙️分支定界法（Branch and Price）
-
-
-
-### 排料算法应用
-
-#### ㊙️Not-fit Polygon
-
-
-
-#### ㊙️碰撞法
-
-
-
-#### ㊙️左底部算法
+### ㊙️Dantzig-Wolfe Decomposition
 
 
 
 
 
-### 加强学习（Reinforcement Learning）
+### ㊙️分支定界法（Branch and Price）
 
 
 
-### 机器学习
+## 排料算法应用
 
-#### ㊙️注意力机制（Attention Mechanism）
-
-
+### ㊙️Not-fit Polygon
 
 
 
-### 统计与回归模型
-
-#### ㊙️线性规划（Linear Regression）
+### ㊙️碰撞法
 
 
 
-#### ㊙️逻辑回归（Logistic Regression）
+### ㊙️左底部算法
+
+
+
+
+
+## 加强学习（Reinforcement Learning）
+
+
+
+## 机器学习
+
+### ㊙️注意力机制（Attention Mechanism）
+
+
+
+
+
+## 统计与回归模型
+
+### ㊙️线性规划（Linear Regression）
+
+
+
+### ㊙️逻辑回归（Logistic Regression）
 
 ![img](https://yuanxiaosc.github.io/2018/06/21/%E6%94%B9%E8%BF%9B%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C%E7%9A%84%E5%AD%A6%E4%B9%A0%E6%96%B9%E6%B3%95%E2%80%94%E2%80%94%E4%BA%A4%E5%8F%89%E7%86%B5/one_1.png)
 
 
 
-#### ㊙️SoftMax
+### ㊙️SoftMax
 
 ![“softmax”的图片搜索结果](https://pic1.zhimg.com/v2-11758fbc2fc5bbbc60106926625b3a4f_1200x500.jpg)
 
@@ -181,7 +183,7 @@ p = np.exp(scores) / np.sum(np.exp(scores))
 
 主要用于多分类回归，可以对向量进行处理，最后得出的概率总和是1
 
-#### ㊙️似然函数（Likelihood Function）
+### ㊙️似然函数（Likelihood Function）
 
 
 
@@ -189,27 +191,27 @@ p = np.exp(scores) / np.sum(np.exp(scores))
 
 参考资料：https://cloud.tencent.com/developer/article/1102103（分类算法总结）、https://zhuanlan.zhihu.com/p/25723112（softmax应用）
 
-### 激活函数
+## 激活函数
 
-#### ㊙️Relu Function
+### ㊙️Relu Function
 
 ![img](https://upload.wikimedia.org/wikipedia/commons/thumb/c/c9/Ramp_function.svg/325px-Ramp_function.svg.png)
 
 
 
-### 损失函数
+## 损失函数
 
-#### ㊙️交叉熵损失函数
-
-
+### ㊙️交叉熵损失函数
 
 
 
-### 其他未分类
-
-#### ㊙️拉格朗日松弛
 
 
+## 其他未分类
 
-#### ㊙️贪婪算法 
+### ㊙️拉格朗日松弛
+
+
+
+### ㊙️贪婪算法 
 

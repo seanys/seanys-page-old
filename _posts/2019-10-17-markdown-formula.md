@@ -1,3 +1,14 @@
+---
+layout: post
+title: "Markdown公式（转载）"
+subtitle: ''
+author: "sean"
+header-img: "img/post-bg-unix-linux.jpg"
+tags:
+  - 学术写作
+
+---
+
 ## Markdown公式（转载）
 
 网站：http://latex.codecogs.com/eqneditor/editor.php
