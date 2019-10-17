@@ -1,9 +1,9 @@
 # Site settings
-title: Yang Shan的学习博客
-SEOTitle: Yang Shan的学习博客 | Sean's Blog
+title: Sean的学习博客
+SEOTitle: Sean的学习博客 | Sean's Blog
 header-img: img/home-bg.jpg
 email: tjyangshan@gmail.com
-description: "Yangshan的学习博客"
+description: "Sean的学习博客"
 keyword: "Yang Shan, Sean Yang, Yang Shan的学习博客, Sean's Blog, 博客, 个人网站, 组合优化, 整数规划, 优化理论"
 url: ""  
 baseurl: ""                             # for example, '/blog' if your blog hosted on 'host/blog'
@@ -85,7 +85,7 @@ sidebar-avatar: "https://tva1.sinaimg.cn/large/006y8mN6ly1g818y88vq0j30u50u0x6p.
 
 # Featured Tags
 featured-tags: true                     # whether or not using Feature-Tags
-featured-condition-size: 1              # A tag will be featured if the size of it is more than this condition value
+featured-condition-size: 0              # A tag will be featured if the size of it is more than this condition value
 
 
 
