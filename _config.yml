@@ -1,10 +1,10 @@
 # Site settings
-title: 羊山的学习博客
-SEOTitle: 羊山的博客 | Sean's Blog
+title: 兔子的学习博客
+SEOTitle: 兔子的学习博客 | Sean's Blog
 header-img: img/home-bg.jpg
 email: tjyangshan@gmail.com
 description: "羊山"
-keyword: "羊山, Yang Shan, Sean Yang, 羊山的博客, Sean's Blog, 博客, 个人网站, 组合优化, 整数规划, 优化理论"
+keyword: "羊山, Yang Shan, Sean Yang, 兔子的学习博客, Sean's Blog, 博客, 个人网站, 组合优化, 整数规划, 优化理论"
 url: ""  
 baseurl: ""                             # for example, '/blog' if your blog hosted on 'host/blog'
 
@@ -59,7 +59,7 @@ kramdown:
 
 
 # Disqus settings
-disqus_username: seanys
+disqus_username: disqus_UwH887dV9F
 
 # Netease settings
 netease_comment: false
