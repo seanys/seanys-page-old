@@ -14,6 +14,15 @@ tags:
 
 ## Combination and Netural Network
 
+### Comparision
+
+| **Article**          | **Key Note**                                                 | **Thought/Comments**                                         |
+| -------------------- | ------------------------------------------------------------ | ------------------------------------------------------------ |
+| Bin Packing with DRL | **Input**: a sequence of size data (length, width and height) of items to be packed**Output**: another sequence which represents the order we pack those items **Evaluation**: We use the surface area (SA) of the bin to evaluate the sequence, and we use SA(o\|s) to denote the surface area | This algorithm use aim dataset to train the network, so it needs a  lot time to train the RNN and doesn't fit new shapes combination |
+|                      |                                                              |                                                              |
+|                      |                                                              |                                                              |
+
+
 ### Sequence to Sequence Learning
 
 
@@ -24,11 +33,5 @@ tags:
 
 
 
-
-
-### Literature Review
-
-
-
-
+### Bin Packing
 
