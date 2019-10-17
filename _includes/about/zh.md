@@ -96,10 +96,12 @@
 
 <img src="https://tva1.sinaimg.cn/large/006y8mN6ly1g81ghjvqnjj30lc0sg763.jpg" style="width:50%">
 
-### PPT设计案例
+### 设计作品（PPT）
 
 <img src="https://tva1.sinaimg.cn/large/006y8mN6ly1g81hv0xm83j31hf0u0aep.jpg">
 
-<img src="https://tva1.sinaimg.cn/large/006y8mN6ly1g81hvczl6aj31hp0u0n2o.jpg"><img src="https://tva1.sinaimg.cn/large/006y8mN6ly1g81hw79oi0j31hl0u0n47.jpg">
+<img src="https://tva1.sinaimg.cn/large/006y8mN6ly1g81hvczl6aj31hp0u0n2o.jpg">
+
+<img src="https://tva1.sinaimg.cn/large/006y8mN6ly1g81hw79oi0j31hl0u0n47.jpg">
 
 <img src="https://tva1.sinaimg.cn/large/006y8mN6ly1g81htzh2y9j31hh0u0npd.jpg">
