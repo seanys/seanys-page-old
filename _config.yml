@@ -1,12 +1,10 @@
 # Site settings
-title: Yangshan Blog
+title: Sean's Blog
 SEOTitle: 羊山的博客 | Sean's Blog
 header-img: img/home-bg.jpg
 email: tjyangshan@gmail.com
 description: "羊山"
-# keyword: "黄玄, Hux黄玄, Hux, 鬼栈, huxpro, @huxpro, 黄玄的博客, Hux Blog, 博客, 个人网站, 互联网, Web, JavaScript, 前端, 设计"
 keyword: "羊山, Yang Shan, Sean Yang, 羊山的博客, Sean's Blog, 博客, 个人网站, 组合优化, 整数规划, 优化理论"
-# url: "https://huangxuan.me"              # your host, for absolute URL
 url: ""  
 baseurl: ""                             # for example, '/blog' if your blog hosted on 'host/blog'
 
