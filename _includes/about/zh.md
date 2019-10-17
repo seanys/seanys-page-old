@@ -102,6 +102,4 @@
 
 <img src="https://tva1.sinaimg.cn/large/006y8mN6ly1g81hvczl6aj31hp0u0n2o.jpg">
 
-<img src="https://tva1.sinaimg.cn/large/006y8mN6ly1g81hw79oi0j31hl0u0n47.jpg">
-
 <img src="https://tva1.sinaimg.cn/large/006y8mN6ly1g81htzh2y9j31hh0u0npd.jpg">
