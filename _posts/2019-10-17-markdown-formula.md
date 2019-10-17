@@ -5,7 +5,7 @@ subtitle: ''
 author: "sean"
 header-img: "img/post-bg-unix-linux.jpg"
 tags:
-  - 学术写作
+  - 学术
 
 ---
 
