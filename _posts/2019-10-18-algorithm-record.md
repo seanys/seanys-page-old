@@ -123,7 +123,7 @@ def randomoptimize(self, domain):
 
 **总结**：对于单峰的优化问题是可以的，对于多峰问题可能会陷入局部最优化，因为只会检索临近点并计算效果。其次，爬山的问题在于如何实现“临近”，比如排料中的NFP就可以模拟“临近”的效果。
 
-### ☣️模拟退火（Simulate Annealing）
+### 🆘模拟退火（Simulate Annealing）
 
 ```python
     # 搜索算法4：模拟退火算法
@@ -171,7 +171,7 @@ def randomoptimize(self, domain):
 
 总结：
 
-### ☣️遗传算法
+### 🆘遗传算法
 
 ```python
 # 搜索算法5： 遗传算法
@@ -253,7 +253,7 @@ def geneticoptimize(self, domain, popsize=50, step=1, mutprob=0.2, elite=0.2, ma
 
 
 
-### 综合案例
+### 🆘综合案例
 
 ```python
 # -*-  coding: utf-8 -*-
@@ -604,13 +604,13 @@ if __name__ == '__main__':
 
 
 
-### ☣️逻辑回归（Logistic Regression）
+### 🆘逻辑回归（Logistic Regression）
 
 ![img](https://yuanxiaosc.github.io/2018/06/21/%E6%94%B9%E8%BF%9B%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C%E7%9A%84%E5%AD%A6%E4%B9%A0%E6%96%B9%E6%B3%95%E2%80%94%E2%80%94%E4%BA%A4%E5%8F%89%E7%86%B5/one_1.png)
 
 
 
-### ☣️SoftMax
+### 🆘SoftMax
 
 ![“softmax”的图片搜索结果](https://pic1.zhimg.com/v2-11758fbc2fc5bbbc60106926625b3a4f_1200x500.jpg)
 
@@ -622,13 +622,358 @@ p = np.exp(scores) / np.sum(np.exp(scores))
 
 主要用于多分类回归，可以对向量进行处理，最后得出的概率总和是1
 
+参考资料：https://zhuanlan.zhihu.com/p/25723112（softmax应用）
+
 ### ☣️似然函数（Likelihood Function）
 
 
 
+### ☣️贝叶斯模型（Bayes）
 
 
-参考资料：https://cloud.tencent.com/developer/article/1102103（分类算法总结）、https://zhuanlan.zhihu.com/p/25723112（softmax应用）
+
+### ✅马尔可夫模型（Markov Models）
+
+<img src="https://pic4.zhimg.com/80/648a55725e67d718d97d6a475891d70b_hd.jpg" style="width:50%"/>
+
+概述：马尔可夫过程中，任何一个状态，只与前一个状态相关
+
+```python
+# 关系矩阵
+transfer_matrix = np.array([[0.6,0.2,0.2],[0.3,0.4,0.3],[0,0.3,0.7]],dtype='float32') 
+# 
+start_matrix = np.array([[0.5,0.3,0.2]],dtype='float32') 
+
+value1 = []
+value2 = []
+value3 = []
+for i in range(30):
+    start_matrix = np.dot(start_matrix,transfer_matrix)
+    value1.append(start_matrix[0][0])
+    value2.append(start_matrix[0][1])
+    value3.append(start_matrix[0][2])
+print(start_matrix)
+
+# 输出[[0.23076934 0.30769244 0.4615386 ]]
+```
+
+### ✅隐马尔可夫模型（Hidden Markov Models）
+
+#### 前言
+
+隐马尔可夫模型即马尔可夫链上加了一层随机过程，一般采用Baum-Welch算法和Viterbi算法进行求解
+
+![preview](https://pic2.zhimg.com/792e033ff9b0418b3b6c9bbaef30fd83_r.jpg)
+
+#### Baum-Welch算法与Viterbi算法
+
+
+
+#### 源码-EM算法
+
+```python
+"""
+隐马尔科夫模型
+三类问题：1.概率计算 2.学习问题（参数估计） 3.预测问题（状态序列的预测）
+"""
+import numpy as np
+from itertools import accumulate
+
+class GenData:
+    """
+    根据隐马尔科夫模型生成相应的观测数据
+    """
+    def __init__(self, hmm, n_sample):
+        self.hmm = hmm
+        self.n_sample = n_sample
+
+    def _locate(self, prob_arr):
+        # 给定概率向量，返回状态
+        seed = np.random.rand(1)
+        for state, cdf in enumerate(accumulate(prob_arr)):
+            if seed <= cdf:
+                return state
+        return
+
+    def init_state(self):
+        # 根据初始状态概率向量，生成初始状态
+        return self._locate(self.hmm.S)
+
+    def state_trans(self, current_state):
+        # 转移状态
+        return self._locate(self.hmm.A[current_state])
+
+    def gen_obs(self, current_state):
+        # 生成观测
+        return self._locate(self.hmm.B[current_state])
+
+    def gen_data(self):
+        # 根据模型产生观测数据
+        current_state = self.init_state()
+        start_obs = self.gen_obs(current_state)
+        state = [current_state]
+        obs = [start_obs]
+        n = 0
+        while n < self.n_sample - 1:
+            n += 1
+            current_state = self.state_trans(current_state)
+            state.append(current_state)
+            obs.append(self.gen_obs(current_state))
+        return state, obs
+
+
+class HMM:
+    def __init__(self, n_state, n_obs, S=None, A=None, B=None):
+        self.n_state = n_state  # 状态的个数n
+        self.n_obs = n_obs  # 观测的种类数m
+        self.S = S  # 1*n, 初始状态概率向量
+        self.A = A  # n*n, 状态转移概率矩阵
+        self.B = B  # n*m, 观测生成概率矩阵
+
+def _alpha(hmm, obs, t):
+    # 计算时刻t各个状态的前向概率
+    b = hmm.B[:, obs[0]]
+    alpha = np.array([hmm.S * b])  # n*1
+    for i in range(1, t + 1):
+        alpha = (alpha @ hmm.A) * np.array([hmm.B[:, obs[i]]])
+    return alpha[0]
+
+def forward_prob(hmm, obs):
+    # 前向算法计算最终生成观测序列的概率, 即各个状态下概率之和
+    alpha = _alpha(hmm, obs, len(obs) - 1)
+    return np.sum(alpha)
+
+def _beta(hmm, obs, t):
+    # 计算时刻t各个状态的后向概率
+    beta = np.ones(hmm.n_state)
+    for i in reversed(range(t + 1, len(obs))):
+        beta = np.sum(hmm.A * hmm.B[:, obs[i]] * beta, axis=1)
+    return beta
+
+def backward_prob(hmm, obs):
+    # 后向算法计算生成观测序列的概率
+    beta = _beta(hmm, obs, 0)
+    return np.sum(hmm.S * hmm.B[:, obs[0]] * beta)
+
+def fb_prob(hmm, obs, t=None):
+    # 将前向和后向合并
+    if t is None:
+        t = 0
+    res = _alpha(hmm, obs, t) * _beta(hmm, obs, t)
+    return res.sum()
+
+def _gamma(hmm, obs, t):
+    # 计算时刻t处于各个状态的概率
+    alpha = _alpha(hmm, obs, t)
+    beta = _beta(hmm, obs, t)
+    prob = alpha * beta
+    return prob / prob.sum()
+
+
+def point_prob(hmm, obs, t, i):
+    # 计算时刻t处于状态i的概率
+    prob = _gamma(hmm, obs, t)
+    return prob[i]
+
+def _xi(hmm, obs, t):
+    alpha = np.mat(_alpha(hmm, obs, t))
+    beta_p = _beta(hmm, obs, t + 1)
+    obs_prob = hmm.B[:, obs[t + 1]]
+    obs_beta = np.mat(obs_prob * beta_p)
+    alpha_obs_beta = np.asarray(alpha.T * obs_beta)
+    xi = alpha_obs_beta * hmm.A
+    return xi / xi.sum()
+
+
+def fit(hmm, obs_data, maxstep=100):
+    # 利用Baum-Welch算法学习
+    hmm.A = np.ones((hmm.n_state, hmm.n_state)) / hmm.n_state
+    hmm.B = np.ones((hmm.n_state, hmm.n_obs)) / hmm.n_obs
+    hmm.S = np.random.sample(hmm.n_state)  # 初始状态概率矩阵（向量），的初始化必须随机状态，否则容易陷入局部最优
+    hmm.S = hmm.S / hmm.S.sum()
+    step = 0
+    while step < maxstep:
+        xi = np.zeros_like(hmm.A)
+        gamma = np.zeros_like(hmm.S)
+        B = np.zeros_like(hmm.B)
+        S = _gamma(hmm, obs_data, 0)
+        for t in range(len(obs_data) - 1):
+            tmp_gamma = _gamma(hmm, obs_data, t)
+            gamma += tmp_gamma
+            xi += _xi(hmm, obs_data, t)
+            B[:, obs_data[t]] += tmp_gamma
+
+        # 更新 A
+        for i in range(hmm.n_state):
+            hmm.A[i] = xi[i] / gamma[i]
+        # 更新 B
+        tmp_gamma_end = _gamma(hmm, obs_data, len(obs_data) - 1)
+        gamma += tmp_gamma_end
+        B[:, obs_data[-1]] += tmp_gamma_end
+        for i in range(hmm.n_state):
+            hmm.B[i] = B[i] / gamma[i]
+        # 更新 S
+        hmm.S = S
+        step += 1
+    return hmm
+
+def predict(hmm, obs):
+    # 采用Viterbi算法预测状态序列
+    N = len(obs)
+    nodes_graph = np.zeros((hmm.n_state, N), dtype=int)  # 存储时刻t且状态为i时， 前一个时刻t-1的状态，用于构建最终的状态序列
+    delta = hmm.S * hmm.B[:, obs[0]]  # 存储到t时刻，且此刻状态为i的最大概率
+    nodes_graph[:, 0] = range(hmm.n_state)
+
+    for t in range(1, N):
+        new_delta = []
+        for i in range(hmm.n_state):
+            temp = [hmm.A[j, i] * d for j, d in enumerate(delta)]  # 当前状态为i时， 选取最优的前一时刻状态
+            max_d = max(temp)
+            new_delta.append(max_d * hmm.B[i, obs[t]])
+            nodes_graph[i, t] = temp.index(max_d)
+        delta = new_delta
+
+    current_state = np.argmax(nodes_graph[:, -1])
+    path = []
+    t = N
+    while t > 0:
+        path.append(current_state)
+        current_state = nodes_graph[current_state, t - 1]
+        t -= 1
+    return list(reversed(path))
+
+
+if __name__ == '__main__':
+    # S = np.array([0.2, 0.4, 0.4])
+    # A = np.array([[0.5, 0.2, 0.3], [0.3, 0.5, 0.2], [0.2, 0.3, 0.5]])
+    # B = np.array([[0.5, 0.2, 0.3], [0.4, 0.2, 0.4], [0.6, 0.3, 0.1]])
+    # hmm_real = HMM(3, 3, S, A, B)
+    # g = GenData(hmm_real, 500)
+    # state, obs = g.gen_data()
+    # 检测生成的数据
+    # state, obs = np.array(state), np.array(obs)
+    # ind = np.where(state==2)[0]
+    # from collections import Counter
+    # obs_ind = obs[ind]
+    # c1 = Counter(obs_ind)
+    # n = sum(c1.values())
+    # for o, val in c.items():
+    #     print(o, val/n)
+    # ind_next = ind + 1
+    # ind_out = np.where(ind_next==1000)
+    # ind_next = np.delete(ind_next, ind_out)
+    # state_next = state[ind_next]
+    # c2 = Counter(state_next)
+    # n = sum(c2.values())
+    # for s, val in c2.items():
+    #     print(s, val/n)
+
+    # 预测
+    S = np.array([0.5, 0.5])
+    A = np.array([[0.8, 1], [0.8, 0.8]])
+    B = np.array([[0.2, 0.0, 0.8], [0, 0.8, 0.2]])
+    hmm = HMM(2, 3, S, A, B)
+    g = GenData(hmm, 200)
+    state, obs = g.gen_data()
+    print(obs)
+    path = predict(hmm, obs)
+    score = sum([int(i == j) for i, j in zip(state, path)])
+    print(score / len(path))
+
+    # 学习
+    # import matplotlib.pyplot as plt
+    #
+    #
+    # def triangle_data(n_sample):
+    #     # 生成三角波形状的序列
+    #     data = []
+    #     for x in range(n_sample):
+    #         x = x % 6
+    #         if x <= 3:
+    #             data.append(x)
+    #         else:
+    #             data.append(6 - x)
+    #     return data
+    #
+    #
+    # hmm = HMM(10, 4)
+    # data = triangle_data(30)
+    # hmm = fit(hmm, data)
+    # g = GenData(hmm, 30)
+    # state, obs = g.gen_data()
+    #
+    # x = [i for i in range(30)]
+    # plt.scatter(x, obs, marker='*', color='r')
+    # plt.plot(x, data, color='g')
+    # plt.show()
+```
+
+参考资料：https://www.zhihu.com/question/20962240（马尔可夫）、https://blog.csdn.net/slx_share/article/details/80237566（隐马尔可夫）、https://blog.csdn.net/slx_share/article/details/80237566（源码案例）
+
+### ✅蒙特卡罗方法（**Monte Carlo** Method）
+
+#### 基础
+
+**概述**通过大量随机样本，去了解一个系统，进而得到所要计算的值。它非常强大和灵活，又相当简单易懂，很容易实现。对于许多问题来说，它往往是最简单的计算方法，有时甚至是唯一可行的方法。
+
+**举例**：在区域内随机产生10000个点，落在圆内的点与圆外的点比例计划，可以推导𝝅的近似值
+
+<img src="http://www.ruanyifeng.com/blogimg/asset/2015/bg2015072604.jpg" style="width:30%"/>
+
+#### 拒绝接受采样
+
+
+
+#### 源码
+
+```python
+import random
+def calpai():
+    n = 1000000
+    r = 1.0
+    a, b = (0.0, 0.0)
+    x_neg, x_pos = a - r, a + r
+    y_neg, y_pos = b - r, b + r
+
+    count = 0
+    for i in range(0, n):
+        x = random.uniform(x_neg, x_pos)
+        y = random.uniform(y_neg, y_pos)
+        if x*x + y*y <= 1.0:
+            count += 1
+
+    print (count / float(n)) * 4
+```
+
+参考资料：http://www.ruanyifeng.com/blog/2015/07/monte-carlo-method.html 蒙特卡洛
+
+### 🆘马尔可夫链蒙特卡洛（Markov chain Monte Carlo）
+
+#### 背景
+
+**动机一**
+
+假如你需要对一维随机变量$X$进行采样， ![[公式]](https://www.zhihu.com/equation?tex=X) 的样本空间是 ![[公式]](https://www.zhihu.com/equation?tex=%5C%7B1%2C2%2C3%5C%7D) ，且概率分别是 ![[公式]](https://www.zhihu.com/equation?tex=%5C%7B1%2F2%2C1%2F4%2C1%2F4%5C%7D) ，这很简单，只需写这样简单的程序：首先根据各离散取值的概率大小对 ![[公式]](https://www.zhihu.com/equation?tex=%5B0%2C1%5D)区间进行等比例划分，如划分为 ![[公式]](https://www.zhihu.com/equation?tex=%5B0%2C0.5%5D%2C%5B0%2C5%2C0.75%5D%2C%5B0.75%2C1%5D) 这三个区间，再通过计算机产生 ![[公式]](https://www.zhihu.com/equation?tex=%5B0%2C1%5D) 之间的伪随机数，根据伪随机数的落点即可完成一次采样。接下来，假如 ![[公式]](https://www.zhihu.com/equation?tex=X) 是连续分布的呢，概率密度是 ![[公式]](https://www.zhihu.com/equation?tex=f%28X%29) ，那该如何进行采样呢？聪明的你肯定会想到累积分布函数， ![[公式]](https://www.zhihu.com/equation?tex=P%28X%3Ct%29%3D%5Cint+_%7B-%5Cinfty%7D%5E%7Bt%7Df%28x%29dx) ，即在 ![[公式]](https://www.zhihu.com/equation?tex=%5B0%2C1%5D) 间随机生成一个数 ![[公式]](https://www.zhihu.com/equation?tex=a) ，然后求使得使 ![[公式]](https://www.zhihu.com/equation?tex=P%28x%3Ct%29%3Da) 成立的 ![[公式]](https://www.zhihu.com/equation?tex=t) ， ![[公式]](https://www.zhihu.com/equation?tex=t) 即可以视作从该分部中得到的一个采样结果。这里有两个前提：一是概率密度函数可积；第二个是累积分布函数有反函数。假如条件不成立怎么办呢？MCMC就登场了。
+
+**动机二**
+
+假如对于高维随机变量，比如 ![[公式]](https://www.zhihu.com/equation?tex=%5Cmathbb%7BR%7D%5E%7B50%7D) ，若每一维取100个点，则总共要取 ![[公式]](https://www.zhihu.com/equation?tex=10%5E%7B100%7D) ，而已知宇宙的基本粒子大约有 ![[公式]](https://www.zhihu.com/equation?tex=10%5E%7B87%7D) 个，对连续的也同样如此。因此MCMC可以解决“维数灾难”问题。
+
+#### M-H采样
+
+
+
+#### Gibbs采样
+
+
+
+参考资料：https://zhuanlan.zhihu.com/p/37121528 MCMC——其实没太看懂
+
+
+
+
+
+参考资料：https://cloud.tencent.com/developer/article/1102103（分类算法总结）
 
 ## 激活函数
 
