@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "算法大杂烩"
-subtitle: 'I do not know what I have done'
+subtitle: '包括了各种算法，后续整理开'
 author: "sean"
 header-img: "img/post-bg-os-metro.jpg"
 tags:
@@ -9,6 +9,14 @@ tags:
 ---
 
 
+
+✅ ：已经整理好
+
+💤 ：大部分整理好了但是没理解
+
+🆘 ：还有一部分需要整理
+
+☣️ ：需要整理
 
 ## 搜索算法
 
@@ -596,9 +604,238 @@ if __name__ == '__main__':
 
 
 
+## 推荐系统
+
+### ✅ 协同过滤模型
+
+**相似性度量方法** 
+
+1.欧几里得距离：该距离只有当两者特征向量中每个特征都较小时，特征向量间距离才比较小。 
+
+2.皮尔森相关系数：该系数度量两个特征向量之间的线性相关性，二者线性相关程度越强，该度量值越高。该度量适用于不同特征的范围不一样的情况。
+
+**基于用户相似度的推荐** 
+
+为用户A提供推荐，首先选择皮尔森相关系数进行度量，计算与A最相似的N个人，然后计算每部电影在相似度加权平均下的加权平均值，以该分值作为每部电影的推荐值。
+
+**基于物品的协作型过滤** 
+
+首先将原始字典的键和值进行调换，此时键为物品，值为一个字典，字典的键为用户，值为分值。根据此字典运行上述的算法，先求物品之间的相似度。
+
+比如要给用户A提供推荐，A做出评价的物品有1，2，3.未作出评价的物品有4，5，6。计算物品4的分值，需要先计算物品4与物品1，2，3的相似度，以相似度作为权值，对物品1，2，3的评分进行加权平均，以此作为对物品4 评分。
+
+```python
+# -*- coding: utf-8 -*-
+__author__ = 'Bai Chenjia'
+from math import *
 
 
-## 统计与回归模型
+class recommendation:
+    def __init__(self):
+        self.critics = {'Lisa Rose': {'Lady in the Water': 2.5, 'Snakes on a Plane': 3.5, 'Just My Luck': 3.0,
+                                      'Superman Returns': 3.5, 'You, Me and Dupree': 2.5, 'The Night Listener': 3.0},
+                        'Gene Seymour': {'Lady in the Water': 3.0, 'Snakes on a Plane': 3.5, 'Just My Luck': 1.5,
+                                         'Superman Returns': 5.0, 'The Night Listener': 3.0, 'You, Me and Dupree': 3.5},
+                        'Michael Phillips': {'Lady in the Water': 2.5, 'Snakes on a Plane': 3.0,
+                                             'Superman Returns': 3.5, 'The Night Listener': 4.0},
+                        'Claudia Puig': {'Snakes on a Plane': 3.5, 'Just My Luck': 3.0, 'The Night Listener': 4.5,
+                                         'Superman Returns': 4.0, 'You, Me and Dupree': 2.5},
+                        'Mick LaSalle': {'Lady in the Water': 3.0, 'Snakes on a Plane': 4.0, 'Just My Luck': 2.0,
+                                         'Superman Returns': 3.0, 'The Night Listener': 3.0, 'You, Me and Dupree': 2.0},
+                        'Jack Matthews': {'Lady in the Water': 3.0, 'Snakes on a Plane': 4.0, 'The Night Listener': 3.0,
+                                          'Superman Returns': 5.0, 'You, Me and Dupree': 3.5},
+                        'Toby': {'Snakes on a Plane': 4.5, 'You, Me and Dupree': 1.0, 'Superman Returns': 4.0}}
+
+    def sim_distance(self, person1, person2, new_critics=0):
+        """
+        使用欧氏距离计算相似度. 返回相似度是一个浮点数值. 返回值为0代表没有相似性.
+        首先计算两个人所看相同电影评分的欧氏距离L. 如两人没有观看相同电影则返回0,否则计算相似度公式为 1/(L+1).
+        其中分母使用L+1是为了防止出现分母为0的情况. 欧氏距离越大，相似度越小;欧氏距离越小，相似度越大
+        """
+        if new_critics != 0:
+            new_critics = self.transformPrefs()
+            movielist1 = new_critics[person1]
+            movielist2 = new_critics[person2]   # dict
+            commonlist = []        # list
+            for item in movielist1:
+                if item in movielist2:
+                    commonlist.append(item)
+            if len(commonlist) == 0:   # 没有公共元素，相似度为0
+                return 0
+            # 计算欧氏距离(使用列表生成式)
+            distance = sum([pow(movielist1[item] - movielist2[item], 2) for item in commonlist])
+            sim = 1 / (sqrt(distance) + 1)
+            return sim
+        else:
+            movielist1 = self.critics[person1]
+            movielist2 = self.critics[person2]   # dict
+            commonlist = []        # list
+            for item in movielist1:
+                if item in movielist2:
+                    commonlist.append(item)
+            if len(commonlist) == 0:   # 没有公共元素，相似度为0
+                return 0
+            # 计算欧氏距离(使用列表生成式)
+            distance = sum([pow(movielist1[item] - movielist2[item], 2) for item in commonlist])
+            sim = 1 / (sqrt(distance) + 1)
+            return sim
+
+    def sim_pearson(self, person1, person2):
+        """
+        计算皮尔森相关系数.   度量两个向量之间的线性相关性.
+        如果一个人总是给出比另一个人更高的分支，但二者的分值只差基本保持一致，则他们仍然存在很好的相关性.
+        :return:两个向量之间的皮尔森相关系数，返回浮点数
+        """
+        movielist1 = self.critics[person1]
+        movielist2 = self.critics[person2]
+        commonlist = []
+        for item in movielist1:
+            if item in movielist2:
+                commonlist.append(item)  # key
+        if len(commonlist) == 0:  # 没有共同项
+            return 0
+
+        sum1 = sum([self.critics[person1][item] for item in commonlist])   # person1评分和
+        sum2 = sum([self.critics[person2][item] for item in commonlist])   # person2评分和
+
+        sum1sq = sum([pow(self.critics[person1][item], 2) for item in commonlist])  # person1评分平方和
+        sum2sq = sum([pow(self.critics[person2][item], 2) for item in commonlist])  # person2评分平方和
+
+        psum = sum([self.critics[person1][item] * self.critics[person2][item]
+                    for item in commonlist])  # 交叉项乘积和
+
+        # calculate perarson
+        n = len(commonlist)
+        num = (psum - (sum1 * sum2 / n))
+        den = sqrt((sum1sq - pow(sum1, 2) / n) * (sum2sq - pow(sum2, 2) / n))
+        if den == 0:
+            return 0
+        r = num / den
+        return r
+
+    def topMatches(self, person, n=5, similarity=sim_pearson):
+        """
+        返回与person最相似的n个人的姓名和相似度. 相似度度量选用 皮尔森相关系数
+        :param person: 要计算的人的姓名
+        :param n: 与person相似度最高的n个人
+        :param similarity: 相似度度量方法
+        :return: 返回一个list，list中元组存储的形式为（相关性, 姓名）
+        """
+        if person not in self.critics:
+            print "person input error!"
+            return 0
+        scores = [(similarity(self, person, item), item) for item in self.critics if item != person]
+        # print scores[:]
+        return sorted(scores, key=lambda it: -it[0])[0:n]  # 取相似度最高的n位
+
+    def getRecommendations(self, person, similarity=sim_pearson):
+        """
+        用与person的相似度对其他人对person未看过的影片进行加权平均，对person未看影片进行加权打分
+        :param person:
+        :param similarity: 相似度度量方法
+        :return: 返回对 person 未看影片的推荐评分，按评分排序进行推荐
+        """
+        moviescore_dict = {}  # 影片--影片对应的评分和
+        moviesim_dict = {}  # 影片--影片对应的相似度和
+        for other in self.critics:
+            sim = similarity(self, other, person)  # 人之间的相似度
+            if other == person:
+                continue
+            if sim < 0:
+                continue
+            for item in self.critics[other]:
+                if item not in self.critics[person]:  # 如果person未对该电影进行评价
+                    moviescore_dict.setdefault(item, 0)
+                    moviescore_dict[item] += self.critics[other][item] * sim
+
+                    moviesim_dict.setdefault(item, 0)
+                    moviesim_dict[item] += sim
+
+        result = [(float(moviescore_dict[item] / moviesim_dict[item]), item)
+                  for item in moviescore_dict]
+        result = sorted(result, key=lambda e1: -e1[0])
+        return result
+
+    def transformPrefs(self):
+        """
+        将self.critics中的 人--电影 的键和值进行调换，反向构造字典
+        :return: 键值调换后的 dict
+        """
+        result = {}
+        for person in self.critics:
+            for item in self.critics[person]:
+                result.setdefault(item, {})
+                result[item][person] = self.critics[person][item]
+        return result
+
+    def calculateSimilarItems(self, similarity=sim_distance):
+        """
+        利用反向构造的 物品--人  字典，构造一个物品相似度字典
+        字典的键是物品，值是与该物品最相似的n个物品以及物品之间的相似度
+        :param n: 与物品最相似的n个物品
+        :return: dict
+        """
+        result = {}
+        reverse_critics = self.transformPrefs()
+        for movie in reverse_critics:
+            scores = [(similarity(self, movie, item, 100), item)
+                      for item in reverse_critics if item != movie]
+            scores = sorted(scores, key=lambda it: -it[0])       # 取相似度最高的n位
+            result[movie] = scores
+        return result
+
+    def getRecommendedItems(self, user):
+        """
+        指定一个名字user，计算对该用户的电影推荐
+        首先利用 calculateSimilarItems方法计算物品之间的相似度dict
+        根据该用户对曾经看过的影片的评分以及该电影与未看过电影的相似度估计用户对未看电影的评分，根据评分进行推荐
+        :param user: 指定的人
+        :return:
+        """
+        userRatings = self.critics[user]  # 返回该用户所看电影和评分
+        itemMatch = self.calculateSimilarItems()  # 返回物品的相似度字典
+        scores = {}
+        totalsim = {}
+        for item, rating in userRatings.items():
+            for similarity, item2 in itemMatch[item]:
+                if item2 in userRatings:   # 若该电影被用户评分
+                    continue
+                scores.setdefault(item2, 0)
+                scores[item2] += similarity * rating
+                totalsim.setdefault(item2, 0)
+                totalsim[item2] += similarity
+        ranking = [(score / totalsim[item], item) for item, score in scores.items()]
+        ranking = sorted(ranking, key=lambda it: -it[0])
+        return ranking
+
+
+if __name__ == '__main__':
+    system = recommendation()
+
+    # 1.欧几里得距离计算相似度
+    print "\n欧几里得相似度:", system.sim_distance('Lisa Rose', 'Gene Seymour')
+
+    # 2.皮尔森相关系数计算
+    print "\n皮尔森相关系数:", system.sim_pearson('Lisa Rose', 'Gene Seymour')
+
+    # 3.计算与某人相似度最高的n个人
+    print "\n与 Toby 相似度最高的n个人", system.topMatches('Toby', n=3)[:]
+
+    # 4.输入人名，对该人未观看的影片推荐
+    print "\n给 Toby 未观看影片的推荐是", system.getRecommendations('Toby')[:]
+
+    # 5.构建物品相似度字典
+    print "\n电影之间的相似度字典是："
+    for key, value in system.calculateSimilarItems().iteritems():
+        print key, ":", value[:]
+
+    # 6.根据物品相似度，输入人名，推荐影片
+    print "\n根据电影相似度给 Toby 推荐的影片是：", system.getRecommendedItems('Toby')[:]
+```
+
+参考资料：https://blog.csdn.net/bcj296050240/article/details/50810662
+
+## 回归模型
 
 ### ☣️线性规划（Linear Regression）
 
@@ -628,15 +865,23 @@ p = np.exp(scores) / np.sum(np.exp(scores))
 
 
 
+### ☣️最大期望算法（Expectation Maximization Algorithm）
+
+
+
 ### ☣️贝叶斯模型（Bayes）
 
 
 
+参考资料：https://cloud.tencent.com/developer/article/1102103（分类算法总结）
+
+## 统计模型-蒙圈
+
 ### ✅马尔可夫模型（Markov Models）
 
-<img src="https://pic4.zhimg.com/80/648a55725e67d718d97d6a475891d70b_hd.jpg" style="width:50%"/>
+**概述**：马尔可夫过程中，任何一个状态，只与前一个状态相关
 
-概述：马尔可夫过程中，任何一个状态，只与前一个状态相关
+<img src="https://pic4.zhimg.com/80/648a55725e67d718d97d6a475891d70b_hd.jpg" style="width:50%"/>
 
 ```python
 # 关系矩阵
@@ -657,7 +902,7 @@ print(start_matrix)
 # 输出[[0.23076934 0.30769244 0.4615386 ]]
 ```
 
-### ✅隐马尔可夫模型（Hidden Markov Models）
+### 💤隐马尔可夫模型（Hidden Markov Models）
 
 #### 前言
 
@@ -665,11 +910,15 @@ print(start_matrix)
 
 ![preview](https://pic2.zhimg.com/792e033ff9b0418b3b6c9bbaef30fd83_r.jpg)
 
-#### Baum-Welch算法与Viterbi算法
+#### Baum-Welch算法
+
+一种EM算法
+
+#### Viterbi算法
 
 
 
-#### 源码-EM算法
+#### 源码-Baum-Welch算法
 
 ```python
 """
@@ -910,21 +1159,15 @@ if __name__ == '__main__':
 
 参考资料：https://www.zhihu.com/question/20962240（马尔可夫）、https://blog.csdn.net/slx_share/article/details/80237566（隐马尔可夫）、https://blog.csdn.net/slx_share/article/details/80237566（源码案例）
 
-### ✅蒙特卡罗方法（**Monte Carlo** Method）
+### 💤蒙特卡罗方法（**Monte Carlo** Method）
 
-#### 基础
+#### 基础模型
 
-**概述**通过大量随机样本，去了解一个系统，进而得到所要计算的值。它非常强大和灵活，又相当简单易懂，很容易实现。对于许多问题来说，它往往是最简单的计算方法，有时甚至是唯一可行的方法。
+**概述**：通过大量随机样本，去了解一个系统，进而得到所要计算的值。它非常强大和灵活，又相当简单易懂，很容易实现。对于许多问题来说，它往往是最简单的计算方法，有时甚至是唯一可行的方法。
 
 **举例**：在区域内随机产生10000个点，落在圆内的点与圆外的点比例计划，可以推导𝝅的近似值
 
 <img src="http://www.ruanyifeng.com/blogimg/asset/2015/bg2015072604.jpg" style="width:30%"/>
-
-#### 拒绝接受采样
-
-
-
-#### 源码
 
 ```python
 import random
@@ -945,9 +1188,69 @@ def calpai():
     print (count / float(n)) * 4
 ```
 
-参考资料：http://www.ruanyifeng.com/blog/2015/07/monte-carlo-method.html 蒙特卡洛
+#### Inverse CDF 方法
 
-### 🆘马尔可夫链蒙特卡洛（Markov chain Monte Carlo）
+**原理**：经典且常见的模型如指数分布、𝛾 分布、t 分布、F 分布、β 分布、Dirichlet 分布都是有的，可以方便采样，但是对于相对复杂的分布，就需要设计采样策略，比如Inverse CDF（Cumulative Distribution Function）方法，CDF可以由概率密度函数（PDF，Probability Density Function）进行积分得到
+
+editing.....
+
+#### 拒绝接受采样
+
+**案例**：假设使用 ![[公式]](https://www.zhihu.com/equation?tex=U%280%2C1%29) 来作为“proposal distribution” ![[公式]](https://www.zhihu.com/equation?tex=G) ，这样 ![[公式]](https://www.zhihu.com/equation?tex=g%28x%29%3D1%5Cforall+x%5Cin+%5B0%2C1%5D) 。如下图所示，我们每次生成的两个样本 ![[公式]](https://www.zhihu.com/equation?tex=Y) 与 ![[公式]](https://www.zhihu.com/equation?tex=U) ，对应下图中矩形内的一点 ![[公式]](https://www.zhihu.com/equation?tex=P%28Y%2CU%E2%88%97c%E2%88%97g%28Y%29%29) 。接受条件 ![[公式]](https://www.zhihu.com/equation?tex=U%5Cleqslant+f%28Y%29c%E2%88%97g%28Y%29) ，即 ![[公式]](https://www.zhihu.com/equation?tex=U%E2%88%97c%E2%88%97g%28Y%29%5Cleqslant+f%28Y%29) 的几何意义是点 ![[公式]](https://www.zhihu.com/equation?tex=P) 在 ![[公式]](https://www.zhihu.com/equation?tex=f%28x%29) 下方，不接受 ![[公式]](https://www.zhihu.com/equation?tex=Y) 的几何意义是点 ![[公式]](https://www.zhihu.com/equation?tex=P) 在 ![[公式]](https://www.zhihu.com/equation?tex=f%28x%29) 的上方。在 ![[公式]](https://www.zhihu.com/equation?tex=f%28x%29) 下方的点(o形状)满足接受条件，上方的点(+形状)不满足接受条件。 
+
+<img src="https://pic1.zhimg.com/80/v2-ba61bc580f87754f4e35675c6ac1b23c_hd.jpg" style="width:50%"/>
+
+**代码实现**：假如我们的目标概率密度函数是 ![[公式]](https://www.zhihu.com/equation?tex=f%28x%29%3D%5Cfrac%7B%28x-0.4%29%5E%7B4%7D%7D%7B%5Cint_%7B0%7D%5E%7B1%7D%28x-0.4%29%5E%7B4%7Ddx%7D) ，对此分布生成样本。
+
+```python
+import random
+import math
+import matplotlib.pyplot as plt
+import seaborn as sns
+import numpy as np
+
+%matplotlib inline
+sns.set_style('darkgrid')
+plt.rcParams['figure.figsize'] = (12, 8)
+
+def AceeptReject(split_val):
+    global c
+    global power
+    while True:
+        x = random.uniform(0, 1)
+        y = random.uniform(0, 1)
+        if y*c <= math.pow(x - split_val, power):
+            return x
+
+power = 4
+t = 0.4  
+sum_ = (math.pow(1-t, power + 1) - math.pow(-t, power + 1)) / (power + 1)  #求积分
+x = np.linspace(0, 1, 100)
+#常数值c
+c = 0.6**4/sum_
+cc = [c for xi in x]
+plt.plot(x, cc, '--',label='c*f(x)')
+#目标概率密度函数的值f(x)
+y = [math.pow(xi - t, power)/sum_ for xi in x]
+plt.plot(x, y,label='f(x)')
+#采样10000个点
+samples = []
+for  i in range(10000):
+    samples.append(AceeptReject(t))
+plt.hist(samples, bins=50, normed=True,label='sampling')
+plt.legend()
+plt.show()
+```
+
+<img src="https://pic2.zhimg.com/80/v2-8ca3019c1c1b0a878f44f51458c5b15d_hd.jpg" alt="img" style="zoom:70%;" />
+
+#### 自适应的拒绝采样（Adaptive Rejection Sampling）
+
+editing.....
+
+参考资料：http://www.ruanyifeng.com/blog/2015/07/monte-carlo-method.html 蒙特卡洛、https://blog.csdn.net/baimafujinji/article/details/51407703 蒙特卡洛采样之拒绝采样（Reject Sampling）
+
+### 💤马尔可夫链蒙特卡洛（Markov chain Monte Carlo）
 
 #### 背景
 
@@ -972,8 +1275,6 @@ def calpai():
 
 
 
-
-参考资料：https://cloud.tencent.com/developer/article/1102103（分类算法总结）
 
 ## 激活函数
 
