@@ -71,8 +71,8 @@ netease_comment: true
 ba_track_id: 379602c3382f9ef94b09f71f42e0a374
 
 # Google Analytics
-# ga_track_id: 'UA-49627206-1'            # Format: UA-xxxxxx-xx
-# ga_domain: huangxuan.me
+ga_track_id: 'UA-150351185-1'            # Format: UA-xxxxxx-xx
+ga_domain: seanys.github.io
 
 
 
