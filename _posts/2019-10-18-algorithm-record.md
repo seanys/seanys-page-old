@@ -55,27 +55,27 @@ tags:
 ### ✅随机搜索算法
 
 ```python
-    # 搜索方法1: 随机搜索算法
-    # 函数会作1000次随机猜测，记录总代价最低的方法. domain为航班号的范围（0-9），共有5个人，因此共有10项
-    def randomoptimize(self, domain):
-        best_sol = []
-        bestcost = 99999
-        for i in range(1000):
-            sol = [0] * len(domain)
-            for j in range(len(domain) / 2):  # 人数
-                sol[2 * j] = random.randint(domain[2 * j][0], domain[2 * j][1])
-                sol[2 * j + 1] = random.randint(domain[2 * j + 1][0], domain[2 * j + 1][1])
+# 搜索方法1: 随机搜索算法
+# 函数会作1000次随机猜测，记录总代价最低的方法. domain为航班号的范围（0-9），共有5个人，因此共有10项
+def randomoptimize(self, domain):
+    best_sol = []
+    bestcost = 99999
+    for i in range(1000):
+        sol = [0] * len(domain)
+        for j in range(len(domain) / 2):  # 人数
+            sol[2 * j] = random.randint(domain[2 * j][0], domain[2 * j][1])
+            sol[2 * j + 1] = random.randint(domain[2 * j + 1][0], domain[2 * j + 1][1])
 
-            print sol[:]
-            newcost = self.schedulecost(sol)
-            if newcost < bestcost:
-                bestcost = newcost
-                best_sol = sol
-            else:
-                continue
-        self.printschedule(best_sol)
-        print "随机搜索算法的结果的最小代价是：", bestcost
-        return best_sol
+        print sol[:]
+        newcost = self.schedulecost(sol)
+        if newcost < bestcost:
+            bestcost = newcost
+            best_sol = sol
+        else:
+            continue
+    self.printschedule(best_sol)
+    print "随机搜索算法的结果的最小代价是：", bestcost
+    return best_sol
 ```
 
 总结：重点在随机函数，相当于大量枚举但是不连续
@@ -237,7 +237,9 @@ def geneticoptimize(self, domain, popsize=50, step=1, mutprob=0.2, elite=0.2, ma
     return scores[0][1]
 ```
 
-总结：https://blog.csdn.net/bcj296050240/article/details/50839806
+总结：
+
+
 
 ### ☣️禁忌搜索（Taboo Search）
 
@@ -552,7 +554,7 @@ if __name__ == '__main__':
 
 
 
-### ☣️分支定界法（Branch and Price）
+### ☣️分支定价法（Branch and Price）
 
 
 

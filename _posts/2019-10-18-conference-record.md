@@ -1,9 +1,9 @@
 ---
 layout: post
-title: "Related Conference"
-subtitle: ''
+title: "学术会议-已经整理"
+subtitle: 'Related Conference'
 author: "sean"
-header-img: "imgpost-bg-unix-linux.jpg"
+header-img: "img/post-bg-unix-linux.jpg"
 tags:
   - 学术
 
