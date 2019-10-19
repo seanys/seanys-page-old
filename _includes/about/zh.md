@@ -6,7 +6,7 @@
 
 **主要擅长**：算法、运筹优化（排程/装箱问题）、网页前端开发（Vue.js/Sketch）、网络爬虫（Scrapy/大规模爬虫）、平面设计（PPT/UI）
 
-**良好掌握**：数据挖掘（TF/情感分析）、统计学基础、小程序开发、iOS开发（Swift）、后端开发（Node.js/PHP-CI/Nginx）、服务器（Ubuntu）等
+**良好掌握**：数据挖掘（Spark）、统计学基础、小程序开发、iOS开发（Swift）、后端开发（Node.js/PHP-CI/Nginx）、服务器（Ubuntu）等
 
 **职业经历**：曾于[Innospace+](http://www.innospaceplus.com.cn)任投资助理、[丫空间](http://www.yaspace.cn)任运营助理
 

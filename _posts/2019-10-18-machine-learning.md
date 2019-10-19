@@ -21,11 +21,7 @@ tags:
 >
 > ☣️  需要整理
 
-备注：部分算法在多个分类中均有应用，可能只写在一个分类中，或者放在了回归模型中
-
-测试公式：$$Gini(p)=\sum_{k=1}^kp_k(1-p_k)=1-\sum_{k=1}^kp_k^2$$
-
-![image-20191019113243393](https://tva1.sinaimg.cn/large/006y8mN6ly1g83cqni8qlj30pa032aab.jpg)
+备注：部分算法在多个分类中均有应用，可能只写在一个分类中，或者放在了回归模型中，网页版不支持公式语句，采用图片模式
 
 
 ## 机器学习与数据挖掘
@@ -430,10 +426,6 @@ if __name__ == '__main__':
     print classify([6.8,3.2,5.9,2.3], decistion_tree) # virginica
 ```
 
-### ☣️ Encoder-Decoder框架
-
-![这里写图片描述](https://img-blog.csdn.net/20171101103708217)
-
 ### ☣️ KNN分类
 
 
@@ -450,7 +442,7 @@ if __name__ == '__main__':
 
 
 
-### ☣️ 最大期望算法（Expectation Maximization Algorithm）
+### ☣️ 最大期望算法
 
 
 
@@ -599,21 +591,87 @@ print('程序运行总耗时： %.5f sec' %running_time)
 
 
 
+## 学习网络
+
+### ☣️ 梯度下降
+
+
+
+### ☣️ BP网络
+
+
+
+### ☣️ RNN系列
+
+#### ☣️ RNN模型
+
+
+
+![roolled RNN](https://caicai.science/images/attention/roolled%20rnn.png)
+
+#### ☣️ LSTM
+
+
+
+#### ☣️ GRU
+
+
+
+## 相关内容
+
+### ☣️ 梯度爆炸问题
+
+
+
+
+
+### ☣️ 代价函数
+
+#### ✅ 二次代价函数
+
+![img](https://img-blog.csdn.net/20160402180717102)
+
+![img](https://img-blog.csdn.net/20160402175137034)
+
+#### ✅ 交叉熵损失函数
+
+![img](https://img-blog.csdn.net/20160402172100739)
+
+参考资料：https://blog.csdn.net/u014313009/article/details/51043064
+
+
+
 ## 前沿研究
 
-### ☣️ Attention Mechanism
+### ✅ Sequence to Sequence
 
-参考资料：https://juejin.im/post/5bbf41c3f265da0af16160d2
+![这里写图片描述](https://img-blog.csdn.net/20171101103708217)
 
+![img](https://images2018.cnblogs.com/blog/1192699/201808/1192699-20180806141638641-1078830067.png)
 
+**概述**：一种函数映射模型，具有弱约束的多对多对应关系。
 
-### ☣️ Gated recurrent unit
+**原理**：左侧Encoder编码将输入序列转化成一个固定长度的向量编码，右侧Decoder解码将之前生成的固定向量再转化成输出序列，编解码部分可以采用CNN、RNN、LSTM、GRU、BLSTM等实现。可以预测任意的序列对应关系。
 
+**意义**：第一次提出了Encoder-Decoder模型，主要用于序列预测
 
+**问题**：Encoder是将输入内容压缩到一个固定长度的向量中，语义编码是固定长度，然后计算出内容进行Decoder
 
-### ☣️ Sequence to Sequence
+### ✅ Attention Mechanism
 
+《Sequence to Sequence Learning with Neural Networks》介绍了一种基于RNN的Seq2Seq模型，基于一个Encoder和一个Decoder来构建基于神经网络的End-to-End的机器翻译模型，其中，Encoder把输入X编码成一个固定长度的隐向量Z，Decoder基于隐向量Z解码出目标输出Y。这是一个非常经典的序列到序列的模型，但是却存在**两个明显的问题**：
 
+1、把输入X的所有信息有压缩到一个固定长度的隐向量Z，忽略了输入输入X的长度，当输入句子长度很长，特别是比训练集中最初的句子长度还长时，模型的性能急剧下降。
+
+2、把输入X编码成一个固定的长度，对于句子中每个词都赋予相同的权重，这样做是不合理的，比如，在机器翻译里，输入的句子与输出句子之间，往往是输入一个或几个词对应于输出的一个或几个词。因此，对输入的每个词赋予相同权重，这样做没有区分度，往往是模型性能下降。
+
+**模型示例**：可以与Seq2Seq对比，中间增加了一个权重层，通过不同的语义编码实现（也就是不同长度的向量）
+
+<img src="https://images2018.cnblogs.com/blog/1192699/201808/1192699-20180806142115912-1682939089.png" alt="img" style="zoom:70%;" />
+
+<img src="https://images2018.cnblogs.com/blog/1192699/201808/1192699-20180806142159178-1634092293.png" alt="img" style="zoom:70%;" />
+
+参考资料：https://zhuanlan.zhihu.com/p/31547842（注意力模型汇总机及其应用）、https://www.cnblogs.com/guoyaohua/p/9429924.html（注意力机制解释及其应用）
 
 ### ☣️ Pointer Network
 
@@ -631,17 +689,89 @@ print('程序运行总耗时： %.5f sec' %running_time)
 
 ## 强化学习（Reinforcement Learning）
 
-### ☣️介绍
+### ☣️ 介绍
+
+![img](https://user-gold-cdn.xitu.io/2019/8/18/16ca41b0a58edcee?imageView2/0/w/1280/h/960/ignore-error/1)
 
 
 
-### ☣️Q-Learning
+如上图左边所示，一个agent(例如：玩家/智能体等)做出了一个action，对environment造成了影响，也就是改变了state，而environment为了反馈给agent，agent就得到了一个奖励(例如：积分/分数)，不断的进行这样的循环，直到结束为止。
+
+上述过程就相当于一个**马尔可夫决策过程**
+
+上图右边所示，S0 状态经过了 a0 的行为后，获得了奖励 r1 ，变成了状态S1，后又经过了 a0 行为得到奖励 r2，变成了状态 S2 ，如此往复循环，直到结束为止。
+
+通过以上的描述，大家都已经确定了一个概念，也就是agent(智能体)在当下做出的决定肯定使得未来收益最大化，那么，一个马儿可夫决策过程对应的奖励总和为：
+
+$$R=r_1+r_2+r_3+...+r_n$$
+
+t 时刻(当下)的未来奖励，只考虑后面的奖励，前面的改变不了：
+
+$R_t=r_t+r_{t+1}+r_{t+2}+...+r_n$
+
+当前的行为对于未来是不确定性的，要打一个折扣，也就是加入一个系数gamma，是一个 0 到 1 的值：
+
+$$R_t=r_1+\gamma_{}r_{t+1}+\gamma^2r_{t+2}+...+\gamma^{n-1}r_n$$
+
+离当前越远的时间，gamma的惩罚系数就会越大，也就是越不确定。为的就是在当前和未来的决策中取得一个平衡。gamma取 0 ，相当于不考虑未来，只考虑当下，是一种很短视的做法；而gamma取 1 ，则完全考虑了未来，又有点过虑了。所以一般gamma会取 0 到 1 之间的一个值。
+
+Rt 可以用 Rt+1 来表示，写成递推式：
+
+$$R_t=r_t+\gamma(r_{t+1}+\gamma(r_{t+2}+...))=r_t+\gamma_{}R_{t+1}$$
+
+参考：https://juejin.im/post/5d591d6af265da03c8151f4f
+
+### ☣️ Q-Learning
+
+**Q(s, a)函数(Quality)，质量函数用来表示智能体在s状态下采用a动作并在之后采取最优动作条件下**的打折的未来奖励(先不管未来的动作如何选择)：
+
+$$Q(s_t,a_t)=maxR_{t+1}$$
+
+假设有了这个Q函数，那么我们就能够求得在当前 t 时刻当中，做出各个决策的最大收益值，通过对比这些收益值，就能够**得到 t 时刻某个决策是这些决策当中收益最高。**
+
+$\pi(s)=argmax_aQ(s,a)$
+
+于是乎，根据Q函数的递推公式可以得到：
+
+$$Q(s_t,a_t)=r+\gamma_{}max_aQ(s_{t+1},a_{t+1})$$
+
+**这就是注明的贝尔曼公式。**贝尔曼公式实际非常合理。对于某个状态来讲，最大化未来奖励相当于最大化即刻奖励与下一状态最大未来奖励之和。
+
+**Q-learning的核心思想是：**我们能够通过贝尔曼公式迭代地近似Q-函数。
+
+
+参考：https://juejin.im/post/5d591d6af265da03c8151f4f
+
+### ☣️ DQN
+
+Deep Q Learning(DQN)是一种融合了神经网络和的Q-Learning方法。
+
+**神经网络的作用**
 
 
 
-
+![img](https://user-gold-cdn.xitu.io/2019/8/18/16ca41b0dc74ff8e?imageView2/0/w/1280/h/960/ignore-error/1)
 
 
+
+使用表格来存储每一个状态 state, 和在这个 state 每个行为 action 所拥有的 Q 值. 而当今问题是在太复杂, 状态可以多到比天上的星星还多(比如下围棋). 如果全用表格来存储它们, 恐怕我们的计算机有再大的内存都不够, 而且每次在这么大的表格中搜索对应的状态也是一件很耗时的事. 不过, 在机器学习中, 有一种方法对这种事情很在行, 那就是神经网络.
+
+我们可以将状态和动作当成神经网络的输入, 然后经过神经网络分析后得到动作的 Q 值, 这样我们就没必要在表格中记录 Q 值, 而是直接使用神经网络生成 Q 值.
+
+还有一种形式的是这样, 我们也能只输入状态值, 输出所有的动作值, 然后按照 Q learning 的原则, 直接选择拥有最大值的动作当做下一步要做的动作.
+
+我们可以想象, 神经网络接受外部的信息, 相当于眼睛鼻子耳朵收集信息, 然后通过大脑加工输出每种动作的值, 最后通过强化学习的方式选择动作.
+
+**神经网络计算Q值**
+
+这一部分就跟监督学习的神经网络一样了我，输入状态值，输出为Q值，根据大量的数据去训练神经网络的参数，最终得到Q-Learning的计算模型，这时候我们就可以利用这个模型来进行强化学习了。
+
+
+
+![img](https://user-gold-cdn.xitu.io/2019/8/18/16ca41b1338135c6?imageView2/0/w/1280/h/960/ignore-error/1)
+
+
+参考：https://juejin.im/post/5d591d6af265da03c8151f4f
 
 ## 推荐系统
 
@@ -888,7 +1018,7 @@ if __name__ == '__main__':
 
 ### 🆘 SoftMax
 
-![“softmax”的图片搜索结果](https://pic1.zhimg.com/v2-11758fbc2fc5bbbc60106926625b3a4f_1200x500.jpg)
+<img src="https://pic1.zhimg.com/v2-11758fbc2fc5bbbc60106926625b3a4f_1200x500.jpg" style="zoom:70%">
 
 ```python
 scores = np.array([123, 456, 789])    # example with 3 classes and each having large scores
@@ -1312,22 +1442,3 @@ editing.....
 
 
 参考资料：https://zhuanlan.zhihu.com/p/37121528 MCMC——其实没太看懂
-
-
-
-
-
-## 激活函数
-
-### ☣️ Relu Function
-
-![img](https://upload.wikimedia.org/wikipedia/commons/thumb/c/c9/Ramp_function.svg/325px-Ramp_function.svg.png)
-
-
-
-## 损失函数
-
-### ☣️ 交叉熵损失函数
-
-
-
