@@ -23,6 +23,10 @@ tags:
 
 备注：部分算法在多个分类中均有应用，可能只写在一个分类中，或者放在了回归模型中
 
+测试公式：$$Gini(p)=\sum_{k=1}^kp_k(1-p_k)=1-\sum_{k=1}^kp_k^2$$
+
+![image-20191019113243393](https://tva1.sinaimg.cn/large/006y8mN6ly1g83cqni8qlj30pa032aab.jpg)
+
 
 ## 机器学习与数据挖掘
 
@@ -211,11 +215,23 @@ def choose_best_feature_to_split(data_set):
     return best_feature_idx
 ```
 
-#### ✅ CART算法（Classification And Regression Tree）
+#### ✅ CART算法
 
-假设有K个类，样本点属于第k类的概率为$$p_k$$，则概率分布的基尼指数定义为：
+**概述**：CART分类树预测分类离散型数据，采用基尼指数选择最优特征，同时决定该特征的最优二值切分点。
 
-$$Gini(p)=\sum_{k=1}^kp_k(1-p_k)=1-\sum_{k=1}^kp_k^2$$
+**概率分布的基尼指数定义**：假设有K个类，样本点属于第k个类的概率为Pk
+
+![img](https://pic3.zhimg.com/80/v2-780d955260d9a2ba8508c1601588b88a_hd.jpg)
+
+**集合D的基尼指数**：
+
+![img](https://pic2.zhimg.com/80/v2-95300197189b4b1b65eb42d1a6bbd7fd_hd.jpg)
+
+**过程概述**：计算基尼系数的加权平均，求min
+
+![img](https://shuwoom.com/wp-content/uploads/2018/10/fb6de7e8b17762b1caa14d6968407289.png)
+
+![img](https://shuwoom.com/wp-content/uploads/2018/10/251158892a1340a1829e3a9f23dc477b.png)
 
 ```python
 # -*- coding: utf-8 -*-
@@ -414,6 +430,10 @@ if __name__ == '__main__':
     print classify([6.8,3.2,5.9,2.3], decistion_tree) # virginica
 ```
 
+### ☣️ Encoder-Decoder框架
+
+![这里写图片描述](https://img-blog.csdn.net/20171101103708217)
+
 ### ☣️ KNN分类
 
 
@@ -581,9 +601,25 @@ print('程序运行总耗时： %.5f sec' %running_time)
 
 ## 前沿研究
 
-### ☣️ 注意力机制（Attention Mechanism）
+### ☣️ Attention Mechanism
+
+参考资料：https://juejin.im/post/5bbf41c3f265da0af16160d2
 
 
+
+### ☣️ Gated recurrent unit
+
+
+
+### ☣️ Sequence to Sequence
+
+
+
+### ☣️ Pointer Network
+
+
+
+### ☣️ Graph Embedding
 
 
 
@@ -909,21 +945,21 @@ print(start_matrix)
 
 ### 💤 隐马尔可夫模型（Hidden Markov Models）
 
-#### 前言
+#### ✅ 前言
 
 隐马尔可夫模型即马尔可夫链上加了一层随机过程，一般采用Baum-Welch算法和Viterbi算法进行求解
 
 ![preview](https://pic2.zhimg.com/792e033ff9b0418b3b6c9bbaef30fd83_r.jpg)
 
-#### Baum-Welch算法
+#### 🆘 Baum-Welch算法
 
 一种EM算法
 
-#### Viterbi算法
+#### 🆘 Viterbi算法
 
 
 
-#### 源码-Baum-Welch算法
+#### 🆘 源码-Baum-Welch算法
 
 ```python
 """
@@ -1166,7 +1202,7 @@ if __name__ == '__main__':
 
 ### 💤 蒙特卡罗方法（**Monte Carlo** Method）
 
-#### 基础模型
+#### ✅ 基础模型
 
 **概述**：通过大量随机样本，去了解一个系统，进而得到所要计算的值。它非常强大和灵活，又相当简单易懂，很容易实现。对于许多问题来说，它往往是最简单的计算方法，有时甚至是唯一可行的方法。
 
@@ -1193,13 +1229,13 @@ def calpai():
     print (count / float(n)) * 4
 ```
 
-#### Inverse CDF 方法
+#### 🆘 Inverse CDF 方法
 
 **原理**：经典且常见的模型如指数分布、𝛾 分布、t 分布、F 分布、β 分布、Dirichlet 分布都是有的，可以方便采样，但是对于相对复杂的分布，就需要设计采样策略，比如Inverse CDF（Cumulative Distribution Function）方法，CDF可以由概率密度函数（PDF，Probability Density Function）进行积分得到
 
 editing.....
 
-#### 拒绝接受采样
+#### 🆘 拒绝接受采样
 
 **案例**：假设使用 ![[公式]](https://www.zhihu.com/equation?tex=U%280%2C1%29) 来作为“proposal distribution” ![[公式]](https://www.zhihu.com/equation?tex=G) ，这样 ![[公式]](https://www.zhihu.com/equation?tex=g%28x%29%3D1%5Cforall+x%5Cin+%5B0%2C1%5D) 。如下图所示，我们每次生成的两个样本 ![[公式]](https://www.zhihu.com/equation?tex=Y) 与 ![[公式]](https://www.zhihu.com/equation?tex=U) ，对应下图中矩形内的一点 ![[公式]](https://www.zhihu.com/equation?tex=P%28Y%2CU%E2%88%97c%E2%88%97g%28Y%29%29) 。接受条件 ![[公式]](https://www.zhihu.com/equation?tex=U%5Cleqslant+f%28Y%29c%E2%88%97g%28Y%29) ，即 ![[公式]](https://www.zhihu.com/equation?tex=U%E2%88%97c%E2%88%97g%28Y%29%5Cleqslant+f%28Y%29) 的几何意义是点 ![[公式]](https://www.zhihu.com/equation?tex=P) 在 ![[公式]](https://www.zhihu.com/equation?tex=f%28x%29) 下方，不接受 ![[公式]](https://www.zhihu.com/equation?tex=Y) 的几何意义是点 ![[公式]](https://www.zhihu.com/equation?tex=P) 在 ![[公式]](https://www.zhihu.com/equation?tex=f%28x%29) 的上方。在 ![[公式]](https://www.zhihu.com/equation?tex=f%28x%29) 下方的点(o形状)满足接受条件，上方的点(+形状)不满足接受条件。 
 
@@ -1249,7 +1285,7 @@ plt.show()
 
 <img src="https://pic2.zhimg.com/80/v2-8ca3019c1c1b0a878f44f51458c5b15d_hd.jpg" alt="img" style="zoom:70%;" />
 
-#### 自适应的拒绝采样（Adaptive Rejection Sampling）
+#### 🆘 自适应的拒绝采样（Adaptive Rejection Sampling）
 
 editing.....
 
@@ -1257,7 +1293,7 @@ editing.....
 
 ### 💤 马尔可夫链蒙特卡洛（Markov chain Monte Carlo）
 
-#### 背景
+#### ✅ 背景
 
 **动机一**
 
@@ -1267,11 +1303,11 @@ editing.....
 
 假如对于高维随机变量，比如 ![[公式]](https://www.zhihu.com/equation?tex=%5Cmathbb%7BR%7D%5E%7B50%7D) ，若每一维取100个点，则总共要取 ![[公式]](https://www.zhihu.com/equation?tex=10%5E%7B100%7D) ，而已知宇宙的基本粒子大约有 ![[公式]](https://www.zhihu.com/equation?tex=10%5E%7B87%7D) 个，对连续的也同样如此。因此MCMC可以解决“维数灾难”问题。
 
-#### M-H采样
+#### 🆘 M-H采样
 
 
 
-#### Gibbs采样
+#### 🆘 Gibbs采样
 
 
 
