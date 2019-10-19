@@ -1010,13 +1010,13 @@ if __name__ == '__main__':
 
 
 
-### 🆘 逻辑回归（Logistic Regression）
+### ✅ 逻辑回归（Logistic Regression）
 
 ![img](https://yuanxiaosc.github.io/2018/06/21/%E6%94%B9%E8%BF%9B%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C%E7%9A%84%E5%AD%A6%E4%B9%A0%E6%96%B9%E6%B3%95%E2%80%94%E2%80%94%E4%BA%A4%E5%8F%89%E7%86%B5/one_1.png)
 
 
 
-### 🆘 SoftMax
+### ✅ SoftMax
 
 <img src="https://pic1.zhimg.com/v2-11758fbc2fc5bbbc60106926625b3a4f_1200x500.jpg" style="zoom:70%">
 
