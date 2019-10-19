@@ -1,28 +1,81 @@
 ---
+
 layout: post
-title: "机器学习算法"
-subtitle: 'Machine Learning Algorithm'
+title: "机器学习与数据挖掘算法"
+subtitle: 'Machine Learning and Data Mining Algorithm'
 author: "sean"
 header-img: "img/post-bg-ai.jpeg"
 tags:
   - 算法
   - 机器学习
+  - 数据挖掘
 ---
 
 
 
-> ✅ ：已经整理好
+> ✅  已经整理好
 >
-> 💤 ：大部分整理好了但是没理解
+> 💤  大部分整理好了但是没理解
 >
-> 🆘 ：还有一部分需要整理
+> 🆘  还有一部分需要整理
 >
-> ☣️ ：需要整理
+> ☣️  需要整理
+
+备注：部分算法在多个分类中均有应用，可能只写在一个分类中，或者放在了回归模型中
 
 
-## 机器学习
+## 机器学习与数据挖掘
 
-### ☣️决策树（Decision Tree）
+### ✅ 决策树（Decision Tree）
+
+#### ✅ 前言
+
+**基本概念**
+
+（1）根结点(Root Node)：它表示整个样本集合，并且该节点可以进一步划分成两个或多个子集。
+
+（2）拆分(Splitting)：表示将一个结点拆分成多个子集的过程。
+
+（3）决策结点(Decision Node)：当一个子结点进一步被拆分成多个子节点时，这个子节点就叫做决策结点。
+
+（4）叶子结点(Leaf/Terminal Node)：无法再拆分的结点被称为叶子结点。
+
+（5）剪枝(Pruning)：移除决策树中子结点的过程就叫做剪枝，跟拆分过程相反。
+
+（6）分支/子树(Branch/Sub-Tree)：一棵决策树的一部分就叫做分支或子树。
+
+（7）父结点和子结点(Paren and Child Node)：一个结点被拆分成多个子节点，这个结点就叫做父节点；其拆分后的子结点也叫做子结点。
+
+**分类**
+
+- 离散性决策树：离散性决策树，其目标变量是离散的，如性别：男或女等；
+- 连续性决策树：连续性决策树，其目标变量是连续的，如工资、价格、年龄等；
+
+![img](https://shuwoom.com/wp-content/uploads/2018/10/65e4301fe9e9a0f4e4d448a8f4181751.png)
+
+**特征选择**
+
+特征选择表示从众多的特征中选择一个特征作为当前节点分裂的标准，如何选择特征有不同的量化评估方法，从而衍生出不同的决策树，如ID3（通过信息增益选择特征）、C4.5（通过信息增益比选择特征）、CART（通过Gini指数选择特征）等。
+
+**决策树的生成**
+
+根据选择的特征评估标准，从上至下递归地生成子节点，直到数据集不可分则停止决策树停止生长。这个过程实际上就是使用满足划分准则的特征不断的将数据集划分成纯度更高，不确定行更小的子集的过程。对于当前数据集的每一次划分，都希望根据某个特征划分之后的各个子集的纯度更高，不确定性更小。
+
+**决策树的裁剪**
+
+决策树容易过拟合，一般需要剪枝来缩小树结构规模、缓解过拟合。
+
+参考资料：https://shuwoom.com/?p=1452
+
+#### ✅ ID3算法
+
+熵这个概念最早起源于物理学，在物理学中是用来度量一个热力学系统的无序程度，而在信息学里面，熵是对不确定性的度量。在1948年，香农引入了信息熵（information entropy），将其定义为离散随机事件出现的概率，一个系统越是有序，信息熵就越低，反之一个系统越是混乱，它的信息熵就越高。所以信息熵可以被认为是系统有序化程度的一个度量。
+
+**案例**：对于有K个类别的分类问题来说，假定样本集合D中第 k 类样本所占的比例为pk（k=1,2,...,K）,则样本集合D的信息熵定义为: 
+
+<img src="https://tva1.sinaimg.cn/large/006y8mN6ly1g83aclz7lhj30d602it8q.jpg" alt="image-20191019100957943" style="zoom:50%;" />
+
+**简单概括**：分叉树上的熵的加权平均值
 
 ```python
 from math import log
@@ -115,7 +168,420 @@ if __name__=='__main__':
     print(createTree(dataSet, labels))  # 输出决策树模型结果
 ```
 
-### ☣️注意力机制（Attention Mechanism）
+#### ✅ C4.5算法
+
+**背景**：我们知道信息增益会偏向取值较多的特征，使用信息增益比可以对这一问题进行校正。
+
+**信息增益**：Gain(D,A) = H(D) – H(D|A)，用于ID3的判断
+
+**信息增益比**：特征A对训练数据集D的信息增益比GainRatio(D,A)定义为其信息增益Gain(D,A)与训练数据集D的经验熵H(D)之比：
+
+<img src="https://shuwoom.com/wp-content/uploads/2018/10/aae983046e32f250faf6daaaf376ec90.png" alt="img" style="zoom:50%;" />
+
+```python
+def choose_best_feature_to_split(data_set):
+    """
+    按照最大信息增益比划分数据
+    :param data_set: 样本数据，如： [[1, 1, 'yes'], [1, 1, 'yes'], [1, 0, 'no'], [0, 1, 'no'], [0, 1, 'no']]
+    :return:
+    """
+    num_feature = len(data_set[0]) - 1 # 特征个数，如：不浮出水面是否可以生存	和是否有脚蹼
+    base_entropy = calc_shannon_ent(data_set) # 经验熵H(D)
+    best_info_gain_ratio = 0.0
+    best_feature_idx = -1
+    for feature_idx in range(num_feature):
+        feature_val_list = [number[feature_idx] for number in data_set]  # 得到某个特征下所有值（某列）
+        unique_feature_val_list = set(feature_val_list)  # 获取无重复的属性特征值
+        new_entropy = 0
+        split_info = 0.0
+        for value in unique_feature_val_list:
+            sub_data_set = split_data_set(data_set, feature_idx, value)
+            prob = len(sub_data_set) / float(len(data_set))  # 即p(t)
+            new_entropy += prob * calc_shannon_ent(sub_data_set)  # 对各子集香农熵求和
+            split_info += -prob * log(prob, 2)
+        info_gain = base_entropy - new_entropy  # 计算信息增益，g(D,A)=H(D)-H(D|A)
+        if split_info == 0:  # fix the overflow bug
+            continue
+        info_gain_ratio = info_gain / split_info
+        # 最大信息增益比
+        if info_gain_ratio > best_info_gain_ratio:
+            best_info_gain_ratio = info_gain_ratio
+            best_feature_idx = feature_idx
+
+    return best_feature_idx
+```
+
+#### ✅ CART算法（Classification And Regression Tree）
+
+假设有K个类，样本点属于第k类的概率为$$p_k$$，则概率分布的基尼指数定义为：
+
+$$Gini(p)=\sum_{k=1}^kp_k(1-p_k)=1-\sum_{k=1}^kp_k^2$$
+
+```python
+# -*- coding: utf-8 -*-
+import numpy as np
+
+class Tree(object):
+    def __init__(self, value=None, true_branch=None, false_branch=None, results=None, col=-1, summary=None, data=None):
+        self.value = value
+        self.true_branch = true_branch
+        self.false_branch = false_branch
+        self.results = results
+        self.col = col
+        self.summary = summary
+        self.data = data
+
+    def __str__(self):
+        print(self.col, self.value)
+        print(self.results)
+        print(self.summary)
+        return ""
+
+def split_datas(rows, value, column):
+    """
+    根据条件分离数据集
+    :param rows:
+    :param value:
+    :param column:
+    :return:  (list1, list2)
+    """
+    list1 = []
+    list2 = []
+    if isinstance(value, int) or isinstance(value, float):
+        for row in rows:
+            if row[column] >= value:
+                list1.append(row)
+            else:
+                list2.append(row)
+    else:
+        for row in rows:
+            if row[column] == value:
+                list1.append(row)
+            else:
+                list2.append(row)
+
+    return list1, list2
+
+
+def calculate_diff_count(data_set):
+    """
+    分类统计data_set中每个类别的数量
+    :param datas:如：[[5.1, 3.5, 1.4, 0.2, 'setosa'], [4.9, 3, 1.4, 0.2, 'setosa'],....]
+    :return: 如：{'setosa': 50, 'versicolor': 50, 'virginica': 50}
+    """
+    results = {}
+    for data in data_set:
+        # 数据的最后一列data[-1]是类别
+        if data[-1] not in results:
+            results.setdefault(data[-1], 1)
+        else:
+            results[data[-1]] += 1
+    return results
+
+
+def gini(data_set):
+    """
+    计算gini的值，即Gini(p)
+    :param data_set: 如：[[5.1, 3.5, 1.4, 0.2, 'setosa'], [4.9, 3, 1.4, 0.2, 'setosa'],....]
+    :return:
+    """
+    length = len(data_set)
+    category_2_cnt = calculate_diff_count(data_set)
+    sum = 0.0
+    for category in category_2_cnt:
+        sum += pow(float(category_2_cnt[category]) / length, 2)
+    return 1 - sum
+
+
+def build_decision_tree(data_set, evaluation_function=gini):
+    """
+    递归建立决策树，当gain=0时，停止回归
+    :param data_set: 如：[[5.1, 3.5, 1.4, 0.2, 'setosa'], [4.9, 3, 1.4, 0.2, 'setosa'],....]
+    :param evaluation_function:
+    :return:
+    """
+    current_gain = evaluation_function(data_set)
+    column_length = len(data_set[0])
+    rows_length = len(data_set)
+
+    best_gain = 0.0
+    best_value = None
+    best_set = None
+
+    # choose the best gain
+    for feature_idx in range(column_length - 1):
+        feature_value_set = set(row[feature_idx] for row in data_set)
+        for feature_value in feature_value_set:
+            sub_data_set1, sub_data_set2 = split_datas(data_set, feature_value, feature_idx)
+            p = float(len(sub_data_set1)) / rows_length
+            # Gini(D,A)表示在特征A的条件下集合D的基尼指数，gini_d_a越小，样本集合不确定性越小
+            # 我们的目的是找到另gini_d_a最小的特征，及gain最大的特征
+            gini_d_a = p * evaluation_function(sub_data_set1) + (1 - p) * evaluation_function(sub_data_set2)
+            gain = current_gain - gini_d_a
+            if gain > best_gain:
+                best_gain = gain
+                best_value = (feature_idx, feature_value)
+                best_set = (sub_data_set1, sub_data_set2)
+    dc_y = {'impurity': '%.3f' % current_gain, 'sample': '%d' % rows_length}
+
+    # stop or not stop
+    if best_gain > 0:
+        true_branch = build_decision_tree(best_set[0], evaluation_function)
+        false_branch = build_decision_tree(best_set[1], evaluation_function)
+        return Tree(col=best_value[0], value=best_value[1], true_branch=true_branch, false_branch=false_branch, summary=dc_y)
+    else:
+        return Tree(results=calculate_diff_count(data_set), summary=dc_y, data=data_set)
+
+
+def prune(tree, mini_gain, evaluation_function=gini):
+    """
+    裁剪
+    :param tree:
+    :param mini_gain:
+    :param evaluation_function:
+    :return:
+    """
+    if tree.true_branch.results == None:
+        prune(tree.true_branch, mini_gain, evaluation_function)
+    if tree.false_branch.results == None:
+        prune(tree.false_branch, mini_gain, evaluation_function)
+
+    if tree.true_branch.results != None and tree.false_branch.results != None:
+        len1 = len(tree.true_branch.data)
+        len2 = len(tree.false_branch.data)
+        len3 = len(tree.true_branch.data + tree.false_branch.data)
+
+        p = float(len1) / (len1 + len2)
+
+        gain = evaluation_function(tree.true_branch.data + tree.false_branch.data) \
+               - p * evaluation_function(tree.true_branch.data)\
+               - (1 - p) * evaluation_function(tree.false_branch.data)
+
+        if gain < mini_gain:
+            # 当节点的gain小于给定的 mini Gain时则合并这两个节点
+            tree.data = tree.true_branch.data + tree.false_branch.data
+            tree.results = calculate_diff_count(tree.data)
+            tree.true_branch = None
+            tree.false_branch = None
+
+
+def classify(data, tree):
+    """
+    分类
+    :param data:
+    :param tree:
+    :return:
+    """
+    if tree.results != None:
+        return tree.results
+    else:
+        branch = None
+        v = data[tree.col]
+        if isinstance(v, int) or isinstance(v, float):
+            if v >= tree.value:
+                branch = tree.true_branch
+            else:
+                branch = tree.false_branch
+        else:
+            if v == tree.value:
+                branch = tree.true_branch
+            else:
+                branch = tree.false_branch
+        return classify(data, branch)
+
+
+def load_csv():
+    def convert_types(s):
+        s = s.strip()
+        try:
+            return float(s) if '.' in s else int(s)
+        except ValueError:
+            return s
+    data = np.loadtxt("datas.csv", dtype="str", delimiter=",")
+    data = data[1:, :]
+    data_set = ([[convert_types(item) for item in row] for row in data])
+    return data_set
+
+
+if __name__ == '__main__':
+    data_set = load_csv()
+    print data_set
+    decistion_tree = build_decision_tree(data_set, evaluation_function=gini)
+    print decistion_tree.results
+    # prune(decistion_tree, 0.4)
+    print classify([5.1,3.5,1.4,0.2], decistion_tree) # setosa
+    print classify([6.8,2.8,4.8,1.4], decistion_tree) # versicolor
+    print classify([6.8,3.2,5.9,2.3], decistion_tree) # virginica
+```
+
+### ☣️ KNN分类
+
+
+
+### ☣️ PCA模型
+
+
+
+### ☣️ EM算法
+
+
+
+### ☣️ Apriori算法
+
+
+
+### ☣️ 最大期望算法（Expectation Maximization Algorithm）
+
+
+
+### ☣️ K-Means算法
+
+
+
+### ☣️ SVM算法
+
+
+
+### ☣️ Adaboost算法
+
+
+
+### ☣️ 贝叶斯模型（Naive Bayes）
+
+```python
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+#########################################
+# Bayes : 用来描述两个条件概率之间的关系
+
+# 参数:        inX: vector to compare to existing dataset (1xN)
+#             dataSet: size m data set of known vectors (NxM)
+#             labels: data set labels (1xM vector)
+#             公式：P(A|B)=P(B|A)P(A)/P(B)
+# 输出:       出错率
+#########################################
+
+import numpy as npy
+import os
+import time
+
+#P(B|A)=P(A|B)*P(A)/P(B)
+
+# 数据集目录
+dataSetDir ='/Users/sean/Datasets'
+
+class Bayes:
+    def __init__(self):
+        self.length=-1
+        self.labelrate=dict()
+        self.vectorrate=dict()
+
+    def fit(self,dataset:list,labels:list):
+        print("训练开始")
+        if len(dataset)!=len(labels):
+            raise ValueError("输入测试数组和类别数组长度不一致")
+        self.length=len(dataset[0])#训练数据特征值的长度
+        labelsnum=len(labels) #类别的数量
+        norlabels=set(labels) #不重复类别的数量
+        for item in norlabels:
+            self.labelrate[item]=labels.count(item)/labelsnum #求当前类别占总类别的比例
+        for vector,label in zip(dataset,labels):
+            if label not in self.vectorrate:
+                self.vectorrate[label]=[]
+            self.vectorrate[label].append(vector)
+        print("训练结束")
+        return self
+
+    def btest(self,testdata,labelset):
+        if self.length==-1:
+            raise ValueError("未开始训练，先训练")
+        #计算testdata分别为各个类别的概率
+        lbDict=dict()
+        for thislb in labelset:
+            p = 1
+            alllabel = self.labelrate[thislb]
+            allvector = self.vectorrate[thislb]
+            vnum=len(allvector)
+            allvector=npy.array(allvector).T
+            for index in range(0,len(testdata)):
+                vector=list(allvector[index])
+                p*=vector.count(testdata[index])/vnum
+            lbDict[thislb]=p * alllabel
+        thislbabel=sorted(lbDict,key=lambda x:lbDict[x],reverse=True)[0]
+        return thislbabel
+
+#加载数据
+def datatoarray(fname):
+    arr=[]
+    fh=open(fname)
+    for i in range(0,32):
+        thisline=fh.readline()
+        for j in range(0 , 32):
+            arr.append(int(thisline[j]))
+    return arr
+
+#建立一个函数取出labels
+def seplabel(fname):
+    filestr=fname.split(".")[0]
+    label=int(filestr.split("_")[0])
+    return label
+
+#建立训练数据
+def traindata():
+    labels=[]
+    trainfile=os.listdir(dataSetDir+"trainingDigits") # 加载测试数据
+    num=len(trainfile)
+    trainarr=npy.zeros((num,1024))
+    for i in range(num):
+        thisfname=trainfile[i]
+        thislabel=seplabel(thisfname)
+        labels.append(thislabel)
+        trainarr[i,]=datatoarray(dataSetDir+"trainingDigits/"+thisfname)
+    return trainarr,labels
+
+# 贝叶斯算法手写识别主流程
+bys=Bayes()
+start = time.time()
+
+# # step 1: 训练数据集
+train_data,labels=traindata()
+train_data=list(train_data)
+bys.fit(train_data,labels)
+
+# # step 2:测试数据集
+thisdata=datatoarray(dataSetDir+"testDigits/8_90.txt")
+labelsall=[0,1,2,3,4,5,6,7,8,9]
+
+# # 识别单个手写体数字
+# test=bys.btest(thisdata,labelsall)
+# print(test)
+
+# # 识别多个手写体数字（批量处理）,并输出结果
+testfile=os.listdir(dataSetDir+"testDigits")
+num=len(testfile)
+x=0
+for i in range(num):
+    thisfilename=testfile[i]
+    thislabel=seplabel(thisfilename)
+    thisdataarr=datatoarray(dataSetDir+"testDigits/"+thisfilename)
+    label=bys.btest(thisdataarr,labelsall)
+    print("测试数字是："+str(thislabel)+"  识别出来的数字是："+str(label))
+    if label!=thislabel:
+        x+=1
+        print("识别出错")
+print(x)
+print("出错率："+str(x/num))
+
+end = time.time()
+running_time = end-start
+print('程序运行总耗时： %.5f sec' %running_time)
+```
+
+
+
+## 前沿研究
+
+### ☣️ 注意力机制（Attention Mechanism）
 
 
 
@@ -401,141 +867,6 @@ p = np.exp(scores) / np.sum(np.exp(scores))
 ### ☣️ 似然函数（Likelihood Function）
 
 
-
-### ☣️ 最大期望算法（Expectation Maximization Algorithm）
-
-
-
-### ☣️ 贝叶斯模型（Naive Bayes）
-
-```python
-#!/usr/bin/python
-# -*- coding: utf-8 -*-
-#########################################
-# Bayes : 用来描述两个条件概率之间的关系
-
-# 参数:        inX: vector to compare to existing dataset (1xN)
-#             dataSet: size m data set of known vectors (NxM)
-#             labels: data set labels (1xM vector)
-#             公式：P(A|B)=P(B|A)P(A)/P(B)
-# 输出:       出错率
-#########################################
-
-import numpy as npy
-import os
-import time
-
-#P(B|A)=P(A|B)*P(A)/P(B)
-
-# 数据集目录
-dataSetDir ='/Users/sean/Datasets'
-
-class Bayes:
-    def __init__(self):
-        self.length=-1
-        self.labelrate=dict()
-        self.vectorrate=dict()
-
-    def fit(self,dataset:list,labels:list):
-        print("训练开始")
-        if len(dataset)!=len(labels):
-            raise ValueError("输入测试数组和类别数组长度不一致")
-        self.length=len(dataset[0])#训练数据特征值的长度
-        labelsnum=len(labels) #类别的数量
-        norlabels=set(labels) #不重复类别的数量
-        for item in norlabels:
-            self.labelrate[item]=labels.count(item)/labelsnum #求当前类别占总类别的比例
-        for vector,label in zip(dataset,labels):
-            if label not in self.vectorrate:
-                self.vectorrate[label]=[]
-            self.vectorrate[label].append(vector)
-        print("训练结束")
-        return self
-
-    def btest(self,testdata,labelset):
-        if self.length==-1:
-            raise ValueError("未开始训练，先训练")
-        #计算testdata分别为各个类别的概率
-        lbDict=dict()
-        for thislb in labelset:
-            p = 1
-            alllabel = self.labelrate[thislb]
-            allvector = self.vectorrate[thislb]
-            vnum=len(allvector)
-            allvector=npy.array(allvector).T
-            for index in range(0,len(testdata)):
-                vector=list(allvector[index])
-                p*=vector.count(testdata[index])/vnum
-            lbDict[thislb]=p * alllabel
-        thislbabel=sorted(lbDict,key=lambda x:lbDict[x],reverse=True)[0]
-        return thislbabel
-
-#加载数据
-def datatoarray(fname):
-    arr=[]
-    fh=open(fname)
-    for i in range(0,32):
-        thisline=fh.readline()
-        for j in range(0 , 32):
-            arr.append(int(thisline[j]))
-    return arr
-
-#建立一个函数取出labels
-def seplabel(fname):
-    filestr=fname.split(".")[0]
-    label=int(filestr.split("_")[0])
-    return label
-
-#建立训练数据
-def traindata():
-    labels=[]
-    trainfile=os.listdir(dataSetDir+"trainingDigits") # 加载测试数据
-    num=len(trainfile)
-    trainarr=npy.zeros((num,1024))
-    for i in range(num):
-        thisfname=trainfile[i]
-        thislabel=seplabel(thisfname)
-        labels.append(thislabel)
-        trainarr[i,]=datatoarray(dataSetDir+"trainingDigits/"+thisfname)
-    return trainarr,labels
-
-# 贝叶斯算法手写识别主流程
-bys=Bayes()
-start = time.time()
-
-# # step 1: 训练数据集
-train_data,labels=traindata()
-train_data=list(train_data)
-bys.fit(train_data,labels)
-
-# # step 2:测试数据集
-thisdata=datatoarray(dataSetDir+"testDigits/8_90.txt")
-labelsall=[0,1,2,3,4,5,6,7,8,9]
-
-# # 识别单个手写体数字
-# test=bys.btest(thisdata,labelsall)
-# print(test)
-
-# # 识别多个手写体数字（批量处理）,并输出结果
-testfile=os.listdir(dataSetDir+"testDigits")
-num=len(testfile)
-x=0
-for i in range(num):
-    thisfilename=testfile[i]
-    thislabel=seplabel(thisfilename)
-    thisdataarr=datatoarray(dataSetDir+"testDigits/"+thisfilename)
-    label=bys.btest(thisdataarr,labelsall)
-    print("测试数字是："+str(thislabel)+"  识别出来的数字是："+str(label))
-    if label!=thislabel:
-        x+=1
-        print("识别出错")
-print(x)
-print("出错率："+str(x/num))
-
-end = time.time()
-running_time = end-start
-print('程序运行总耗时： %.5f sec' %running_time)
-```
 
 ### ☣️ 贝叶斯网络（Bayes Network）
 
