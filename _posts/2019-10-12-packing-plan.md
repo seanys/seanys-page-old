@@ -3,7 +3,7 @@ layout: post
 title: "排料的阶段性目标"
 subtitle: 'Slove 2D bin packing step by step'
 author: "sean"
-header-img: "img/post-bg-run-man.jpeg.jpeg"
+header-img: "img/post-bg-run-man.jpeg"
 tags:
   - 计划
 
