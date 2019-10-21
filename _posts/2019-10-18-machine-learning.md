@@ -719,7 +719,7 @@ Rt 可以用 Rt+1 来表示，写成递推式：
 
 $$R_t=r_t+\gamma(r_{t+1}+\gamma(r_{t+2}+...))=r_t+\gamma_{}R_{t+1}$$
 
-参考：https://juejin.im/post/5d591d6af265da03c8151f4f
+参考：https://juejin.im/post/5d591d6af265da03c8151f4f、https://easyai.tech/ai-definition/reinforcement-learning/
 
 ### ☣️ Q-Learning
 

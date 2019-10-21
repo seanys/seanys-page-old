@@ -33,6 +33,8 @@ tags:
 
 **解决方案**：一步步来
 
+**部分备注**：（1）先从小规模训练起（2）可以提前采用监督学习，再采用强化学习，神经网络是BP网络
+
 **潜在问题**：因为效果的差异性，可能最后的结果不一定合理（暂时不考虑）
 
 
@@ -42,23 +44,20 @@ tags:
 - [ ] Introduction
 
   - [ ] Background
-
 - [ ] Literature Review
 
   - [ ] 2D Irregular Strips Packing
+    - [ ] 
   - [ ] Neural Network in Combination Optimization
-
+    - [ ] 
 - [ ] The Difinition of the Problem
-
 - [ ] Algorithm Outline
-
 - [ ] Initialization and Classification Model
 
   - [ ] Ajdust strips using lowest-gravity-center principle
     - [ ] 参考 Algorithm for 2D irregular-shaped nesting problem based on the NFP algorithm and lowest-gravity-center principle
   - [ ] Clustering by features
     - [ ] 参考 Automatic Data Clustering Analysis of Arbitrary Shape with K-means and Enhanced Ant-based Template Mechanism或者直接处理
-
 - [ ] Neural Network Method and Heuristic Optimization
 
   - [ ] Architecture of the network
@@ -68,21 +67,13 @@ tags:
 
   - [ ] Heruistic Optimization Algorithm
     - [ ] 同调整算法
-
 - [ ] Computational Results
-
 - [ ] Conclusion
-
+  - [ ] 取得的效果是可观的（理想化）
+  - [ ] 可以转移到其他的问题，其量化的实现思想
 - [ ] Acknowledge/References
 
 
 
 ![image-20191021005156381](https://tva1.sinaimg.cn/large/006y8mN6gy1g855gklphej31ju0rkwl6.jpg)
 
-### 需要寻找
-
-- [x] 需要一个初始化的算法——重心最低策略
-- [x] 需要一个形状分类算法——K-Means算法
-
-- [x] 需要寻找一个可以用的训练网络！！！！
-- [x] 需要传统的排样后的优化措施——重心最低策略，直接平移即可

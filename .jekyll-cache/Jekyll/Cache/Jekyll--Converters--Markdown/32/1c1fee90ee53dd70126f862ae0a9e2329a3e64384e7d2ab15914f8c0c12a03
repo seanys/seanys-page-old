@@ -1,0 +1,1501 @@
+I"�<blockquote>
+  <p>✅ ：已经整理好</p>
+
+  <p>💤 ：大部分整理好了但是没理解</p>
+
+  <p>🆘 ：还有一部分需要整理</p>
+
+  <p>☣️ ：需要整理</p>
+</blockquote>
+
+<h2 id="搜索算法">搜索算法</h2>
+
+<h3 id="️局部检索local-search">☣️局部检索（Local Search）</h3>
+
+<h3 id="️变邻域检索variable-neighborhood-search">☣️变邻域检索（Variable Neighborhood Search）</h3>
+
+<h3 id="️迭代邻域检索iterated-local-search-">☣️迭代邻域检索（Iterated Local Search, ）</h3>
+
+<h2 id="精确算法">精确算法</h2>
+
+<h3 id="️分支定界法branch-and-bound">☣️分支定界法（Branch and Bound）</h3>
+
+<h3 id="️割平面算法branch-and-cut">☣️割平面算法（Branch and Cut）</h3>
+
+<h3 id="️动态规划算法">☣️动态规划算法</h3>
+
+<h2 id="近似算法">近似算法</h2>
+
+<h3 id="-前言">✅ 前言</h3>
+
+<p><strong>问题一</strong>：航班选择最优，共计12个航班，要使得总的票价最少且每个人的等待时间之和最小</p>
+
+<p><strong>问题二</strong>：学生选择宿舍的问题，每个学生可以实现填报志愿，如果安排的宿舍与志愿完全一致，则代价为0，与第二志愿一致，代价为1，如果没有和志愿一致，代价为3。</p>
+
+<p><strong>核心</strong>：将自己要优化的目标量化的表达出来，是解决优化函数的关键</p>
+
+<p><strong>损失函数</strong>：如在普通的数值优化问题中，可选择当前值与目标值距离的绝对之差，或者使用平方损失函数均可。</p>
+
+<p>代码参考资料：https://blog.csdn.net/bcj296050240/article/details/50839806</p>
+
+<h3 id="-随机搜索算法">✅ 随机搜索算法</h3>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+</pre></td><td class="rouge-code"><pre><span class="c1"># 搜索方法1: 随机搜索算法
+# 函数会作1000次随机猜测，记录总代价最低的方法. domain为航班号的范围（0-9），共有5个人，因此共有10项
+</span><span class="k">def</span> <span class="nf">randomoptimize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">domain</span><span class="p">):</span>
+    <span class="n">best_sol</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">bestcost</span> <span class="o">=</span> <span class="mi">99999</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1000</span><span class="p">):</span>
+        <span class="n">sol</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">domain</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">domain</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span><span class="p">):</span>  <span class="c1"># 人数
+</span>            <span class="n">sol</span><span class="p">[</span><span class="mi">2</span> <span class="o">*</span> <span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="n">domain</span><span class="p">[</span><span class="mi">2</span> <span class="o">*</span> <span class="n">j</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="n">domain</span><span class="p">[</span><span class="mi">2</span> <span class="o">*</span> <span class="n">j</span><span class="p">][</span><span class="mi">1</span><span class="p">])</span>
+            <span class="n">sol</span><span class="p">[</span><span class="mi">2</span> <span class="o">*</span> <span class="n">j</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="n">domain</span><span class="p">[</span><span class="mi">2</span> <span class="o">*</span> <span class="n">j</span> <span class="o">+</span> <span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="n">domain</span><span class="p">[</span><span class="mi">2</span> <span class="o">*</span> <span class="n">j</span> <span class="o">+</span> <span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">])</span>
+
+        <span class="k">print</span> <span class="n">sol</span><span class="p">[:]</span>
+        <span class="n">newcost</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">schedulecost</span><span class="p">(</span><span class="n">sol</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">newcost</span> <span class="o">&lt;</span> <span class="n">bestcost</span><span class="p">:</span>
+            <span class="n">bestcost</span> <span class="o">=</span> <span class="n">newcost</span>
+            <span class="n">best_sol</span> <span class="o">=</span> <span class="n">sol</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">continue</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">printschedule</span><span class="p">(</span><span class="n">best_sol</span><span class="p">)</span>
+    <span class="k">print</span> <span class="s">"随机搜索算法的结果的最小代价是："</span><span class="p">,</span> <span class="n">bestcost</span>
+    <span class="k">return</span> <span class="n">best_sol</span>
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>总结：重点在随机函数，相当于大量枚举但是不连续</p>
+
+<h3 id="-爬山法hill-climbing">✅ 爬山法（Hill Climbing）</h3>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+</pre></td><td class="rouge-code"><pre>    <span class="c1"># 搜索算法2：爬山法
+</span>    <span class="c1"># 首先随机选择一个解作为种子解，每次寻找这个种子相近的解，如果相近的解有代价更小的解，则把这个新的解作为种子
+</span>    <span class="c1"># 依次循环进行，当循环到某种子附近的解都比该种子的代价大时，说明到达了局部极小值点，搜索结束
+</span>    <span class="k">def</span> <span class="nf">hillclimb</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">domain</span><span class="p">):</span>
+        <span class="c1"># 随机产生一个航班序列作为初始种子
+</span>        <span class="n">seed</span> <span class="o">=</span> <span class="p">[</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="n">domain</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="n">domain</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">1</span><span class="p">])</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">domain</span><span class="p">))]</span>
+        <span class="k">while</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">neighbor</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="c1"># 循环改变解的每一个值产生一个临近解的列表
+</span>            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">domain</span><span class="p">)):</span>
+                <span class="c1"># 下列判断是为了将某一位加减1后不超出domain的范围
+</span>                <span class="c1"># print seed
+</span>                <span class="k">if</span> <span class="n">seed</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">domain</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">]:</span>
+                    <span class="n">newneighbor</span> <span class="o">=</span> <span class="n">seed</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="n">i</span><span class="p">]</span> <span class="o">+</span> <span class="p">[</span><span class="n">seed</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">seed</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">:]</span>
+                    <span class="c1"># print newneighbor[:]
+</span>                    <span class="n">neighbor</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">newneighbor</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">seed</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">domain</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">1</span><span class="p">]:</span>
+                    <span class="n">newneighbor</span> <span class="o">=</span> <span class="n">seed</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="n">i</span><span class="p">]</span> <span class="o">+</span> <span class="p">[</span><span class="n">seed</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">seed</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">:]</span>
+                    <span class="c1"># print newneighbor[:]
+</span>                    <span class="n">neighbor</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">newneighbor</span><span class="p">)</span>
+
+            <span class="c1"># 对所有的临近解计算代价，排序，得到代价最小的解
+</span>            <span class="n">neighbor_cost</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span>
+                <span class="p">[(</span><span class="n">s</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">schedulecost</span><span class="p">(</span><span class="n">s</span><span class="p">))</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">neighbor</span><span class="p">],</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+
+            <span class="c1"># 如果新的最小代价 &gt; 原种子代价，则跳出循环
+</span>            <span class="k">if</span> <span class="n">neighbor_cost</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">schedulecost</span><span class="p">(</span><span class="n">seed</span><span class="p">):</span>
+                <span class="k">break</span>
+
+            <span class="c1"># 新的代价更小的临近解作为新的种子
+</span>            <span class="n">seed</span> <span class="o">=</span> <span class="n">neighbor_cost</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+            <span class="k">print</span> <span class="s">"newseed = "</span><span class="p">,</span> <span class="n">seed</span><span class="p">[:],</span> <span class="s">" 代价："</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">schedulecost</span><span class="p">(</span><span class="n">seed</span><span class="p">)</span>
+        <span class="c1"># 输出
+</span>        <span class="bp">self</span><span class="o">.</span><span class="n">printschedule</span><span class="p">(</span><span class="n">seed</span><span class="p">)</span>
+        <span class="k">print</span> <span class="s">"爬山法得到的解的最小代价是"</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">schedulecost</span><span class="p">(</span><span class="n">seed</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">seed</span>
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p><strong>总结</strong>：对于单峰的优化问题是可以的，对于多峰问题可能会陷入局部最优化，因为只会检索临近点并计算效果。其次，爬山的问题在于如何实现“临近”，比如排料中的NFP就可以模拟“临近”的效果。</p>
+
+<h3 id="-模拟退火simulate-annealing">🆘 模拟退火（Simulate Annealing）</h3>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+</pre></td><td class="rouge-code"><pre>    <span class="c1"># 搜索算法4：模拟退火算法
+</span>    <span class="c1"># 参数：T代表原始温度，cool代表冷却率，step代表每次选择临近解的变化范围
+</span>    <span class="c1"># 原理：退火算法以一个问题的随机解开始，用一个变量表示温度，这一温度开始时非常高，而后逐步降低
+</span>    <span class="c1">#      在每一次迭代期间，算法会随机选中题解中的某个数字，然后朝某个方向变化。如果新的成本值更
+</span>    <span class="c1">#      低，则新的题解将会变成当前题解，这与爬山法类似。不过，如果成本值更高的话，则新的题解仍
+</span>    <span class="c1">#      有可能成为当前题解，这是避免局部极小值问题的一种尝试。
+</span>    <span class="c1"># 注意：算法总会接受一个更优的解，而且在退火的开始阶段会接受较差的解，随着退火的不断进行，算法
+</span>    <span class="c1">#      原来越不能接受较差的解，直到最后，它只能接受更优的解。
+</span>    <span class="c1"># 算法接受较差解的概率 P = exp[-(highcost-lowcost)/temperature]
+</span>    <span class="k">def</span> <span class="nf">annealingoptimize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">domain</span><span class="p">,</span> <span class="n">T</span><span class="o">=</span><span class="mf">10000.0</span><span class="p">,</span> <span class="n">cool</span><span class="o">=</span><span class="mf">0.98</span><span class="p">,</span> <span class="n">step</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+        <span class="c1"># 随机初始化值
+</span>        <span class="n">vec</span> <span class="o">=</span> <span class="p">[</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="n">domain</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="n">domain</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">1</span><span class="p">])</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">domain</span><span class="p">))]</span>
+
+        <span class="c1"># 循环
+</span>        <span class="k">while</span> <span class="n">T</span> <span class="o">&gt;</span> <span class="mf">0.1</span><span class="p">:</span>
+            <span class="c1"># 选择一个索引值
+</span>            <span class="n">i</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">domain</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="c1"># 选择一个改变索引值的方向
+</span>            <span class="n">c</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="o">-</span><span class="n">step</span><span class="p">,</span> <span class="n">step</span><span class="p">)</span>  <span class="c1"># -1 or 0 or 1
+</span>            <span class="c1"># 构造新的解
+</span>            <span class="n">vecb</span> <span class="o">=</span> <span class="n">vec</span><span class="p">[:]</span>
+            <span class="n">vecb</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">+=</span> <span class="n">c</span>
+            <span class="k">if</span> <span class="n">vecb</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">domain</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">]:</span>  <span class="c1"># 判断越界情况
+</span>                <span class="n">vecb</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">domain</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">vecb</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">domain</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">1</span><span class="p">]:</span>
+                <span class="n">vecb</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">domain</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
+
+            <span class="c1"># 计算当前成本和新的成本
+</span>            <span class="n">cost1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">schedulecost</span><span class="p">(</span><span class="n">vec</span><span class="p">)</span>
+            <span class="n">cost2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">schedulecost</span><span class="p">(</span><span class="n">vecb</span><span class="p">)</span>
+
+            <span class="c1"># 判断新的解是否优于原始解 或者 算法将以一定概率接受较差的解
+</span>            <span class="k">if</span> <span class="n">cost2</span> <span class="o">&lt;</span> <span class="n">cost1</span> <span class="ow">or</span> <span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">()</span> <span class="o">&lt;</span> <span class="n">math</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="p">(</span><span class="n">cost2</span> <span class="o">-</span> <span class="n">cost1</span><span class="p">)</span> <span class="o">/</span> <span class="n">T</span><span class="p">):</span>
+                <span class="n">vec</span> <span class="o">=</span> <span class="n">vecb</span>
+
+            <span class="n">T</span> <span class="o">=</span> <span class="n">T</span> <span class="o">*</span> <span class="n">cool</span>  <span class="c1"># 温度冷却
+</span>            <span class="k">print</span> <span class="n">vecb</span><span class="p">[:],</span> <span class="s">"代价:"</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">schedulecost</span><span class="p">(</span><span class="n">vecb</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">printschedule</span><span class="p">(</span><span class="n">vec</span><span class="p">)</span>
+        <span class="k">print</span> <span class="s">"模拟退火算法得到的最小代价是："</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">schedulecost</span><span class="p">(</span><span class="n">vec</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">vec</span>
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>总结：</p>
+
+<h3 id="-遗传算法">🆘 遗传算法</h3>
+
+<blockquote>
+  <p>选择（Select）：可理解为优胜劣汰，部分适应能力强的个体被保留，而较弱的则逐渐消失。常用的选择策略是 “比例选择”，也就是个体被选中的概率与其适应度函数值成正比。</p>
+
+  <p>交叉(Crossover)： 即繁衍后代，两个个体的DNA进行交叉融合，从而产生下一代。</p>
+
+  <p>变异(Mutation)：在繁殖过程中，下一代染色体的基因会有一定概率产生变异。变异发生的概率记为P。</p>
+</blockquote>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+</pre></td><td class="rouge-code"><pre><span class="c1"># 搜索算法5： 遗传算法
+# 原理： 首先随机生成一组解，我们称之为种群，在优化过程的每一步，算法会计算整个种群的成本函数，
+#       从而得到一个有关题解的有序列表。随后根据种群构造进化的下一代种群，方法如下：
+#       遗传：从当前种群中选出代价最优的一部分加入下一代种群，称为“精英选拔”
+#       变异：对一个既有解进行微小的、简单的、随机的修改
+#       交叉：选取最优解中的两个解，按照某种方式进行交叉。方法有单点交叉，多点交叉和均匀交叉
+# 一个种群是通过对最优解进行随机的变异和配对处理构造出来的，它的大小通常与旧的种群相同，尔后，这一过程会
+#       一直重复进行————新的种群经过排序，又一个种群被构造出来，如果达到指定的迭代次数之后题解都没有得
+#       改善，整个过程就结束了
+# 参数：
+# popsize-种群数量 step-变异改变的大小 mutprob-交叉和变异的比例 elite-直接遗传的比例 maxiter-最大迭代次数
+</span><span class="k">def</span> <span class="nf">geneticoptimize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">domain</span><span class="p">,</span> <span class="n">popsize</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">step</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">mutprob</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span> <span class="n">elite</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span> <span class="n">maxiter</span><span class="o">=</span><span class="mi">100</span><span class="p">):</span>
+    <span class="c1"># 变异操作的函数
+</span>    <span class="k">def</span> <span class="nf">mutate</span><span class="p">(</span><span class="n">vec</span><span class="p">):</span>
+        <span class="n">i</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">domain</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">()</span> <span class="o">&lt;</span> <span class="mf">0.5</span> <span class="ow">and</span> <span class="n">vec</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">domain</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">]:</span>
+            <span class="k">return</span> <span class="n">vec</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="n">i</span><span class="p">]</span> <span class="o">+</span> <span class="p">[</span><span class="n">vec</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">-</span> <span class="n">step</span><span class="p">]</span> <span class="o">+</span> <span class="n">vec</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">:]</span>
+        <span class="k">elif</span> <span class="n">vec</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">domain</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">1</span><span class="p">]:</span>
+            <span class="k">return</span> <span class="n">vec</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="n">i</span><span class="p">]</span> <span class="o">+</span> <span class="p">[</span><span class="n">vec</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">+</span> <span class="n">step</span><span class="p">]</span> <span class="o">+</span> <span class="n">vec</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">:]</span>
+
+    <span class="c1"># 交叉操作的函数（单点交叉）
+</span>    <span class="k">def</span> <span class="nf">crossover</span><span class="p">(</span><span class="n">r1</span><span class="p">,</span> <span class="n">r2</span><span class="p">):</span>
+        <span class="n">i</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">domain</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">r1</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="n">i</span><span class="p">]</span> <span class="o">+</span> <span class="n">r2</span><span class="p">[</span><span class="n">i</span><span class="p">:]</span>
+
+    <span class="c1"># 构造初始种群
+</span>    <span class="n">pop</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">popsize</span><span class="p">):</span>
+        <span class="n">vec</span> <span class="o">=</span> <span class="p">[</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="n">domain</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="n">domain</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">1</span><span class="p">])</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">domain</span><span class="p">))]</span>
+        <span class="n">pop</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">vec</span><span class="p">)</span>
+
+    <span class="c1"># 每一代中有多少胜出者
+</span>    <span class="n">topelite</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">elite</span> <span class="o">*</span> <span class="n">popsize</span><span class="p">)</span>
+
+    <span class="c1"># 主循环
+</span>    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">maxiter</span><span class="p">):</span>
+        <span class="n">scores</span> <span class="o">=</span> <span class="p">[(</span><span class="bp">self</span><span class="o">.</span><span class="n">schedulecost</span><span class="p">(</span><span class="n">v</span><span class="p">),</span> <span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">pop</span><span class="p">]</span>
+        <span class="n">scores</span><span class="o">.</span><span class="n">sort</span><span class="p">()</span>
+        <span class="n">ranked</span> <span class="o">=</span> <span class="p">[</span><span class="n">v</span> <span class="k">for</span> <span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span> <span class="ow">in</span> <span class="n">scores</span><span class="p">]</span>  <span class="c1"># 解按照代价由小到大的排序
+</span>
+        <span class="c1"># 优质解遗传到下一代
+</span>        <span class="n">pop</span> <span class="o">=</span> <span class="n">ranked</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span> <span class="n">topelite</span><span class="p">]</span>
+
+        <span class="c1"># 如果当前种群数量小于既定数量，则添加变异和交叉遗传
+</span>        <span class="k">while</span> <span class="nb">len</span><span class="p">(</span><span class="n">pop</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">popsize</span><span class="p">:</span>
+            <span class="c1"># 随机数小于 mutprob 则变异，否则交叉
+</span>            <span class="k">if</span> <span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">()</span> <span class="o">&lt;</span> <span class="n">mutprob</span><span class="p">:</span>  <span class="c1"># mutprob控制交叉和变异的比例
+</span>                <span class="c1"># 选择一个个体
+</span>                <span class="n">c</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">topelite</span><span class="p">)</span>
+                <span class="c1"># 变异
+</span>                <span class="n">pop</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">mutate</span><span class="p">(</span><span class="n">ranked</span><span class="p">[</span><span class="n">c</span><span class="p">]))</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># 随机选择两个个体进行交叉
+</span>                <span class="n">c1</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">topelite</span><span class="p">)</span>
+                <span class="n">c2</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">topelite</span><span class="p">)</span>
+                <span class="n">pop</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">crossover</span><span class="p">(</span><span class="n">ranked</span><span class="p">[</span><span class="n">c1</span><span class="p">],</span> <span class="n">ranked</span><span class="p">[</span><span class="n">c2</span><span class="p">]))</span>
+        <span class="c1"># 输出当前种群中代价最小的解
+</span>        <span class="k">print</span> <span class="n">scores</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">],</span> <span class="s">"代价："</span><span class="p">,</span> <span class="n">scores</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">printschedule</span><span class="p">(</span><span class="n">scores</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">])</span>
+    <span class="k">print</span> <span class="s">"遗传算法求得的最小代价："</span><span class="p">,</span> <span class="n">scores</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">scores</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>总结：</p>
+
+<h3 id="️-禁忌搜索taboo-search">☣️ 禁忌搜索（Taboo Search）</h3>
+
+<p>局部检索算法，</p>
+
+<h3 id="️-蚁群算法">☣️ 蚁群算法</h3>
+
+<h3 id="️-粒子群算法1995">☣️ 粒子群算法（1995）</h3>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80
+81
+82
+83
+84
+85
+86
+87
+88
+89
+90
+91
+</pre></td><td class="rouge-code"><pre><span class="c1"># -*- coding: utf-8 -*-
+</span><span class="kn">import</span> <span class="nn">sys</span>
+<span class="nb">reload</span><span class="p">(</span><span class="n">sys</span><span class="p">)</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">setdefaultencoding</span><span class="p">(</span><span class="s">'utf-8'</span><span class="p">)</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="n">np</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="n">plt</span>
+
+<span class="c1"># 目标函数定义
+</span><span class="k">def</span> <span class="nf">ras</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="mi">20</span> <span class="o">+</span> <span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">**</span><span class="mi">2</span> <span class="o">-</span> <span class="mi">10</span><span class="o">*</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">*</span><span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">+</span><span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">*</span><span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+    <span class="k">return</span> <span class="n">y</span>
+    
+<span class="c1"># 参数初始化
+</span><span class="n">w</span> <span class="o">=</span> <span class="mf">1.0</span>
+<span class="n">c1</span> <span class="o">=</span> <span class="mf">1.49445</span>
+<span class="n">c2</span> <span class="o">=</span> <span class="mf">1.49445</span>
+
+<span class="n">maxgen</span> <span class="o">=</span> <span class="mi">200</span>   <span class="c1"># 进化次数  
+</span><span class="n">sizepop</span> <span class="o">=</span> <span class="mi">20</span>   <span class="c1"># 种群规模
+</span>
+<span class="c1"># 粒子速度和位置的范围
+</span><span class="n">Vmax</span> <span class="o">=</span>  <span class="mi">1</span>
+<span class="n">Vmin</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+<span class="n">popmax</span> <span class="o">=</span>  <span class="mi">5</span>
+<span class="n">popmin</span> <span class="o">=</span> <span class="o">-</span><span class="mi">5</span>
+
+
+<span class="c1"># 产生初始粒子和速度
+</span><span class="n">pop</span> <span class="o">=</span> <span class="mi">5</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">,(</span><span class="mi">2</span><span class="p">,</span><span class="n">sizepop</span><span class="p">))</span>
+<span class="n">v</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">,(</span><span class="mi">2</span><span class="p">,</span><span class="n">sizepop</span><span class="p">))</span>
+
+
+<span class="n">fitness</span> <span class="o">=</span> <span class="n">ras</span><span class="p">(</span><span class="n">pop</span><span class="p">)</span>             <span class="c1"># 计算适应度
+</span><span class="n">i</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argmin</span><span class="p">(</span><span class="n">fitness</span><span class="p">)</span>      <span class="c1"># 找最好的个体
+</span><span class="n">gbest</span> <span class="o">=</span> <span class="n">pop</span>                    <span class="c1"># 记录个体最优位置
+</span><span class="n">zbest</span> <span class="o">=</span> <span class="n">pop</span><span class="p">[:,</span><span class="n">i</span><span class="p">]</span>              <span class="c1"># 记录群体最优位置
+</span><span class="n">fitnessgbest</span> <span class="o">=</span> <span class="n">fitness</span>        <span class="c1"># 个体最佳适应度值
+</span><span class="n">fitnesszbest</span> <span class="o">=</span> <span class="n">fitness</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>      <span class="c1"># 全局最佳适应度值
+</span>
+
+<span class="c1"># 迭代寻优
+</span><span class="n">t</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="n">record</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">maxgen</span><span class="p">)</span>
+<span class="k">while</span> <span class="n">t</span> <span class="o">&lt;</span> <span class="n">maxgen</span><span class="p">:</span>
+    
+    <span class="c1"># 速度更新
+</span>    <span class="n">v</span> <span class="o">=</span> <span class="n">w</span> <span class="o">*</span> <span class="n">v</span> <span class="o">+</span> <span class="n">c1</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">()</span> <span class="o">*</span> <span class="p">(</span><span class="n">gbest</span> <span class="o">-</span> <span class="n">pop</span><span class="p">)</span> <span class="o">+</span> <span class="n">c2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">()</span> <span class="o">*</span> <span class="p">(</span><span class="n">zbest</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span> <span class="o">-</span> <span class="n">pop</span><span class="p">)</span>
+    <span class="n">v</span><span class="p">[</span><span class="n">v</span> <span class="o">&gt;</span> <span class="n">Vmax</span><span class="p">]</span> <span class="o">=</span> <span class="n">Vmax</span>     <span class="c1"># 限制速度
+</span>    <span class="n">v</span><span class="p">[</span><span class="n">v</span> <span class="o">&lt;</span> <span class="n">Vmin</span><span class="p">]</span> <span class="o">=</span> <span class="n">Vmin</span>
+    
+    <span class="c1"># 位置更新
+</span>    <span class="n">pop</span> <span class="o">=</span> <span class="n">pop</span> <span class="o">+</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">v</span><span class="p">;</span>
+    <span class="n">pop</span><span class="p">[</span><span class="n">pop</span> <span class="o">&gt;</span> <span class="n">popmax</span><span class="p">]</span> <span class="o">=</span> <span class="n">popmax</span>  <span class="c1"># 限制位置
+</span>    <span class="n">pop</span><span class="p">[</span><span class="n">pop</span> <span class="o">&lt;</span> <span class="n">popmin</span><span class="p">]</span> <span class="o">=</span> <span class="n">popmin</span>
+    
+    <span class="s">'''
+    # 自适应变异
+    p = np.random.random()             # 随机生成一个0~1内的数
+    if p &gt; 0.8:                          # 如果这个数落在变异概率区间内，则进行变异处理
+        k = np.random.randint(0,2)     # 在[0,2)之间随机选一个整数
+        pop[:,k] = np.random.random()  # 在选定的位置进行变异 
+    '''</span>
+
+    <span class="c1"># 计算适应度值
+</span>    <span class="n">fitness</span> <span class="o">=</span> <span class="n">ras</span><span class="p">(</span><span class="n">pop</span><span class="p">)</span>
+    
+    <span class="c1"># 个体最优位置更新
+</span>    <span class="n">index</span> <span class="o">=</span> <span class="n">fitness</span> <span class="o">&lt;</span> <span class="n">fitnessgbest</span>
+    <span class="n">fitnessgbest</span><span class="p">[</span><span class="n">index</span><span class="p">]</span> <span class="o">=</span> <span class="n">fitness</span><span class="p">[</span><span class="n">index</span><span class="p">]</span>
+    <span class="n">gbest</span><span class="p">[:,</span><span class="n">index</span><span class="p">]</span> <span class="o">=</span> <span class="n">pop</span><span class="p">[:,</span><span class="n">index</span><span class="p">]</span>
+
+    <span class="c1"># 群体最优更新
+</span>    <span class="n">j</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argmin</span><span class="p">(</span><span class="n">fitness</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">fitness</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">fitnesszbest</span><span class="p">:</span>
+        <span class="n">zbest</span> <span class="o">=</span> <span class="n">pop</span><span class="p">[:,</span><span class="n">j</span><span class="p">]</span>
+        <span class="n">fitnesszbest</span> <span class="o">=</span> <span class="n">fitness</span><span class="p">[</span><span class="n">j</span><span class="p">]</span>
+
+    <span class="n">record</span><span class="p">[</span><span class="n">t</span><span class="p">]</span> <span class="o">=</span> <span class="n">fitnesszbest</span> <span class="c1"># 记录群体最优位置的变化   
+</span>    
+    <span class="n">t</span> <span class="o">=</span> <span class="n">t</span> <span class="o">+</span> <span class="mi">1</span>
+    
+
+<span class="c1"># 结果分析
+</span><span class="k">print</span> <span class="n">zbest</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">record</span><span class="p">,</span><span class="s">'b-'</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s">'generation'</span><span class="p">)</span>  
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s">'fitness'</span><span class="p">)</span>  
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s">'fitness curve'</span><span class="p">)</span>  
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>参考：https://www.cnblogs.com/21207-iHome/p/6062535.html</p>
+
+<h3 id="-布谷鸟搜索2009-cuckoo-search">✅ 布谷鸟搜索（2009 Cuckoo Search）</h3>
+
+<p><img src="https://vlight.me/images/CS_via_Levy_Flights.png" style="zoom:50%" /></p>
+
+<p>觉得没啥很大用</p>
+
+<p>参考资料：https://vlight.me/2017/12/17/Cuckoo-Search/</p>
+
+<h3 id="-综合案例">🆘 综合案例</h3>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80
+81
+82
+83
+84
+85
+86
+87
+88
+89
+90
+91
+92
+93
+94
+95
+96
+97
+98
+99
+100
+101
+102
+103
+104
+105
+106
+107
+108
+109
+110
+111
+112
+113
+114
+115
+116
+117
+118
+119
+120
+121
+122
+123
+124
+125
+126
+127
+128
+129
+130
+131
+132
+133
+134
+135
+136
+137
+138
+139
+140
+141
+142
+143
+144
+145
+146
+147
+148
+149
+150
+151
+152
+153
+154
+155
+156
+157
+158
+159
+160
+161
+162
+163
+164
+165
+166
+167
+168
+169
+170
+171
+172
+173
+174
+175
+176
+177
+178
+179
+180
+181
+182
+183
+184
+185
+186
+187
+188
+189
+190
+191
+192
+193
+194
+195
+196
+197
+198
+199
+200
+201
+202
+203
+204
+205
+206
+207
+208
+209
+210
+211
+212
+213
+214
+215
+216
+217
+218
+219
+220
+221
+222
+223
+224
+225
+226
+227
+228
+229
+230
+231
+232
+233
+234
+235
+236
+237
+238
+239
+240
+241
+242
+243
+244
+245
+246
+247
+248
+249
+250
+251
+252
+253
+254
+255
+256
+257
+258
+259
+260
+261
+262
+263
+264
+265
+266
+267
+268
+269
+270
+</pre></td><td class="rouge-code"><pre><span class="c1"># -*-  coding: utf-8 -*-
+</span><span class="n">__author__</span> <span class="o">=</span> <span class="s">'Bai Chenjia'</span>
+
+<span class="kn">import</span> <span class="nn">random</span>
+<span class="kn">import</span> <span class="nn">math</span>
+<span class="s">"""
+宿舍分配问题，属于搜索优化问题。优化方法使用optimization.py中使用的
+随机搜索、爬山法、模拟退火法、遗传算法等. 但题解的描述比之前的问题复杂
+"""</span>
+
+
+<span class="k">class</span> <span class="nc">dorm</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># 代表宿舍，每个宿舍有两个隔间可用
+</span>        <span class="bp">self</span><span class="o">.</span><span class="n">dorms</span> <span class="o">=</span> <span class="p">[</span><span class="s">'Zeus'</span><span class="p">,</span> <span class="s">'Athena'</span><span class="p">,</span> <span class="s">'Hercules'</span><span class="p">,</span> <span class="s">'Bacchus'</span><span class="p">,</span> <span class="s">'Pluto'</span><span class="p">]</span>
+
+        <span class="c1"># 代表选择，第一列代表人名，第二列和第三列代表该学生的首选和次选
+</span>        <span class="bp">self</span><span class="o">.</span><span class="n">prefs</span> <span class="o">=</span> <span class="p">[(</span><span class="s">'Toby'</span><span class="p">,</span> <span class="p">(</span><span class="s">'Bacchus'</span><span class="p">,</span> <span class="s">'Hercules'</span><span class="p">)),</span>
+                      <span class="p">(</span><span class="s">'Steve'</span><span class="p">,</span> <span class="p">(</span><span class="s">'Zeus'</span><span class="p">,</span> <span class="s">'Pluto'</span><span class="p">)),</span>
+                      <span class="p">(</span><span class="s">'Karen'</span><span class="p">,</span> <span class="p">(</span><span class="s">'Athena'</span><span class="p">,</span> <span class="s">'Zeus'</span><span class="p">)),</span>
+                      <span class="p">(</span><span class="s">'Sarah'</span><span class="p">,</span> <span class="p">(</span><span class="s">'Zeus'</span><span class="p">,</span> <span class="s">'Pluto'</span><span class="p">)),</span>
+                      <span class="p">(</span><span class="s">'Dave'</span><span class="p">,</span> <span class="p">(</span><span class="s">'Athena'</span><span class="p">,</span> <span class="s">'Bacchus'</span><span class="p">)),</span>
+                      <span class="p">(</span><span class="s">'Jeff'</span><span class="p">,</span> <span class="p">(</span><span class="s">'Hercules'</span><span class="p">,</span> <span class="s">'Pluto'</span><span class="p">)),</span>
+                      <span class="p">(</span><span class="s">'Fred'</span><span class="p">,</span> <span class="p">(</span><span class="s">'Pluto'</span><span class="p">,</span> <span class="s">'Athena'</span><span class="p">)),</span>
+                      <span class="p">(</span><span class="s">'Suzie'</span><span class="p">,</span> <span class="p">(</span><span class="s">'Bacchus'</span><span class="p">,</span> <span class="s">'Hercules'</span><span class="p">)),</span>
+                      <span class="p">(</span><span class="s">'Laura'</span><span class="p">,</span> <span class="p">(</span><span class="s">'Bacchus'</span><span class="p">,</span> <span class="s">'Hercules'</span><span class="p">)),</span>
+                      <span class="p">(</span><span class="s">'James'</span><span class="p">,</span> <span class="p">(</span><span class="s">'Hercules'</span><span class="p">,</span> <span class="s">'Athena'</span><span class="p">))]</span>
+
+        <span class="c1"># 题解的表示法：
+</span>        <span class="c1"># 设想每个宿舍有两个槽，本例中共有5个宿舍，则共有10个槽，我们将每名学生依序安置于各空槽
+</span>        <span class="c1"># 内————则第一名学生有10种选择，解的取值范围为0-9；第二名学生有9种选择，解的取值范围为
+</span>        <span class="c1"># 0-8，第三名学生解的取值范围是0-7，以此类推，最后一名学生只有一个可选。
+</span>        <span class="c1"># 按照上述题解的表示法初始化题解范围：
+</span>        <span class="bp">self</span><span class="o">.</span><span class="n">domain</span> <span class="o">=</span> <span class="p">[(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="o">*</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dorms</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="o">-</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">prefs</span><span class="p">))]</span>
+
+    <span class="c1"># 根据题解序列vec打印出最终宿舍分配方案
+</span>    <span class="c1"># 注意，输出一个槽后表明该槽已经用过，需将该槽删除
+</span>    <span class="k">def</span> <span class="nf">printsolution</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vec</span><span class="p">):</span>
+        <span class="n">slots</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="c1"># slots = [0,0,1,1,2,2,3,3,4,4]
+</span>        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dorms</span><span class="p">)):</span>
+            <span class="n">slots</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+            <span class="n">slots</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+        <span class="c1"># 循环题解
+</span>        <span class="k">print</span> <span class="s">"选择方案是："</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">vec</span><span class="p">)):</span>
+            <span class="n">index</span> <span class="o">=</span> <span class="n">slots</span><span class="p">[</span><span class="n">vec</span><span class="p">[</span><span class="n">i</span><span class="p">]]</span>
+            <span class="k">print</span> <span class="bp">self</span><span class="o">.</span><span class="n">prefs</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">dorms</span><span class="p">[</span><span class="n">index</span><span class="p">]</span>
+            <span class="k">del</span> <span class="n">slots</span><span class="p">[</span><span class="n">vec</span><span class="p">[</span><span class="n">i</span><span class="p">]]</span>
+
+    <span class="c1"># 代价函数: 如果学生当前安置的宿舍使其首选则代价为0，是其次选则代价为1，否则代价为3
+</span>    <span class="c1"># 注意，输出一个槽后表明该槽已经用过，需将该槽删除
+</span>    <span class="k">def</span> <span class="nf">dormcost</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vec</span><span class="p">):</span>
+        <span class="n">cost</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="c1"># 建立槽
+</span>        <span class="n">slots</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dorms</span><span class="p">)):</span>
+            <span class="n">slots</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+            <span class="n">slots</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+        <span class="c1"># 循环题解
+</span>        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">vec</span><span class="p">)):</span>
+            <span class="n">index</span> <span class="o">=</span> <span class="n">slots</span><span class="p">[</span><span class="n">vec</span><span class="p">[</span><span class="n">i</span><span class="p">]]</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">dorms</span><span class="p">[</span><span class="n">index</span><span class="p">]</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">prefs</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">]:</span>
+                <span class="n">cost</span> <span class="o">+=</span> <span class="mi">0</span>
+            <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">dorms</span><span class="p">[</span><span class="n">index</span><span class="p">]</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">prefs</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">]:</span>
+                <span class="n">cost</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">cost</span> <span class="o">+=</span> <span class="mi">3</span>
+            <span class="k">del</span> <span class="n">slots</span><span class="p">[</span><span class="n">vec</span><span class="p">[</span><span class="n">i</span><span class="p">]]</span>
+        <span class="k">return</span> <span class="n">cost</span>
+
+    <span class="s">"""
+    下列函数与 optimization 中函数相同，只不过代价函数和输出函数用本问题的输出函数
+    """</span>
+    <span class="c1"># 搜索方法1: 随机搜索算法
+</span>    <span class="c1"># 函数会作1000次随机猜测，记录总代价最低的方法. domain为航班号的范围（0-9），共有5个人，因此共有10项
+</span>    <span class="k">def</span> <span class="nf">randomoptimize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">domain</span><span class="p">):</span>
+        <span class="n">best_sol</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">bestcost</span> <span class="o">=</span> <span class="mi">99999</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1000</span><span class="p">):</span>
+            <span class="n">sol</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">domain</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">domain</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span><span class="p">):</span>  <span class="c1"># 人数
+</span>                <span class="n">sol</span><span class="p">[</span><span class="mi">2</span> <span class="o">*</span> <span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="n">domain</span><span class="p">[</span><span class="mi">2</span> <span class="o">*</span> <span class="n">j</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="n">domain</span><span class="p">[</span><span class="mi">2</span> <span class="o">*</span> <span class="n">j</span><span class="p">][</span><span class="mi">1</span><span class="p">])</span>
+                <span class="n">sol</span><span class="p">[</span><span class="mi">2</span> <span class="o">*</span> <span class="n">j</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="n">domain</span><span class="p">[</span><span class="mi">2</span> <span class="o">*</span> <span class="n">j</span> <span class="o">+</span> <span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="n">domain</span><span class="p">[</span><span class="mi">2</span> <span class="o">*</span> <span class="n">j</span> <span class="o">+</span> <span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">])</span>
+
+            <span class="k">print</span> <span class="n">sol</span><span class="p">[:]</span>
+            <span class="n">newcost</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dormcost</span><span class="p">(</span><span class="n">sol</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">newcost</span> <span class="o">&lt;</span> <span class="n">bestcost</span><span class="p">:</span>
+                <span class="n">bestcost</span> <span class="o">=</span> <span class="n">newcost</span>
+                <span class="n">best_sol</span> <span class="o">=</span> <span class="n">sol</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">continue</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">printsolution</span><span class="p">(</span><span class="n">best_sol</span><span class="p">)</span>
+        <span class="k">print</span> <span class="s">"随机搜索算法的结果的最小代价是："</span><span class="p">,</span> <span class="n">bestcost</span>
+        <span class="k">return</span> <span class="n">best_sol</span>
+
+    <span class="c1"># 搜索算法2：爬山法
+</span>    <span class="c1"># 首先随机选择一个解作为种子解，每次寻找这个种子相近的解，如果相近的解有代价更小的解，则把这个新的解作为种子
+</span>    <span class="c1"># 依次循环进行，当循环到某种子附近的解都比该种子的代价大时，说明到达了局部极小值点，搜索结束
+</span>    <span class="k">def</span> <span class="nf">hillclimb</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">domain</span><span class="p">):</span>
+        <span class="c1"># 随机产生一个航班序列作为初始种子
+</span>        <span class="n">seed</span> <span class="o">=</span> <span class="p">[</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="n">domain</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="n">domain</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">1</span><span class="p">])</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">domain</span><span class="p">))]</span>
+        <span class="k">while</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">neighbor</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="c1"># 循环改变解的每一个值产生一个临近解的列表
+</span>            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">domain</span><span class="p">)):</span>
+                <span class="c1"># 下列判断是为了将某一位加减1后不超出domain的范围
+</span>                <span class="c1"># print seed
+</span>                <span class="k">if</span> <span class="n">seed</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">domain</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">]:</span>
+                    <span class="n">newneighbor</span> <span class="o">=</span> <span class="n">seed</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="n">i</span><span class="p">]</span> <span class="o">+</span> <span class="p">[</span><span class="n">seed</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">seed</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">:]</span>
+                    <span class="c1"># print newneighbor[:]
+</span>                    <span class="n">neighbor</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">newneighbor</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">seed</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">domain</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">1</span><span class="p">]:</span>
+                    <span class="n">newneighbor</span> <span class="o">=</span> <span class="n">seed</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="n">i</span><span class="p">]</span> <span class="o">+</span> <span class="p">[</span><span class="n">seed</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">seed</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">:]</span>
+                    <span class="c1"># print newneighbor[:]
+</span>                    <span class="n">neighbor</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">newneighbor</span><span class="p">)</span>
+
+            <span class="c1"># 对所有的临近解计算代价，排序，得到代价最小的解
+</span>            <span class="n">neighbor_cost</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span>
+                <span class="p">[(</span><span class="n">s</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dormcost</span><span class="p">(</span><span class="n">s</span><span class="p">))</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">neighbor</span><span class="p">],</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+
+            <span class="c1"># 如果新的最小代价 &gt; 原种子代价，则跳出循环
+</span>            <span class="k">if</span> <span class="n">neighbor_cost</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">dormcost</span><span class="p">(</span><span class="n">seed</span><span class="p">):</span>
+                <span class="k">break</span>
+
+            <span class="c1"># 新的代价更小的临近解作为新的种子
+</span>            <span class="n">seed</span> <span class="o">=</span> <span class="n">neighbor_cost</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+            <span class="k">print</span> <span class="s">"newseed = "</span><span class="p">,</span> <span class="n">seed</span><span class="p">[:],</span> <span class="s">" 代价："</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dormcost</span><span class="p">(</span><span class="n">seed</span><span class="p">)</span>
+        <span class="c1"># 输出
+</span>        <span class="bp">self</span><span class="o">.</span><span class="n">printsolution</span><span class="p">(</span><span class="n">seed</span><span class="p">)</span>
+        <span class="k">print</span> <span class="s">"爬山法得到的解的最小代价是"</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dormcost</span><span class="p">(</span><span class="n">seed</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">seed</span>
+
+    <span class="c1"># 搜索算法4：模拟退火算法
+</span>    <span class="c1"># 参数：T代表原始温度，cool代表冷却率，step代表每次选择临近解的变化范围
+</span>    <span class="c1"># 原理：退火算法以一个问题的随机解开始，用一个变量表示温度，这一温度开始时非常高，而后逐步降低
+</span>    <span class="c1">#      在每一次迭代期间，算啊会随机选中题解中的某个数字，然后朝某个方向变化。如果新的成本值更
+</span>    <span class="c1">#      低，则新的题解将会变成当前题解，这与爬山法类似。不过，如果成本值更高的话，则新的题解仍
+</span>    <span class="c1">#      有可能成为当前题解，这是避免局部极小值问题的一种尝试。
+</span>    <span class="c1"># 注意：算法总会接受一个更优的解，而且在退火的开始阶段会接受较差的解，随着退火的不断进行，算法
+</span>    <span class="c1">#      原来越不能接受较差的解，直到最后，它只能接受更优的解。
+</span>    <span class="c1"># 算法接受较差解的概率 P = exp[-(highcost-lowcost)/temperature]
+</span>    <span class="k">def</span> <span class="nf">annealingoptimize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">domain</span><span class="p">,</span> <span class="n">T</span><span class="o">=</span><span class="mf">10000.0</span><span class="p">,</span> <span class="n">cool</span><span class="o">=</span><span class="mf">0.98</span><span class="p">,</span> <span class="n">step</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+        <span class="c1"># 随机初始化值
+</span>        <span class="n">vec</span> <span class="o">=</span> <span class="p">[</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="n">domain</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="n">domain</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">1</span><span class="p">])</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">domain</span><span class="p">))]</span>
+
+        <span class="c1"># 循环
+</span>        <span class="k">while</span> <span class="n">T</span> <span class="o">&gt;</span> <span class="mf">0.1</span><span class="p">:</span>
+            <span class="c1"># 选择一个索引值
+</span>            <span class="n">i</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">domain</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="c1"># 选择一个改变索引值的方向
+</span>            <span class="n">c</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="o">-</span><span class="n">step</span><span class="p">,</span> <span class="n">step</span><span class="p">)</span>  <span class="c1"># -1 or 0 or 1
+</span>            <span class="c1"># 构造新的解
+</span>            <span class="n">vecb</span> <span class="o">=</span> <span class="n">vec</span><span class="p">[:]</span>
+            <span class="n">vecb</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">+=</span> <span class="n">c</span>
+            <span class="k">if</span> <span class="n">vecb</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">domain</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">]:</span>  <span class="c1"># 判断越界情况
+</span>                <span class="n">vecb</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">domain</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">vecb</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">domain</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">1</span><span class="p">]:</span>
+                <span class="n">vecb</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">domain</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
+
+            <span class="c1"># 计算当前成本和新的成本
+</span>            <span class="n">cost1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dormcost</span><span class="p">(</span><span class="n">vec</span><span class="p">)</span>
+            <span class="n">cost2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dormcost</span><span class="p">(</span><span class="n">vecb</span><span class="p">)</span>
+
+            <span class="c1"># 判断新的解是否优于原始解 或者 算法将以一定概率接受较差的解
+</span>            <span class="k">if</span> <span class="n">cost2</span> <span class="o">&lt;</span> <span class="n">cost1</span> <span class="ow">or</span> <span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">()</span> <span class="o">&lt;</span> <span class="n">math</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="p">(</span><span class="n">cost2</span> <span class="o">-</span> <span class="n">cost1</span><span class="p">)</span> <span class="o">/</span> <span class="n">T</span><span class="p">):</span>
+                <span class="n">vec</span> <span class="o">=</span> <span class="n">vecb</span>
+
+            <span class="n">T</span> <span class="o">=</span> <span class="n">T</span> <span class="o">*</span> <span class="n">cool</span>  <span class="c1"># 温度冷却
+</span>            <span class="k">print</span> <span class="n">vecb</span><span class="p">[:],</span> <span class="s">"代价:"</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dormcost</span><span class="p">(</span><span class="n">vecb</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">printsolution</span><span class="p">(</span><span class="n">vec</span><span class="p">)</span>
+        <span class="k">print</span> <span class="s">"模拟退火算法得到的最小代价是："</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dormcost</span><span class="p">(</span><span class="n">vec</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">vec</span>
+
+    <span class="c1"># 搜索算法5： 遗传算法
+</span>    <span class="c1"># 原理： 首先随机生成一组解，我们称之为种群，在优化过程的每一步，算法会计算整个种群的成本函数，
+</span>    <span class="c1">#       从而得到一个有关题解的有序列表。随后根据种群构造进化的下一代种群，方法如下：
+</span>    <span class="c1">#       遗传：从当前种群中选出代价最优的一部分加入下一代种群，称为“精英选拔”
+</span>    <span class="c1">#       变异：对一个既有解进行微小的、简单的、随机的修改
+</span>    <span class="c1">#       交叉：选取最优解中的两个解，按照某种方式进行交叉。方法有单点交叉，多点交叉和均匀交叉
+</span>    <span class="c1"># 一个种群是通过对最优解进行随机的变异和配对处理构造出来的，它的大小通常与旧的种群相同，尔后，这一过程会
+</span>    <span class="c1">#       一直重复进行————新的种群经过排序，又一个种群被构造出来，如果达到指定的迭代次数之后题解都没有得
+</span>    <span class="c1">#       改善，整个过程就结束了
+</span>    <span class="c1"># 参数：
+</span>    <span class="c1"># popsize-种群数量 step-变异改变的大小 mutprob-交叉和变异的比例 elite-直接遗传的比例 maxiter-最大迭代次数
+</span>    <span class="k">def</span> <span class="nf">geneticoptimize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">domain</span><span class="p">,</span> <span class="n">popsize</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">step</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">mutprob</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span> <span class="n">elite</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span> <span class="n">maxiter</span><span class="o">=</span><span class="mi">100</span><span class="p">):</span>
+        <span class="c1"># 变异操作的函数
+</span>        <span class="k">def</span> <span class="nf">mutate</span><span class="p">(</span><span class="n">vec</span><span class="p">):</span>
+            <span class="n">i</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">domain</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="n">res</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">if</span> <span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">()</span> <span class="o">&lt;</span> <span class="mf">0.5</span> <span class="ow">and</span> <span class="n">vec</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">domain</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">]:</span>
+                <span class="n">res</span> <span class="o">=</span> <span class="n">vec</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="n">i</span><span class="p">]</span> <span class="o">+</span> <span class="p">[</span><span class="n">vec</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">-</span> <span class="n">step</span><span class="p">]</span> <span class="o">+</span> <span class="n">vec</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">:]</span>
+            <span class="k">elif</span> <span class="n">vec</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">domain</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">1</span><span class="p">]:</span>
+                <span class="n">res</span> <span class="o">=</span> <span class="n">vec</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="n">i</span><span class="p">]</span> <span class="o">+</span> <span class="p">[</span><span class="n">vec</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">+</span> <span class="n">step</span><span class="p">]</span> <span class="o">+</span> <span class="n">vec</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">:]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">res</span> <span class="o">=</span> <span class="n">vec</span>
+            <span class="k">return</span> <span class="n">res</span>
+
+        <span class="c1"># 交叉操作的函数（单点交叉）
+</span>        <span class="k">def</span> <span class="nf">crossover</span><span class="p">(</span><span class="n">r1</span><span class="p">,</span> <span class="n">r2</span><span class="p">):</span>
+            <span class="n">i</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">domain</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">r1</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="n">i</span><span class="p">]</span> <span class="o">+</span> <span class="n">r2</span><span class="p">[</span><span class="n">i</span><span class="p">:]</span>
+
+        <span class="c1"># 构造初始种群
+</span>        <span class="n">pop</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">popsize</span><span class="p">):</span>
+            <span class="n">vec</span> <span class="o">=</span> <span class="p">[</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="n">domain</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="n">domain</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">1</span><span class="p">])</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">domain</span><span class="p">))]</span>
+            <span class="n">pop</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">vec</span><span class="p">)</span>
+
+        <span class="c1"># 每一代中有多少胜出者
+</span>        <span class="n">topelite</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">elite</span> <span class="o">*</span> <span class="n">popsize</span><span class="p">)</span>
+
+        <span class="c1"># 主循环
+</span>        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">maxiter</span><span class="p">):</span>
+            <span class="k">if</span> <span class="p">[]</span> <span class="ow">in</span> <span class="n">pop</span><span class="p">:</span>
+                <span class="k">print</span> <span class="s">"***"</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">scores</span> <span class="o">=</span> <span class="p">[(</span><span class="bp">self</span><span class="o">.</span><span class="n">dormcost</span><span class="p">(</span><span class="n">v</span><span class="p">),</span> <span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">pop</span><span class="p">]</span>
+            <span class="k">except</span><span class="p">:</span>
+                <span class="k">print</span> <span class="s">"pop!!"</span><span class="p">,</span> <span class="n">pop</span><span class="p">[:]</span>
+            <span class="n">scores</span><span class="o">.</span><span class="n">sort</span><span class="p">()</span>
+            <span class="n">ranked</span> <span class="o">=</span> <span class="p">[</span><span class="n">v</span> <span class="k">for</span> <span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span> <span class="ow">in</span> <span class="n">scores</span><span class="p">]</span>  <span class="c1"># 解按照代价由小到大的排序
+</span>
+            <span class="c1"># 优质解遗传到下一代
+</span>            <span class="n">pop</span> <span class="o">=</span> <span class="n">ranked</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span> <span class="n">topelite</span><span class="p">]</span>
+            <span class="c1"># 如果当前种群数量小于既定数量，则添加变异和交叉遗传
+</span>            <span class="k">while</span> <span class="nb">len</span><span class="p">(</span><span class="n">pop</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">popsize</span><span class="p">:</span>
+                <span class="c1"># 随机数小于 mutprob 则变异，否则交叉
+</span>                <span class="k">if</span> <span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">()</span> <span class="o">&lt;</span> <span class="n">mutprob</span><span class="p">:</span>  <span class="c1"># mutprob控制交叉和变异的比例
+</span>                    <span class="c1"># 选择一个个体
+</span>                    <span class="n">c</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">topelite</span><span class="p">)</span>
+                    <span class="c1"># 变异
+</span>                    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">ranked</span><span class="p">[</span><span class="n">c</span><span class="p">])</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">prefs</span><span class="p">):</span>
+                        <span class="n">temp</span> <span class="o">=</span> <span class="n">mutate</span><span class="p">(</span><span class="n">ranked</span><span class="p">[</span><span class="n">c</span><span class="p">])</span>
+                        <span class="k">if</span> <span class="n">temp</span> <span class="o">==</span> <span class="p">[]:</span>
+                            <span class="k">print</span> <span class="s">"******"</span><span class="p">,</span> <span class="n">ranked</span><span class="p">[</span><span class="n">c</span><span class="p">]</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="n">pop</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">temp</span><span class="p">)</span>
+
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="c1"># 随机选择两个个体进行交叉
+</span>                    <span class="n">c1</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">topelite</span><span class="p">)</span>
+                    <span class="n">c2</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">topelite</span><span class="p">)</span>
+                    <span class="n">pop</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">crossover</span><span class="p">(</span><span class="n">ranked</span><span class="p">[</span><span class="n">c1</span><span class="p">],</span> <span class="n">ranked</span><span class="p">[</span><span class="n">c2</span><span class="p">]))</span>
+            <span class="c1"># 输出当前种群中代价最小的解
+</span>            <span class="k">print</span> <span class="n">scores</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">],</span> <span class="s">"代价："</span><span class="p">,</span> <span class="n">scores</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">printsolution</span><span class="p">(</span><span class="n">scores</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">])</span>
+        <span class="k">print</span> <span class="s">"遗传算法求得的最小代价："</span><span class="p">,</span> <span class="n">scores</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">scores</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
+
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">'__main__'</span><span class="p">:</span>
+    <span class="n">dormsol</span> <span class="o">=</span> <span class="n">dorm</span><span class="p">()</span>
+    <span class="c1">#sol = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+</span>    <span class="c1">#dormsol.printsolution(sol)
+</span>    <span class="c1">#dormsol.dormcost(sol)
+</span>
+    <span class="n">domain</span> <span class="o">=</span> <span class="n">dormsol</span><span class="o">.</span><span class="n">domain</span>
+
+    <span class="c1"># 方法1：随机猜测
+</span>    <span class="c1">#dormsol.randomoptimize(domain)
+</span>
+    <span class="c1"># 方法2：爬山法
+</span>    <span class="c1">#dormsol.hillclimb(domain)
+</span>
+    <span class="c1"># 方法3：模拟退火法
+</span>    <span class="c1">#dormsol.annealingoptimize(domain)
+</span>
+    <span class="c1"># 方法4：遗传算法
+</span>    <span class="n">dormsol</span><span class="o">.</span><span class="n">geneticoptimize</span><span class="p">(</span><span class="n">domain</span><span class="p">)</span>
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>参考资料：https://blog.csdn.net/bcj296050240/article/details/50839806</p>
+
+<h2 id="排料算法应用">排料算法应用</h2>
+
+<h3 id="️-not-fit-polygon">☣️ Not-fit Polygon</h3>
+
+<h3 id="️-碰撞法">☣️ 碰撞法</h3>
+
+<h3 id="️-左底部算法">☣️ 左底部算法</h3>
+
+<h2 id="大规模分解算法">大规模分解算法</h2>
+
+<h3 id="️-列生成column-generation">☣️ 列生成（Column Generation）</h3>
+
+<h3 id="️-benders-decomposition">☣️ Benders Decomposition</h3>
+
+<h3 id="️-dantzig-wolfe-decomposition">☣️ Dantzig-Wolfe Decomposition</h3>
+
+<h3 id="️-分支定价法branch-and-price">☣️ 分支定价法（Branch and Price）</h3>
+
+<h2 id="经典问题">经典问题</h2>
+
+<h3 id="️-旅行商问题">☣️ 旅行商问题</h3>
+
+<blockquote>
+  <p>采用进化算法解决</p>
+</blockquote>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80
+81
+82
+83
+84
+85
+86
+87
+88
+89
+90
+91
+92
+93
+94
+95
+</pre></td><td class="rouge-code"><pre><span class="c1"># -*- coding: utf-8 -*-
+</span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="n">plt</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="n">np</span>
+
+<span class="n">N_CITIES</span> <span class="o">=</span> <span class="mi">20</span>  <span class="c1"># 城市数量
+</span><span class="n">CROSS_RATE</span> <span class="o">=</span> <span class="mf">0.1</span>  <span class="c1"># DNA交叉概率
+</span><span class="n">MUTATE_RATE</span> <span class="o">=</span> <span class="mf">0.02</span>  <span class="c1"># 变异概率
+</span><span class="n">POP_SIZE</span> <span class="o">=</span> <span class="mi">500</span>  <span class="c1"># 个体数量
+</span><span class="n">N_GENERATIONS</span> <span class="o">=</span> <span class="mi">500</span>  <span class="c1"># 迭代轮数
+</span>
+
+<span class="k">class</span> <span class="nc">GA</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">DNA_size</span><span class="p">,</span> <span class="n">cross_rate</span><span class="p">,</span> <span class="n">mutation_rate</span><span class="p">,</span> <span class="n">pop_size</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">DNA_size</span> <span class="o">=</span> <span class="n">DNA_size</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cross_rate</span> <span class="o">=</span> <span class="n">cross_rate</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mutate_rate</span> <span class="o">=</span> <span class="n">mutation_rate</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pop_size</span> <span class="o">=</span> <span class="n">pop_size</span>
+        <span class="c1">#  初始化每个个体的DNA
+</span>        <span class="bp">self</span><span class="o">.</span><span class="n">pop</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">permutation</span><span class="p">(</span><span class="n">DNA_size</span><span class="p">)</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">pop_size</span><span class="p">)])</span>
+
+    <span class="k">def</span> <span class="nf">translateDNA</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">DNA</span><span class="p">,</span> <span class="n">city_position</span><span class="p">):</span>   <span class="c1"># 获得每个城市的坐标
+</span>        <span class="n">line_x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty_like</span><span class="p">(</span><span class="n">DNA</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+        <span class="n">line_y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty_like</span><span class="p">(</span><span class="n">DNA</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">d</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">DNA</span><span class="p">):</span>
+            <span class="n">city_coord</span> <span class="o">=</span> <span class="n">city_position</span><span class="p">[</span><span class="n">d</span><span class="p">]</span>
+            <span class="n">line_x</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">city_coord</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span>
+            <span class="n">line_y</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">city_coord</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">line_x</span><span class="p">,</span> <span class="n">line_y</span>
+
+    <span class="k">def</span> <span class="nf">get_fitness</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">line_x</span><span class="p">,</span> <span class="n">line_y</span><span class="p">):</span>
+        <span class="n">total_distance</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pop_size</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">xs</span><span class="p">,</span> <span class="n">ys</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">line_x</span><span class="p">,</span> <span class="n">line_y</span><span class="p">)):</span>
+            <span class="n">total_distance</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="nb">sum</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">square</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="n">xs</span><span class="p">))</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">square</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="n">ys</span><span class="p">))))</span>
+        <span class="n">fitness</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">DNA_size</span> <span class="o">*</span> <span class="mi">2</span> <span class="o">/</span> <span class="n">total_distance</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">fitness</span><span class="p">,</span> <span class="n">total_distance</span>
+
+    <span class="k">def</span> <span class="nf">select</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fitness</span><span class="p">):</span>  <span class="c1"># 适应度高的DNA有更大的概率保留
+</span>        <span class="n">idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pop_size</span><span class="p">),</span> <span class="n">size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">pop_size</span><span class="p">,</span> <span class="n">replace</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="n">fitness</span> <span class="o">/</span> <span class="n">fitness</span><span class="o">.</span><span class="nb">sum</span><span class="p">())</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">pop</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">crossover</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parent</span><span class="p">,</span> <span class="n">pop</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">()</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">cross_rate</span><span class="p">:</span>
+            <span class="n">i_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">pop_size</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>  <span class="c1"># 选择另一个体
+</span>            <span class="n">cross_points</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">DNA_size</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="nb">bool</span><span class="p">)</span>  <span class="c1"># 确定DNA如何交叉
+</span>            <span class="n">keep_city</span> <span class="o">=</span> <span class="n">parent</span><span class="p">[</span><span class="o">~</span><span class="n">cross_points</span><span class="p">]</span>
+            <span class="n">swap_city</span> <span class="o">=</span> <span class="n">pop</span><span class="p">[</span><span class="n">i_</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">pop</span><span class="p">[</span><span class="n">i_</span><span class="p">]</span><span class="o">.</span><span class="n">ravel</span><span class="p">(),</span> <span class="n">keep_city</span><span class="p">,</span> <span class="n">invert</span><span class="o">=</span><span class="bp">True</span><span class="p">)]</span>
+            <span class="n">parent</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">((</span><span class="n">keep_city</span><span class="p">,</span> <span class="n">swap_city</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">parent</span>
+
+    <span class="k">def</span> <span class="nf">mutate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">child</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">point</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">DNA_size</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">()</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">mutate_rate</span><span class="p">:</span>  <span class="c1"># 变异：交换两个基因
+</span>                <span class="n">swap_point</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">DNA_size</span><span class="p">)</span>
+                <span class="n">swapA</span><span class="p">,</span> <span class="n">swapB</span> <span class="o">=</span> <span class="n">child</span><span class="p">[</span><span class="n">point</span><span class="p">],</span> <span class="n">child</span><span class="p">[</span><span class="n">swap_point</span><span class="p">]</span>
+                <span class="n">child</span><span class="p">[</span><span class="n">point</span><span class="p">],</span> <span class="n">child</span><span class="p">[</span><span class="n">swap_point</span><span class="p">]</span> <span class="o">=</span> <span class="n">swapB</span><span class="p">,</span> <span class="n">swapA</span>
+        <span class="k">return</span> <span class="n">child</span>
+
+    <span class="k">def</span> <span class="nf">evolve</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fitness</span><span class="p">):</span>
+        <span class="n">pop</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="n">fitness</span><span class="p">)</span>
+        <span class="n">pop_copy</span> <span class="o">=</span> <span class="n">pop</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">parent</span> <span class="ow">in</span> <span class="n">pop</span><span class="p">:</span>  <span class="c1"># for every parent
+</span>            <span class="n">child</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">crossover</span><span class="p">(</span><span class="n">parent</span><span class="p">,</span> <span class="n">pop_copy</span><span class="p">)</span>
+            <span class="n">child</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mutate</span><span class="p">(</span><span class="n">child</span><span class="p">)</span>
+            <span class="n">parent</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">child</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pop</span> <span class="o">=</span> <span class="n">pop</span>
+
+
+<span class="k">class</span> <span class="nc">TravelSalesPerson</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_cities</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">city_position</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="n">n_cities</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>  <span class="c1"># 初始化每个城市的坐标
+</span>        <span class="n">plt</span><span class="o">.</span><span class="n">ion</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">plotting</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lx</span><span class="p">,</span> <span class="n">ly</span><span class="p">,</span> <span class="n">total_d</span><span class="p">):</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">cla</span><span class="p">()</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">city_position</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">city_position</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s">'k'</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">lx</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">ly</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="s">'r-'</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="o">-</span><span class="mf">0.05</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.05</span><span class="p">,</span> <span class="s">"Total distance=</span><span class="si">%.2</span><span class="s">f"</span> <span class="o">%</span> <span class="n">total_d</span><span class="p">,</span> <span class="n">fontdict</span><span class="o">=</span><span class="p">{</span><span class="s">'size'</span><span class="p">:</span> <span class="mi">20</span><span class="p">,</span> <span class="s">'color'</span><span class="p">:</span> <span class="s">'red'</span><span class="p">})</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">xlim</span><span class="p">((</span><span class="o">-</span><span class="mf">0.1</span><span class="p">,</span> <span class="mf">1.1</span><span class="p">))</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">ylim</span><span class="p">((</span><span class="o">-</span><span class="mf">0.1</span><span class="p">,</span> <span class="mf">1.1</span><span class="p">))</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">pause</span><span class="p">(</span><span class="mf">0.01</span><span class="p">)</span>
+
+<span class="n">ga</span> <span class="o">=</span> <span class="n">GA</span><span class="p">(</span><span class="n">DNA_size</span><span class="o">=</span><span class="n">N_CITIES</span><span class="p">,</span> <span class="n">cross_rate</span><span class="o">=</span><span class="n">CROSS_RATE</span><span class="p">,</span> <span class="n">mutation_rate</span><span class="o">=</span><span class="n">MUTATE_RATE</span><span class="p">,</span> <span class="n">pop_size</span><span class="o">=</span><span class="n">POP_SIZE</span><span class="p">)</span>
+<span class="n">env</span> <span class="o">=</span> <span class="n">TravelSalesPerson</span><span class="p">(</span><span class="n">N_CITIES</span><span class="p">)</span>  <span class="c1"># 初始化每个城市的坐标
+</span>
+<span class="k">for</span> <span class="n">generation</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N_GENERATIONS</span><span class="p">):</span>
+    <span class="n">lx</span><span class="p">,</span> <span class="n">ly</span> <span class="o">=</span> <span class="n">ga</span><span class="o">.</span><span class="n">translateDNA</span><span class="p">(</span><span class="n">ga</span><span class="o">.</span><span class="n">pop</span><span class="p">,</span> <span class="n">env</span><span class="o">.</span><span class="n">city_position</span><span class="p">)</span>  <span class="c1"># 将DNA中的城市id转换为城市坐标
+</span>    <span class="n">fitness</span><span class="p">,</span> <span class="n">total_distance</span> <span class="o">=</span> <span class="n">ga</span><span class="o">.</span><span class="n">get_fitness</span><span class="p">(</span><span class="n">lx</span><span class="p">,</span> <span class="n">ly</span><span class="p">)</span>
+    <span class="n">ga</span><span class="o">.</span><span class="n">evolve</span><span class="p">(</span><span class="n">fitness</span><span class="p">)</span>  <span class="c1"># 模拟进化过程
+</span>    <span class="n">best_idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">fitness</span><span class="p">)</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">'Gen:'</span><span class="p">,</span> <span class="n">generation</span><span class="p">,</span> <span class="s">'| best fit: </span><span class="si">%.2</span><span class="s">f'</span> <span class="o">%</span> <span class="n">fitness</span><span class="p">[</span><span class="n">best_idx</span><span class="p">],)</span>
+
+    <span class="n">env</span><span class="o">.</span><span class="n">plotting</span><span class="p">(</span><span class="n">lx</span><span class="p">[</span><span class="n">best_idx</span><span class="p">],</span> <span class="n">ly</span><span class="p">[</span><span class="n">best_idx</span><span class="p">],</span> <span class="n">total_distance</span><span class="p">[</span><span class="n">best_idx</span><span class="p">])</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">ioff</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<h3 id="️-0-1-背包问题">☣️ 0-1 背包问题</h3>
+
+<blockquote>
+  <p>进化算法解决</p>
+</blockquote>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+</pre></td><td class="rouge-code"><pre><span class="c1"># -*- coding: utf-8 -*-
+</span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="n">np</span>
+
+<span class="n">N_ITEMS</span> <span class="o">=</span> <span class="mi">20</span>  <span class="c1"># 物品数量
+</span><span class="n">CROSS_RATE</span> <span class="o">=</span> <span class="mf">0.5</span>  <span class="c1"># DNA交叉概率
+</span><span class="n">MUTATE_RATE</span> <span class="o">=</span> <span class="mf">0.01</span>  <span class="c1"># 变异概率
+</span><span class="n">POP_SIZE</span> <span class="o">=</span> <span class="mi">400</span>  <span class="c1"># 个体数量
+</span><span class="n">N_GENERATIONS</span> <span class="o">=</span> <span class="mi">20</span>  <span class="c1"># 迭代轮数
+</span>
+
+<span class="k">class</span> <span class="nc">GA</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">DNA_size</span><span class="p">,</span> <span class="n">cross_rate</span><span class="p">,</span> <span class="n">mutate_rate</span><span class="p">,</span> <span class="n">pop_size</span><span class="p">,</span> <span class="n">n_generations</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">DNA_size</span> <span class="o">=</span> <span class="n">DNA_size</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cross_rate</span> <span class="o">=</span> <span class="n">cross_rate</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mutate_rate</span> <span class="o">=</span> <span class="n">mutate_rate</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pop_size</span> <span class="o">=</span> <span class="n">pop_size</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">n_generations</span> <span class="o">=</span> <span class="n">n_generations</span>
+        <span class="c1">#  初始化每个个体的DNA
+</span>        <span class="bp">self</span><span class="o">.</span><span class="n">pop</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="n">pop_size</span><span class="p">,</span> <span class="n">DNA_size</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">get_fitness</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">v</span><span class="p">,</span> <span class="n">c</span><span class="p">):</span>
+        <span class="n">fitness</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">pop_size</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">individual</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pop</span><span class="p">):</span>  <span class="c1"># 计算每个个体的fitness和weight
+</span>            <span class="n">weight</span> <span class="o">=</span> <span class="n">w</span><span class="p">[</span><span class="n">individual</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="nb">bool</span><span class="p">)]</span><span class="o">.</span><span class="nb">sum</span><span class="p">()</span>
+            <span class="n">value</span> <span class="o">=</span> <span class="n">v</span><span class="p">[</span><span class="n">individual</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="nb">bool</span><span class="p">)]</span><span class="o">.</span><span class="nb">sum</span><span class="p">()</span>
+            <span class="c1"># 若物品总重量超过capacity，则fitness为0
+</span>            <span class="n">fitness</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span> <span class="k">if</span> <span class="n">weight</span> <span class="o">&gt;</span> <span class="n">c</span> <span class="k">else</span> <span class="n">value</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">fitness</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">DNA_size</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">select</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fitness</span><span class="p">):</span>  <span class="c1"># 适应度高的DNA有更大的概率保留
+</span>        <span class="n">index</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pop_size</span><span class="p">),</span> <span class="n">size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">pop_size</span><span class="p">,</span> <span class="n">replace</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="n">fitness</span><span class="o">/</span><span class="n">fitness</span><span class="o">.</span><span class="nb">sum</span><span class="p">())</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">pop</span><span class="p">[</span><span class="n">index</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">mutate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dna</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">point</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">DNA_size</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">()</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">mutate_rate</span><span class="p">:</span>
+                <span class="n">dna</span><span class="p">[</span><span class="n">point</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span> <span class="k">if</span> <span class="n">dna</span><span class="p">[</span><span class="n">point</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span> <span class="k">else</span> <span class="mi">1</span>  <span class="c1"># 变异
+</span>
+    <span class="k">def</span> <span class="nf">crossover</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pop</span><span class="p">):</span>
+        <span class="n">pop_copy</span> <span class="o">=</span> <span class="n">pop</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pop_size</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">()</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">cross_rate</span><span class="p">:</span>
+                <span class="n">i_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pop_size</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>  <span class="c1"># 选择另一个体
+</span>                <span class="n">cross_points</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">DNA_size</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="nb">bool</span><span class="p">)</span>  <span class="c1"># 确定DNA交叉点
+</span>                <span class="n">pop</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">cross_points</span><span class="p">]</span> <span class="o">=</span> <span class="n">pop_copy</span><span class="p">[</span><span class="n">i_</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="n">cross_points</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">mutate</span><span class="p">(</span><span class="n">pop</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+
+
+<span class="n">c</span> <span class="o">=</span> <span class="mi">40</span>  <span class="c1"># 背包容量
+</span><span class="n">w</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">9</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">9</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">2</span><span class="p">])</span>  <span class="c1"># 物品重量
+</span><span class="n">v</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">6</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">9</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">9</span><span class="p">])</span>  <span class="c1"># 物品价值
+</span>
+<span class="n">ga</span> <span class="o">=</span> <span class="n">GA</span><span class="p">(</span><span class="n">N_ITEMS</span><span class="p">,</span> <span class="n">CROSS_RATE</span><span class="p">,</span> <span class="n">MUTATE_RATE</span><span class="p">,</span> <span class="n">POP_SIZE</span><span class="p">,</span> <span class="n">N_GENERATIONS</span><span class="p">)</span>
+
+<span class="k">for</span> <span class="n">generation</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N_GENERATIONS</span><span class="p">):</span>
+    <span class="n">fitness</span> <span class="o">=</span> <span class="n">ga</span><span class="o">.</span><span class="n">get_fitness</span><span class="p">(</span><span class="n">w</span><span class="p">,</span> <span class="n">v</span><span class="p">,</span> <span class="n">c</span><span class="p">)</span>
+    <span class="n">pop</span> <span class="o">=</span> <span class="n">ga</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="n">fitness</span><span class="p">)</span>
+    <span class="n">ga</span><span class="o">.</span><span class="n">crossover</span><span class="p">(</span><span class="n">pop</span><span class="p">)</span>
+    <span class="n">best_idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">fitness</span><span class="p">)</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">'Gen:'</span><span class="p">,</span> <span class="n">generation</span><span class="p">,</span> <span class="s">'| best fit: </span><span class="si">%.2</span><span class="s">f'</span> <span class="o">%</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">fitness</span><span class="p">[</span><span class="n">best_idx</span><span class="p">])</span><span class="o">*</span><span class="n">ga</span><span class="o">.</span><span class="n">DNA_size</span><span class="p">),</span> <span class="s">'| items:'</span><span class="p">,</span> <span class="n">ga</span><span class="o">.</span><span class="n">pop</span><span class="p">[</span><span class="n">best_idx</span><span class="p">])</span>
+    <span class="n">ga</span><span class="o">.</span><span class="n">pop</span> <span class="o">=</span> <span class="n">pop</span>
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<h2 id="其他未分类">其他未分类</h2>
+
+<h3 id="-启发式算法">✅ 启发式算法</h3>
+
+<p><img src="https://tva1.sinaimg.cn/large/006y8mN6ly1g83p9zif17j30iy0g676d.jpg" alt="Heuristic-Algorithms" /></p>
+
+<h3 id="️-拉格朗日松弛">☣️ 拉格朗日松弛</h3>
+
+<h3 id="️-贪婪算法">☣️ 贪婪算法</h3>
+
+<h3 id="️-网络流算法">☣️ 网络流算法</h3>
+
+<h3 id="️-并行计算">☣️ 并行计算</h3>
+
+:ET
