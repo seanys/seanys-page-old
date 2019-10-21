@@ -1,0 +1,2314 @@
+I"Z�<blockquote>
+  <p>✅  已经整理好</p>
+
+  <p>💤  大部分整理好了但是没理解</p>
+
+  <p>🆘  还有一部分需要整理</p>
+
+  <p>☣️  需要整理</p>
+</blockquote>
+
+<p>备注：部分算法在多个分类中均有应用，可能只写在一个分类中，或者放在了回归模型中</p>
+
+<h2 id="机器学习与数据挖掘">机器学习与数据挖掘</h2>
+
+<h3 id="-决策树decision-tree">✅ 决策树（Decision Tree）</h3>
+
+<h4 id="-前言">✅ 前言</h4>
+
+<p><strong>基本概念</strong></p>
+
+<p>（1）根结点(Root Node)：它表示整个样本集合，并且该节点可以进一步划分成两个或多个子集。</p>
+
+<p>（2）拆分(Splitting)：表示将一个结点拆分成多个子集的过程。</p>
+
+<p>（3）决策结点(Decision Node)：当一个子结点进一步被拆分成多个子节点时，这个子节点就叫做决策结点。</p>
+
+<p>（4）叶子结点(Leaf/Terminal Node)：无法再拆分的结点被称为叶子结点。</p>
+
+<p>（5）剪枝(Pruning)：移除决策树中子结点的过程就叫做剪枝，跟拆分过程相反。</p>
+
+<p>（6）分支/子树(Branch/Sub-Tree)：一棵决策树的一部分就叫做分支或子树。</p>
+
+<p>（7）父结点和子结点(Paren and Child Node)：一个结点被拆分成多个子节点，这个结点就叫做父节点；其拆分后的子结点也叫做子结点。</p>
+
+<p><strong>分类</strong></p>
+
+<ul>
+  <li>离散性决策树：离散性决策树，其目标变量是离散的，如性别：男或女等；</li>
+  <li>连续性决策树：连续性决策树，其目标变量是连续的，如工资、价格、年龄等；</li>
+</ul>
+
+<p><img src="https://shuwoom.com/wp-content/uploads/2018/10/65e4301fe9e9a0f4e4d448a8f4181751.png" alt="img" /></p>
+
+<p><strong>特征选择</strong></p>
+
+<p>特征选择表示从众多的特征中选择一个特征作为当前节点分裂的标准，如何选择特征有不同的量化评估方法，从而衍生出不同的决策树，如ID3（通过信息增益选择特征）、C4.5（通过信息增益比选择特征）、CART（通过Gini指数选择特征）等。</p>
+
+<p><strong>决策树的生成</strong></p>
+
+<p>根据选择的特征评估标准，从上至下递归地生成子节点，直到数据集不可分则停止决策树停止生长。这个过程实际上就是使用满足划分准则的特征不断的将数据集划分成纯度更高，不确定行更小的子集的过程。对于当前数据集的每一次划分，都希望根据某个特征划分之后的各个子集的纯度更高，不确定性更小。</p>
+
+<p><strong>决策树的裁剪</strong></p>
+
+<p>决策树容易过拟合，一般需要剪枝来缩小树结构规模、缓解过拟合。</p>
+
+<p>参考资料：https://shuwoom.com/?p=1452</p>
+
+<h4 id="-id3算法">✅ ID3算法</h4>
+
+<p>熵这个概念最早起源于物理学，在物理学中是用来度量一个热力学系统的无序程度，而在信息学里面，熵是对不确定性的度量。在1948年，香农引入了信息熵（information entropy），将其定义为离散随机事件出现的概率，一个系统越是有序，信息熵就越低，反之一个系统越是混乱，它的信息熵就越高。所以信息熵可以被认为是系统有序化程度的一个度量。</p>
+
+<p><strong>案例</strong>：对于有K个类别的分类问题来说，假定样本集合D中第 k 类样本所占的比例为pk（k=1,2,…,K）,则样本集合D的信息熵定义为:</p>
+
+<script type="math/tex; mode=display">Ent(D)=-\sum_{k=1}^KP_k·log_2p_k</script>
+
+<p><strong>简单概括</strong>：分叉树上的熵的加权平均值</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80
+81
+82
+83
+84
+85
+86
+87
+88
+</pre></td><td class="rouge-code"><pre><span class="kn">from</span> <span class="nn">math</span> <span class="kn">import</span> <span class="n">log</span>
+<span class="kn">import</span> <span class="nn">operator</span>
+
+<span class="k">def</span> <span class="nf">calcShannonEnt</span><span class="p">(</span><span class="n">dataSet</span><span class="p">):</span>  <span class="c1"># 计算数据的熵(entropy)
+</span>    <span class="n">numEntries</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">dataSet</span><span class="p">)</span>  <span class="c1"># 数据条数
+</span>    <span class="n">labelCounts</span><span class="o">=</span><span class="p">{}</span>
+    <span class="k">for</span> <span class="n">featVec</span> <span class="ow">in</span> <span class="n">dataSet</span><span class="p">:</span>
+        <span class="n">currentLabel</span><span class="o">=</span><span class="n">featVec</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="c1"># 每行数据的最后一个字（类别）
+</span>        <span class="k">if</span> <span class="n">currentLabel</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">labelCounts</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="n">labelCounts</span><span class="p">[</span><span class="n">currentLabel</span><span class="p">]</span><span class="o">=</span><span class="mi">0</span>
+        <span class="n">labelCounts</span><span class="p">[</span><span class="n">currentLabel</span><span class="p">]</span><span class="o">+=</span><span class="mi">1</span>  <span class="c1"># 统计有多少个类以及每个类的数量
+</span>    <span class="n">shannonEnt</span><span class="o">=</span><span class="mi">0</span>
+    <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">labelCounts</span><span class="p">:</span>
+        <span class="n">prob</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="n">labelCounts</span><span class="p">[</span><span class="n">key</span><span class="p">])</span><span class="o">/</span><span class="n">numEntries</span> <span class="c1"># 计算单个类的熵值
+</span>        <span class="n">shannonEnt</span><span class="o">-=</span><span class="n">prob</span><span class="o">*</span><span class="n">log</span><span class="p">(</span><span class="n">prob</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span> <span class="c1"># 累加每个类的熵值
+</span>    <span class="k">return</span> <span class="n">shannonEnt</span>
+
+<span class="k">def</span> <span class="nf">createDataSet1</span><span class="p">():</span>    <span class="c1"># 创造示例数据
+</span>    <span class="n">dataSet</span> <span class="o">=</span> <span class="p">[[</span><span class="s">'长'</span><span class="p">,</span> <span class="s">'粗'</span><span class="p">,</span> <span class="s">'男'</span><span class="p">],</span>
+               <span class="p">[</span><span class="s">'短'</span><span class="p">,</span> <span class="s">'粗'</span><span class="p">,</span> <span class="s">'男'</span><span class="p">],</span>
+               <span class="p">[</span><span class="s">'短'</span><span class="p">,</span> <span class="s">'粗'</span><span class="p">,</span> <span class="s">'男'</span><span class="p">],</span>
+               <span class="p">[</span><span class="s">'长'</span><span class="p">,</span> <span class="s">'细'</span><span class="p">,</span> <span class="s">'女'</span><span class="p">],</span>
+               <span class="p">[</span><span class="s">'短'</span><span class="p">,</span> <span class="s">'细'</span><span class="p">,</span> <span class="s">'女'</span><span class="p">],</span>
+               <span class="p">[</span><span class="s">'短'</span><span class="p">,</span> <span class="s">'粗'</span><span class="p">,</span> <span class="s">'女'</span><span class="p">],</span>
+               <span class="p">[</span><span class="s">'长'</span><span class="p">,</span> <span class="s">'粗'</span><span class="p">,</span> <span class="s">'女'</span><span class="p">],</span>
+               <span class="p">[</span><span class="s">'长'</span><span class="p">,</span> <span class="s">'粗'</span><span class="p">,</span> <span class="s">'女'</span><span class="p">]]</span>
+    <span class="n">labels</span> <span class="o">=</span> <span class="p">[</span><span class="s">'头发'</span><span class="p">,</span><span class="s">'声音'</span><span class="p">]</span>  <span class="c1">#两个特征
+</span>    <span class="k">return</span> <span class="n">dataSet</span><span class="p">,</span><span class="n">labels</span>
+
+<span class="k">def</span> <span class="nf">splitDataSet</span><span class="p">(</span><span class="n">dataSet</span><span class="p">,</span><span class="n">axis</span><span class="p">,</span><span class="n">value</span><span class="p">):</span> <span class="c1"># 按某个特征分类后的数据
+</span>    <span class="n">retDataSet</span><span class="o">=</span><span class="p">[]</span>
+    <span class="k">for</span> <span class="n">featVec</span> <span class="ow">in</span> <span class="n">dataSet</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">featVec</span><span class="p">[</span><span class="n">axis</span><span class="p">]</span><span class="o">==</span><span class="n">value</span><span class="p">:</span>
+            <span class="n">reducedFeatVec</span> <span class="o">=</span><span class="n">featVec</span><span class="p">[:</span><span class="n">axis</span><span class="p">]</span>
+            <span class="n">reducedFeatVec</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">featVec</span><span class="p">[</span><span class="n">axis</span><span class="o">+</span><span class="mi">1</span><span class="p">:])</span>
+            <span class="n">retDataSet</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">reducedFeatVec</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">retDataSet</span>
+
+<span class="k">def</span> <span class="nf">chooseBestFeatureToSplit</span><span class="p">(</span><span class="n">dataSet</span><span class="p">):</span>  <span class="c1"># 选择最优的分类特征
+</span>    <span class="n">numFeatures</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">dataSet</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">-</span><span class="mi">1</span>
+    <span class="n">baseEntropy</span> <span class="o">=</span> <span class="n">calcShannonEnt</span><span class="p">(</span><span class="n">dataSet</span><span class="p">)</span>  <span class="c1"># 原始的熵
+</span>    <span class="n">bestInfoGain</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">bestFeature</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">numFeatures</span><span class="p">):</span>
+        <span class="n">featList</span> <span class="o">=</span> <span class="p">[</span><span class="n">example</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">example</span> <span class="ow">in</span> <span class="n">dataSet</span><span class="p">]</span>
+        <span class="n">uniqueVals</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">featList</span><span class="p">)</span>
+        <span class="n">newEntropy</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">uniqueVals</span><span class="p">:</span>
+            <span class="n">subDataSet</span> <span class="o">=</span> <span class="n">splitDataSet</span><span class="p">(</span><span class="n">dataSet</span><span class="p">,</span><span class="n">i</span><span class="p">,</span><span class="n">value</span><span class="p">)</span>
+            <span class="n">prob</span> <span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">subDataSet</span><span class="p">)</span><span class="o">/</span><span class="nb">float</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">dataSet</span><span class="p">))</span>
+            <span class="n">newEntropy</span> <span class="o">+=</span><span class="n">prob</span><span class="o">*</span><span class="n">calcShannonEnt</span><span class="p">(</span><span class="n">subDataSet</span><span class="p">)</span>  <span class="c1"># 按特征分类后的熵
+</span>        <span class="n">infoGain</span> <span class="o">=</span> <span class="n">baseEntropy</span> <span class="o">-</span> <span class="n">newEntropy</span>  <span class="c1"># 原始熵与按特征分类后的熵的差值
+</span>        <span class="k">if</span> <span class="p">(</span><span class="n">infoGain</span><span class="o">&gt;</span><span class="n">bestInfoGain</span><span class="p">):</span>   <span class="c1"># 若按某特征划分后，熵值减少的最大，则次特征为最优分类特征
+</span>            <span class="n">bestInfoGain</span><span class="o">=</span><span class="n">infoGain</span>
+            <span class="n">bestFeature</span> <span class="o">=</span> <span class="n">i</span>
+    <span class="k">return</span> <span class="n">bestFeature</span>
+
+<span class="k">def</span> <span class="nf">majorityCnt</span><span class="p">(</span><span class="n">classList</span><span class="p">):</span>    <span class="c1">#按分类后类别数量排序，比如：最后分类为2男1女，则判定为男；
+</span>    <span class="n">classCount</span><span class="o">=</span><span class="p">{}</span>
+    <span class="k">for</span> <span class="n">vote</span> <span class="ow">in</span> <span class="n">classList</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">vote</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">classCount</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="n">classCount</span><span class="p">[</span><span class="n">vote</span><span class="p">]</span><span class="o">=</span><span class="mi">0</span>
+        <span class="n">classCount</span><span class="p">[</span><span class="n">vote</span><span class="p">]</span><span class="o">+=</span><span class="mi">1</span>
+    <span class="n">sortedClassCount</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">classCount</span><span class="o">.</span><span class="n">items</span><span class="p">(),</span><span class="n">key</span><span class="o">=</span><span class="n">operator</span><span class="o">.</span><span class="n">itemgetter</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span><span class="n">reverse</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">sortedClassCount</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+
+<span class="k">def</span> <span class="nf">createTree</span><span class="p">(</span><span class="n">dataSet</span><span class="p">,</span><span class="n">labels</span><span class="p">):</span>
+    <span class="n">classList</span><span class="o">=</span><span class="p">[</span><span class="n">example</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">example</span> <span class="ow">in</span> <span class="n">dataSet</span><span class="p">]</span>  <span class="c1"># 类别：男或女
+</span>    <span class="k">if</span> <span class="n">classList</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="n">classList</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">==</span><span class="nb">len</span><span class="p">(</span><span class="n">classList</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">classList</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">dataSet</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">==</span><span class="mi">1</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">majorityCnt</span><span class="p">(</span><span class="n">classList</span><span class="p">)</span>
+    <span class="n">bestFeat</span><span class="o">=</span><span class="n">chooseBestFeatureToSplit</span><span class="p">(</span><span class="n">dataSet</span><span class="p">)</span> <span class="c1">#选择最优特征
+</span>    <span class="n">bestFeatLabel</span><span class="o">=</span><span class="n">labels</span><span class="p">[</span><span class="n">bestFeat</span><span class="p">]</span>
+    <span class="n">myTree</span><span class="o">=</span><span class="p">{</span><span class="n">bestFeatLabel</span><span class="p">:{}}</span> <span class="c1">#分类结果以字典形式保存
+</span>    <span class="k">del</span><span class="p">(</span><span class="n">labels</span><span class="p">[</span><span class="n">bestFeat</span><span class="p">])</span>
+    <span class="n">featValues</span><span class="o">=</span><span class="p">[</span><span class="n">example</span><span class="p">[</span><span class="n">bestFeat</span><span class="p">]</span> <span class="k">for</span> <span class="n">example</span> <span class="ow">in</span> <span class="n">dataSet</span><span class="p">]</span>
+    <span class="n">uniqueVals</span><span class="o">=</span><span class="nb">set</span><span class="p">(</span><span class="n">featValues</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">uniqueVals</span><span class="p">:</span>
+        <span class="n">subLabels</span><span class="o">=</span><span class="n">labels</span><span class="p">[:]</span>
+        <span class="n">myTree</span><span class="p">[</span><span class="n">bestFeatLabel</span><span class="p">][</span><span class="n">value</span><span class="p">]</span><span class="o">=</span><span class="n">createTree</span><span class="p">(</span><span class="n">splitDataSet</span>\
+                            <span class="p">(</span><span class="n">dataSet</span><span class="p">,</span><span class="n">bestFeat</span><span class="p">,</span><span class="n">value</span><span class="p">),</span><span class="n">subLabels</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">myTree</span>
+
+
+<span class="k">if</span> <span class="n">__name__</span><span class="o">==</span><span class="s">'__main__'</span><span class="p">:</span>
+    <span class="n">dataSet</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="n">createDataSet1</span><span class="p">()</span>  <span class="c1"># 创造示列数据
+</span>    <span class="k">print</span><span class="p">(</span><span class="n">createTree</span><span class="p">(</span><span class="n">dataSet</span><span class="p">,</span> <span class="n">labels</span><span class="p">))</span>  <span class="c1"># 输出决策树模型结果
+</span></pre></td></tr></tbody></table></code></pre></div></div>
+
+<h4 id="-c45算法">✅ C4.5算法</h4>
+
+<p><strong>背景</strong>：我们知道信息增益会偏向取值较多的特征，使用信息增益比可以对这一问题进行校正。</p>
+
+<table>
+  <tbody>
+    <tr>
+      <td><strong>信息增益</strong>：$Gain(D,A) = H(D) – H(D</td>
+      <td>A)$，用于ID3的判断</td>
+    </tr>
+  </tbody>
+</table>
+
+<p><strong>信息增益比</strong>：特征A对训练数据集D的信息增益比GainRatio(D,A)定义为其信息增益Gain(D,A)与训练数据集D的经验熵H(D)之比：</p>
+
+<script type="math/tex; mode=display">GainRatio(D,A)=\frac{Gain(D,A)}{H(D)}</script>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+</pre></td><td class="rouge-code"><pre><span class="k">def</span> <span class="nf">choose_best_feature_to_split</span><span class="p">(</span><span class="n">data_set</span><span class="p">):</span>
+    <span class="s">"""
+    按照最大信息增益比划分数据
+    :param data_set: 样本数据，如： [[1, 1, 'yes'], [1, 1, 'yes'], [1, 0, 'no'], [0, 1, 'no'], [0, 1, 'no']]
+    :return:
+    """</span>
+    <span class="n">num_feature</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">data_set</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">-</span> <span class="mi">1</span> <span class="c1"># 特征个数，如：不浮出水面是否可以生存	和是否有脚蹼
+</span>    <span class="n">base_entropy</span> <span class="o">=</span> <span class="n">calc_shannon_ent</span><span class="p">(</span><span class="n">data_set</span><span class="p">)</span> <span class="c1"># 经验熵H(D)
+</span>    <span class="n">best_info_gain_ratio</span> <span class="o">=</span> <span class="mf">0.0</span>
+    <span class="n">best_feature_idx</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+    <span class="k">for</span> <span class="n">feature_idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_feature</span><span class="p">):</span>
+        <span class="n">feature_val_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">number</span><span class="p">[</span><span class="n">feature_idx</span><span class="p">]</span> <span class="k">for</span> <span class="n">number</span> <span class="ow">in</span> <span class="n">data_set</span><span class="p">]</span>  <span class="c1"># 得到某个特征下所有值（某列）
+</span>        <span class="n">unique_feature_val_list</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">feature_val_list</span><span class="p">)</span>  <span class="c1"># 获取无重复的属性特征值
+</span>        <span class="n">new_entropy</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">split_info</span> <span class="o">=</span> <span class="mf">0.0</span>
+        <span class="k">for</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">unique_feature_val_list</span><span class="p">:</span>
+            <span class="n">sub_data_set</span> <span class="o">=</span> <span class="n">split_data_set</span><span class="p">(</span><span class="n">data_set</span><span class="p">,</span> <span class="n">feature_idx</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+            <span class="n">prob</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">sub_data_set</span><span class="p">)</span> <span class="o">/</span> <span class="nb">float</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">data_set</span><span class="p">))</span>  <span class="c1"># 即p(t)
+</span>            <span class="n">new_entropy</span> <span class="o">+=</span> <span class="n">prob</span> <span class="o">*</span> <span class="n">calc_shannon_ent</span><span class="p">(</span><span class="n">sub_data_set</span><span class="p">)</span>  <span class="c1"># 对各子集香农熵求和
+</span>            <span class="n">split_info</span> <span class="o">+=</span> <span class="o">-</span><span class="n">prob</span> <span class="o">*</span> <span class="n">log</span><span class="p">(</span><span class="n">prob</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="n">info_gain</span> <span class="o">=</span> <span class="n">base_entropy</span> <span class="o">-</span> <span class="n">new_entropy</span>  <span class="c1"># 计算信息增益，g(D,A)=H(D)-H(D|A)
+</span>        <span class="k">if</span> <span class="n">split_info</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>  <span class="c1"># fix the overflow bug
+</span>            <span class="k">continue</span>
+        <span class="n">info_gain_ratio</span> <span class="o">=</span> <span class="n">info_gain</span> <span class="o">/</span> <span class="n">split_info</span>
+        <span class="c1"># 最大信息增益比
+</span>        <span class="k">if</span> <span class="n">info_gain_ratio</span> <span class="o">&gt;</span> <span class="n">best_info_gain_ratio</span><span class="p">:</span>
+            <span class="n">best_info_gain_ratio</span> <span class="o">=</span> <span class="n">info_gain_ratio</span>
+            <span class="n">best_feature_idx</span> <span class="o">=</span> <span class="n">feature_idx</span>
+
+    <span class="k">return</span> <span class="n">best_feature_idx</span>
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<h4 id="-cart算法">✅ CART算法</h4>
+
+<p><strong>概述</strong>：CART分类树预测分类离散型数据，采用基尼指数选择最优特征，同时决定该特征的最优二值切分点。</p>
+
+<p><strong>概率分布的基尼指数定义</strong>：假设有K个类，样本点属于第k个类的概率为Pk</p>
+
+<script type="math/tex; mode=display">Gini(p)=\sum_{k=1}^mp_k(1-p_k)=1-\sum_{k=1}^Kp_k^2</script>
+
+<p><strong>集合D的基尼指数</strong>：</p>
+
+<script type="math/tex; mode=display">Gini(D)=1-\sum_{k=1}^K(\frac{|C_k|}{D})^2</script>
+
+<p><strong>过程概述</strong>：计算基尼系数的加权平均，求min</p>
+
+<p><img src="https://shuwoom.com/wp-content/uploads/2018/10/fb6de7e8b17762b1caa14d6968407289.png" alt="img" /></p>
+
+<p><img src="https://shuwoom.com/wp-content/uploads/2018/10/251158892a1340a1829e3a9f23dc477b.png" alt="img" /></p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80
+81
+82
+83
+84
+85
+86
+87
+88
+89
+90
+91
+92
+93
+94
+95
+96
+97
+98
+99
+100
+101
+102
+103
+104
+105
+106
+107
+108
+109
+110
+111
+112
+113
+114
+115
+116
+117
+118
+119
+120
+121
+122
+123
+124
+125
+126
+127
+128
+129
+130
+131
+132
+133
+134
+135
+136
+137
+138
+139
+140
+141
+142
+143
+144
+145
+146
+147
+148
+149
+150
+151
+152
+153
+154
+155
+156
+157
+158
+159
+160
+161
+162
+163
+164
+165
+166
+167
+168
+169
+170
+171
+172
+173
+174
+175
+176
+177
+178
+179
+180
+181
+182
+183
+184
+185
+186
+187
+188
+189
+190
+191
+192
+193
+194
+</pre></td><td class="rouge-code"><pre><span class="c1"># -*- coding: utf-8 -*-
+</span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="n">np</span>
+
+<span class="k">class</span> <span class="nc">Tree</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">true_branch</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">false_branch</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">results</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">col</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">summary</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">value</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">true_branch</span> <span class="o">=</span> <span class="n">true_branch</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">false_branch</span> <span class="o">=</span> <span class="n">false_branch</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">results</span> <span class="o">=</span> <span class="n">results</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">col</span> <span class="o">=</span> <span class="n">col</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">summary</span> <span class="o">=</span> <span class="n">summary</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">data</span>
+
+    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">print</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">col</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+        <span class="k">print</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="p">)</span>
+        <span class="k">print</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">summary</span><span class="p">)</span>
+        <span class="k">return</span> <span class="s">""</span>
+
+<span class="k">def</span> <span class="nf">split_datas</span><span class="p">(</span><span class="n">rows</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">column</span><span class="p">):</span>
+    <span class="s">"""
+    根据条件分离数据集
+    :param rows:
+    :param value:
+    :param column:
+    :return:  (list1, list2)
+    """</span>
+    <span class="n">list1</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">list2</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">float</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">rows</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">row</span><span class="p">[</span><span class="n">column</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="n">value</span><span class="p">:</span>
+                <span class="n">list1</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">list2</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">rows</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">row</span><span class="p">[</span><span class="n">column</span><span class="p">]</span> <span class="o">==</span> <span class="n">value</span><span class="p">:</span>
+                <span class="n">list1</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">list2</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">list1</span><span class="p">,</span> <span class="n">list2</span>
+
+
+<span class="k">def</span> <span class="nf">calculate_diff_count</span><span class="p">(</span><span class="n">data_set</span><span class="p">):</span>
+    <span class="s">"""
+    分类统计data_set中每个类别的数量
+    :param datas:如：[[5.1, 3.5, 1.4, 0.2, 'setosa'], [4.9, 3, 1.4, 0.2, 'setosa'],....]
+    :return: 如：{'setosa': 50, 'versicolor': 50, 'virginica': 50}
+    """</span>
+    <span class="n">results</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">data</span> <span class="ow">in</span> <span class="n">data_set</span><span class="p">:</span>
+        <span class="c1"># 数据的最后一列data[-1]是类别
+</span>        <span class="k">if</span> <span class="n">data</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">results</span><span class="p">:</span>
+            <span class="n">results</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">results</span><span class="p">[</span><span class="n">data</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]]</span> <span class="o">+=</span> <span class="mi">1</span>
+    <span class="k">return</span> <span class="n">results</span>
+
+
+<span class="k">def</span> <span class="nf">gini</span><span class="p">(</span><span class="n">data_set</span><span class="p">):</span>
+    <span class="s">"""
+    计算gini的值，即Gini(p)
+    :param data_set: 如：[[5.1, 3.5, 1.4, 0.2, 'setosa'], [4.9, 3, 1.4, 0.2, 'setosa'],....]
+    :return:
+    """</span>
+    <span class="n">length</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">data_set</span><span class="p">)</span>
+    <span class="n">category_2_cnt</span> <span class="o">=</span> <span class="n">calculate_diff_count</span><span class="p">(</span><span class="n">data_set</span><span class="p">)</span>
+    <span class="nb">sum</span> <span class="o">=</span> <span class="mf">0.0</span>
+    <span class="k">for</span> <span class="n">category</span> <span class="ow">in</span> <span class="n">category_2_cnt</span><span class="p">:</span>
+        <span class="nb">sum</span> <span class="o">+=</span> <span class="nb">pow</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">category_2_cnt</span><span class="p">[</span><span class="n">category</span><span class="p">])</span> <span class="o">/</span> <span class="n">length</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+    <span class="k">return</span> <span class="mi">1</span> <span class="o">-</span> <span class="nb">sum</span>
+
+
+<span class="k">def</span> <span class="nf">build_decision_tree</span><span class="p">(</span><span class="n">data_set</span><span class="p">,</span> <span class="n">evaluation_function</span><span class="o">=</span><span class="n">gini</span><span class="p">):</span>
+    <span class="s">"""
+    递归建立决策树，当gain=0时，停止回归
+    :param data_set: 如：[[5.1, 3.5, 1.4, 0.2, 'setosa'], [4.9, 3, 1.4, 0.2, 'setosa'],....]
+    :param evaluation_function:
+    :return:
+    """</span>
+    <span class="n">current_gain</span> <span class="o">=</span> <span class="n">evaluation_function</span><span class="p">(</span><span class="n">data_set</span><span class="p">)</span>
+    <span class="n">column_length</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">data_set</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="n">rows_length</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">data_set</span><span class="p">)</span>
+
+    <span class="n">best_gain</span> <span class="o">=</span> <span class="mf">0.0</span>
+    <span class="n">best_value</span> <span class="o">=</span> <span class="bp">None</span>
+    <span class="n">best_set</span> <span class="o">=</span> <span class="bp">None</span>
+
+    <span class="c1"># choose the best gain
+</span>    <span class="k">for</span> <span class="n">feature_idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">column_length</span> <span class="o">-</span> <span class="mi">1</span><span class="p">):</span>
+        <span class="n">feature_value_set</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="n">feature_idx</span><span class="p">]</span> <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">data_set</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">feature_value</span> <span class="ow">in</span> <span class="n">feature_value_set</span><span class="p">:</span>
+            <span class="n">sub_data_set1</span><span class="p">,</span> <span class="n">sub_data_set2</span> <span class="o">=</span> <span class="n">split_datas</span><span class="p">(</span><span class="n">data_set</span><span class="p">,</span> <span class="n">feature_value</span><span class="p">,</span> <span class="n">feature_idx</span><span class="p">)</span>
+            <span class="n">p</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">sub_data_set1</span><span class="p">))</span> <span class="o">/</span> <span class="n">rows_length</span>
+            <span class="c1"># Gini(D,A)表示在特征A的条件下集合D的基尼指数，gini_d_a越小，样本集合不确定性越小
+</span>            <span class="c1"># 我们的目的是找到另gini_d_a最小的特征，及gain最大的特征
+</span>            <span class="n">gini_d_a</span> <span class="o">=</span> <span class="n">p</span> <span class="o">*</span> <span class="n">evaluation_function</span><span class="p">(</span><span class="n">sub_data_set1</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">p</span><span class="p">)</span> <span class="o">*</span> <span class="n">evaluation_function</span><span class="p">(</span><span class="n">sub_data_set2</span><span class="p">)</span>
+            <span class="n">gain</span> <span class="o">=</span> <span class="n">current_gain</span> <span class="o">-</span> <span class="n">gini_d_a</span>
+            <span class="k">if</span> <span class="n">gain</span> <span class="o">&gt;</span> <span class="n">best_gain</span><span class="p">:</span>
+                <span class="n">best_gain</span> <span class="o">=</span> <span class="n">gain</span>
+                <span class="n">best_value</span> <span class="o">=</span> <span class="p">(</span><span class="n">feature_idx</span><span class="p">,</span> <span class="n">feature_value</span><span class="p">)</span>
+                <span class="n">best_set</span> <span class="o">=</span> <span class="p">(</span><span class="n">sub_data_set1</span><span class="p">,</span> <span class="n">sub_data_set2</span><span class="p">)</span>
+    <span class="n">dc_y</span> <span class="o">=</span> <span class="p">{</span><span class="s">'impurity'</span><span class="p">:</span> <span class="s">'</span><span class="si">%.3</span><span class="s">f'</span> <span class="o">%</span> <span class="n">current_gain</span><span class="p">,</span> <span class="s">'sample'</span><span class="p">:</span> <span class="s">'</span><span class="si">%</span><span class="s">d'</span> <span class="o">%</span> <span class="n">rows_length</span><span class="p">}</span>
+
+    <span class="c1"># stop or not stop
+</span>    <span class="k">if</span> <span class="n">best_gain</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">true_branch</span> <span class="o">=</span> <span class="n">build_decision_tree</span><span class="p">(</span><span class="n">best_set</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">evaluation_function</span><span class="p">)</span>
+        <span class="n">false_branch</span> <span class="o">=</span> <span class="n">build_decision_tree</span><span class="p">(</span><span class="n">best_set</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">evaluation_function</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">Tree</span><span class="p">(</span><span class="n">col</span><span class="o">=</span><span class="n">best_value</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">value</span><span class="o">=</span><span class="n">best_value</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">true_branch</span><span class="o">=</span><span class="n">true_branch</span><span class="p">,</span> <span class="n">false_branch</span><span class="o">=</span><span class="n">false_branch</span><span class="p">,</span> <span class="n">summary</span><span class="o">=</span><span class="n">dc_y</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">Tree</span><span class="p">(</span><span class="n">results</span><span class="o">=</span><span class="n">calculate_diff_count</span><span class="p">(</span><span class="n">data_set</span><span class="p">),</span> <span class="n">summary</span><span class="o">=</span><span class="n">dc_y</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">data_set</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">prune</span><span class="p">(</span><span class="n">tree</span><span class="p">,</span> <span class="n">mini_gain</span><span class="p">,</span> <span class="n">evaluation_function</span><span class="o">=</span><span class="n">gini</span><span class="p">):</span>
+    <span class="s">"""
+    裁剪
+    :param tree:
+    :param mini_gain:
+    :param evaluation_function:
+    :return:
+    """</span>
+    <span class="k">if</span> <span class="n">tree</span><span class="o">.</span><span class="n">true_branch</span><span class="o">.</span><span class="n">results</span> <span class="o">==</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="n">prune</span><span class="p">(</span><span class="n">tree</span><span class="o">.</span><span class="n">true_branch</span><span class="p">,</span> <span class="n">mini_gain</span><span class="p">,</span> <span class="n">evaluation_function</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">tree</span><span class="o">.</span><span class="n">false_branch</span><span class="o">.</span><span class="n">results</span> <span class="o">==</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="n">prune</span><span class="p">(</span><span class="n">tree</span><span class="o">.</span><span class="n">false_branch</span><span class="p">,</span> <span class="n">mini_gain</span><span class="p">,</span> <span class="n">evaluation_function</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">tree</span><span class="o">.</span><span class="n">true_branch</span><span class="o">.</span><span class="n">results</span> <span class="o">!=</span> <span class="bp">None</span> <span class="ow">and</span> <span class="n">tree</span><span class="o">.</span><span class="n">false_branch</span><span class="o">.</span><span class="n">results</span> <span class="o">!=</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="n">len1</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">tree</span><span class="o">.</span><span class="n">true_branch</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
+        <span class="n">len2</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">tree</span><span class="o">.</span><span class="n">false_branch</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
+        <span class="n">len3</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">tree</span><span class="o">.</span><span class="n">true_branch</span><span class="o">.</span><span class="n">data</span> <span class="o">+</span> <span class="n">tree</span><span class="o">.</span><span class="n">false_branch</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
+
+        <span class="n">p</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">len1</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">len1</span> <span class="o">+</span> <span class="n">len2</span><span class="p">)</span>
+
+        <span class="n">gain</span> <span class="o">=</span> <span class="n">evaluation_function</span><span class="p">(</span><span class="n">tree</span><span class="o">.</span><span class="n">true_branch</span><span class="o">.</span><span class="n">data</span> <span class="o">+</span> <span class="n">tree</span><span class="o">.</span><span class="n">false_branch</span><span class="o">.</span><span class="n">data</span><span class="p">)</span> \
+               <span class="o">-</span> <span class="n">p</span> <span class="o">*</span> <span class="n">evaluation_function</span><span class="p">(</span><span class="n">tree</span><span class="o">.</span><span class="n">true_branch</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>\
+               <span class="o">-</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">p</span><span class="p">)</span> <span class="o">*</span> <span class="n">evaluation_function</span><span class="p">(</span><span class="n">tree</span><span class="o">.</span><span class="n">false_branch</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">gain</span> <span class="o">&lt;</span> <span class="n">mini_gain</span><span class="p">:</span>
+            <span class="c1"># 当节点的gain小于给定的 mini Gain时则合并这两个节点
+</span>            <span class="n">tree</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">tree</span><span class="o">.</span><span class="n">true_branch</span><span class="o">.</span><span class="n">data</span> <span class="o">+</span> <span class="n">tree</span><span class="o">.</span><span class="n">false_branch</span><span class="o">.</span><span class="n">data</span>
+            <span class="n">tree</span><span class="o">.</span><span class="n">results</span> <span class="o">=</span> <span class="n">calculate_diff_count</span><span class="p">(</span><span class="n">tree</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
+            <span class="n">tree</span><span class="o">.</span><span class="n">true_branch</span> <span class="o">=</span> <span class="bp">None</span>
+            <span class="n">tree</span><span class="o">.</span><span class="n">false_branch</span> <span class="o">=</span> <span class="bp">None</span>
+
+
+<span class="k">def</span> <span class="nf">classify</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">tree</span><span class="p">):</span>
+    <span class="s">"""
+    分类
+    :param data:
+    :param tree:
+    :return:
+    """</span>
+    <span class="k">if</span> <span class="n">tree</span><span class="o">.</span><span class="n">results</span> <span class="o">!=</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">tree</span><span class="o">.</span><span class="n">results</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">branch</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="n">v</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">tree</span><span class="o">.</span><span class="n">col</span><span class="p">]</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="nb">float</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">v</span> <span class="o">&gt;=</span> <span class="n">tree</span><span class="o">.</span><span class="n">value</span><span class="p">:</span>
+                <span class="n">branch</span> <span class="o">=</span> <span class="n">tree</span><span class="o">.</span><span class="n">true_branch</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">branch</span> <span class="o">=</span> <span class="n">tree</span><span class="o">.</span><span class="n">false_branch</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">v</span> <span class="o">==</span> <span class="n">tree</span><span class="o">.</span><span class="n">value</span><span class="p">:</span>
+                <span class="n">branch</span> <span class="o">=</span> <span class="n">tree</span><span class="o">.</span><span class="n">true_branch</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">branch</span> <span class="o">=</span> <span class="n">tree</span><span class="o">.</span><span class="n">false_branch</span>
+        <span class="k">return</span> <span class="n">classify</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">branch</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">load_csv</span><span class="p">():</span>
+    <span class="k">def</span> <span class="nf">convert_types</span><span class="p">(</span><span class="n">s</span><span class="p">):</span>
+        <span class="n">s</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="k">if</span> <span class="s">'.'</span> <span class="ow">in</span> <span class="n">s</span> <span class="k">else</span> <span class="nb">int</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+        <span class="k">except</span> <span class="nb">ValueError</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">s</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">loadtxt</span><span class="p">(</span><span class="s">"datas.csv"</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s">"str"</span><span class="p">,</span> <span class="n">delimiter</span><span class="o">=</span><span class="s">","</span><span class="p">)</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="mi">1</span><span class="p">:,</span> <span class="p">:]</span>
+    <span class="n">data_set</span> <span class="o">=</span> <span class="p">([[</span><span class="n">convert_types</span><span class="p">(</span><span class="n">item</span><span class="p">)</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">row</span><span class="p">]</span> <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">data</span><span class="p">])</span>
+    <span class="k">return</span> <span class="n">data_set</span>
+
+
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">'__main__'</span><span class="p">:</span>
+    <span class="n">data_set</span> <span class="o">=</span> <span class="n">load_csv</span><span class="p">()</span>
+    <span class="k">print</span> <span class="n">data_set</span>
+    <span class="n">decistion_tree</span> <span class="o">=</span> <span class="n">build_decision_tree</span><span class="p">(</span><span class="n">data_set</span><span class="p">,</span> <span class="n">evaluation_function</span><span class="o">=</span><span class="n">gini</span><span class="p">)</span>
+    <span class="k">print</span> <span class="n">decistion_tree</span><span class="o">.</span><span class="n">results</span>
+    <span class="c1"># prune(decistion_tree, 0.4)
+</span>    <span class="k">print</span> <span class="n">classify</span><span class="p">([</span><span class="mf">5.1</span><span class="p">,</span><span class="mf">3.5</span><span class="p">,</span><span class="mf">1.4</span><span class="p">,</span><span class="mf">0.2</span><span class="p">],</span> <span class="n">decistion_tree</span><span class="p">)</span> <span class="c1"># setosa
+</span>    <span class="k">print</span> <span class="n">classify</span><span class="p">([</span><span class="mf">6.8</span><span class="p">,</span><span class="mf">2.8</span><span class="p">,</span><span class="mf">4.8</span><span class="p">,</span><span class="mf">1.4</span><span class="p">],</span> <span class="n">decistion_tree</span><span class="p">)</span> <span class="c1"># versicolor
+</span>    <span class="k">print</span> <span class="n">classify</span><span class="p">([</span><span class="mf">6.8</span><span class="p">,</span><span class="mf">3.2</span><span class="p">,</span><span class="mf">5.9</span><span class="p">,</span><span class="mf">2.3</span><span class="p">],</span> <span class="n">decistion_tree</span><span class="p">)</span> <span class="c1"># virginica
+</span></pre></td></tr></tbody></table></code></pre></div></div>
+
+<h3 id="️-knn分类">☣️ KNN分类</h3>
+
+<h3 id="️-pca模型">☣️ PCA模型</h3>
+
+<h3 id="️-em算法">☣️ EM算法</h3>
+
+<h3 id="️-apriori算法">☣️ Apriori算法</h3>
+
+<h3 id="️-最大期望算法">☣️ 最大期望算法</h3>
+
+<h3 id="️-k-means算法">☣️ K-Means算法</h3>
+
+<h3 id="️-svm算法">☣️ SVM算法</h3>
+
+<h3 id="️-adaboost算法">☣️ Adaboost算法</h3>
+
+<h3 id="️-贝叶斯模型naive-bayes">☣️ 贝叶斯模型（Naive Bayes）</h3>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80
+81
+82
+83
+84
+85
+86
+87
+88
+89
+90
+91
+92
+93
+94
+95
+96
+97
+98
+99
+100
+101
+102
+103
+104
+105
+106
+107
+108
+109
+110
+111
+112
+113
+114
+115
+116
+117
+118
+119
+120
+121
+122
+123
+124
+125
+126
+</pre></td><td class="rouge-code"><pre><span class="c1">#!/usr/bin/python
+# -*- coding: utf-8 -*-
+#########################################
+# Bayes : 用来描述两个条件概率之间的关系
+</span>
+<span class="c1"># 参数:        inX: vector to compare to existing dataset (1xN)
+#             dataSet: size m data set of known vectors (NxM)
+#             labels: data set labels (1xM vector)
+#             公式：P(A|B)=P(B|A)P(A)/P(B)
+# 输出:       出错率
+#########################################
+</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="n">npy</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">time</span>
+
+<span class="c1">#P(B|A)=P(A|B)*P(A)/P(B)
+</span>
+<span class="c1"># 数据集目录
+</span><span class="n">dataSetDir</span> <span class="o">=</span><span class="s">'/Users/sean/Datasets'</span>
+
+<span class="k">class</span> <span class="nc">Bayes</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">length</span><span class="o">=-</span><span class="mi">1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">labelrate</span><span class="o">=</span><span class="nb">dict</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">vectorrate</span><span class="o">=</span><span class="nb">dict</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">dataset</span><span class="p">:</span><span class="nb">list</span><span class="p">,</span><span class="n">labels</span><span class="p">:</span><span class="nb">list</span><span class="p">):</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">"训练开始"</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span><span class="o">!=</span><span class="nb">len</span><span class="p">(</span><span class="n">labels</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="nb">ValueError</span><span class="p">(</span><span class="s">"输入测试数组和类别数组长度不一致"</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">length</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">dataset</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="c1">#训练数据特征值的长度
+</span>        <span class="n">labelsnum</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">labels</span><span class="p">)</span> <span class="c1">#类别的数量
+</span>        <span class="n">norlabels</span><span class="o">=</span><span class="nb">set</span><span class="p">(</span><span class="n">labels</span><span class="p">)</span> <span class="c1">#不重复类别的数量
+</span>        <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">norlabels</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">labelrate</span><span class="p">[</span><span class="n">item</span><span class="p">]</span><span class="o">=</span><span class="n">labels</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="n">item</span><span class="p">)</span><span class="o">/</span><span class="n">labelsnum</span> <span class="c1">#求当前类别占总类别的比例
+</span>        <span class="k">for</span> <span class="n">vector</span><span class="p">,</span><span class="n">label</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span><span class="n">labels</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">label</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">vectorrate</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">vectorrate</span><span class="p">[</span><span class="n">label</span><span class="p">]</span><span class="o">=</span><span class="p">[]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">vectorrate</span><span class="p">[</span><span class="n">label</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">vector</span><span class="p">)</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">"训练结束"</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span>
+
+    <span class="k">def</span> <span class="nf">btest</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">testdata</span><span class="p">,</span><span class="n">labelset</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">length</span><span class="o">==-</span><span class="mi">1</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="nb">ValueError</span><span class="p">(</span><span class="s">"未开始训练，先训练"</span><span class="p">)</span>
+        <span class="c1">#计算testdata分别为各个类别的概率
+</span>        <span class="n">lbDict</span><span class="o">=</span><span class="nb">dict</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">thislb</span> <span class="ow">in</span> <span class="n">labelset</span><span class="p">:</span>
+            <span class="n">p</span> <span class="o">=</span> <span class="mi">1</span>
+            <span class="n">alllabel</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">labelrate</span><span class="p">[</span><span class="n">thislb</span><span class="p">]</span>
+            <span class="n">allvector</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">vectorrate</span><span class="p">[</span><span class="n">thislb</span><span class="p">]</span>
+            <span class="n">vnum</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">allvector</span><span class="p">)</span>
+            <span class="n">allvector</span><span class="o">=</span><span class="n">npy</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">allvector</span><span class="p">)</span><span class="o">.</span><span class="n">T</span>
+            <span class="k">for</span> <span class="n">index</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="nb">len</span><span class="p">(</span><span class="n">testdata</span><span class="p">)):</span>
+                <span class="n">vector</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="n">allvector</span><span class="p">[</span><span class="n">index</span><span class="p">])</span>
+                <span class="n">p</span><span class="o">*=</span><span class="n">vector</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="n">testdata</span><span class="p">[</span><span class="n">index</span><span class="p">])</span><span class="o">/</span><span class="n">vnum</span>
+            <span class="n">lbDict</span><span class="p">[</span><span class="n">thislb</span><span class="p">]</span><span class="o">=</span><span class="n">p</span> <span class="o">*</span> <span class="n">alllabel</span>
+        <span class="n">thislbabel</span><span class="o">=</span><span class="nb">sorted</span><span class="p">(</span><span class="n">lbDict</span><span class="p">,</span><span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span><span class="n">lbDict</span><span class="p">[</span><span class="n">x</span><span class="p">],</span><span class="n">reverse</span><span class="o">=</span><span class="bp">True</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">thislbabel</span>
+
+<span class="c1">#加载数据
+</span><span class="k">def</span> <span class="nf">datatoarray</span><span class="p">(</span><span class="n">fname</span><span class="p">):</span>
+    <span class="n">arr</span><span class="o">=</span><span class="p">[]</span>
+    <span class="n">fh</span><span class="o">=</span><span class="nb">open</span><span class="p">(</span><span class="n">fname</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">32</span><span class="p">):</span>
+        <span class="n">thisline</span><span class="o">=</span><span class="n">fh</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span> <span class="p">,</span> <span class="mi">32</span><span class="p">):</span>
+            <span class="n">arr</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">thisline</span><span class="p">[</span><span class="n">j</span><span class="p">]))</span>
+    <span class="k">return</span> <span class="n">arr</span>
+
+<span class="c1">#建立一个函数取出labels
+</span><span class="k">def</span> <span class="nf">seplabel</span><span class="p">(</span><span class="n">fname</span><span class="p">):</span>
+    <span class="n">filestr</span><span class="o">=</span><span class="n">fname</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">"."</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">label</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">filestr</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">"_"</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="k">return</span> <span class="n">label</span>
+
+<span class="c1">#建立训练数据
+</span><span class="k">def</span> <span class="nf">traindata</span><span class="p">():</span>
+    <span class="n">labels</span><span class="o">=</span><span class="p">[]</span>
+    <span class="n">trainfile</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">dataSetDir</span><span class="o">+</span><span class="s">"trainingDigits"</span><span class="p">)</span> <span class="c1"># 加载测试数据
+</span>    <span class="n">num</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">trainfile</span><span class="p">)</span>
+    <span class="n">trainarr</span><span class="o">=</span><span class="n">npy</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">num</span><span class="p">,</span><span class="mi">1024</span><span class="p">))</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num</span><span class="p">):</span>
+        <span class="n">thisfname</span><span class="o">=</span><span class="n">trainfile</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+        <span class="n">thislabel</span><span class="o">=</span><span class="n">seplabel</span><span class="p">(</span><span class="n">thisfname</span><span class="p">)</span>
+        <span class="n">labels</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">thislabel</span><span class="p">)</span>
+        <span class="n">trainarr</span><span class="p">[</span><span class="n">i</span><span class="p">,]</span><span class="o">=</span><span class="n">datatoarray</span><span class="p">(</span><span class="n">dataSetDir</span><span class="o">+</span><span class="s">"trainingDigits/"</span><span class="o">+</span><span class="n">thisfname</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">trainarr</span><span class="p">,</span><span class="n">labels</span>
+
+<span class="c1"># 贝叶斯算法手写识别主流程
+</span><span class="n">bys</span><span class="o">=</span><span class="n">Bayes</span><span class="p">()</span>
+<span class="n">start</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+
+<span class="c1"># # step 1: 训练数据集
+</span><span class="n">train_data</span><span class="p">,</span><span class="n">labels</span><span class="o">=</span><span class="n">traindata</span><span class="p">()</span>
+<span class="n">train_data</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="n">train_data</span><span class="p">)</span>
+<span class="n">bys</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">train_data</span><span class="p">,</span><span class="n">labels</span><span class="p">)</span>
+
+<span class="c1"># # step 2:测试数据集
+</span><span class="n">thisdata</span><span class="o">=</span><span class="n">datatoarray</span><span class="p">(</span><span class="n">dataSetDir</span><span class="o">+</span><span class="s">"testDigits/8_90.txt"</span><span class="p">)</span>
+<span class="n">labelsall</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">5</span><span class="p">,</span><span class="mi">6</span><span class="p">,</span><span class="mi">7</span><span class="p">,</span><span class="mi">8</span><span class="p">,</span><span class="mi">9</span><span class="p">]</span>
+
+<span class="c1"># # 识别单个手写体数字
+# test=bys.btest(thisdata,labelsall)
+# print(test)
+</span>
+<span class="c1"># # 识别多个手写体数字（批量处理）,并输出结果
+</span><span class="n">testfile</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">dataSetDir</span><span class="o">+</span><span class="s">"testDigits"</span><span class="p">)</span>
+<span class="n">num</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">testfile</span><span class="p">)</span>
+<span class="n">x</span><span class="o">=</span><span class="mi">0</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num</span><span class="p">):</span>
+    <span class="n">thisfilename</span><span class="o">=</span><span class="n">testfile</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+    <span class="n">thislabel</span><span class="o">=</span><span class="n">seplabel</span><span class="p">(</span><span class="n">thisfilename</span><span class="p">)</span>
+    <span class="n">thisdataarr</span><span class="o">=</span><span class="n">datatoarray</span><span class="p">(</span><span class="n">dataSetDir</span><span class="o">+</span><span class="s">"testDigits/"</span><span class="o">+</span><span class="n">thisfilename</span><span class="p">)</span>
+    <span class="n">label</span><span class="o">=</span><span class="n">bys</span><span class="o">.</span><span class="n">btest</span><span class="p">(</span><span class="n">thisdataarr</span><span class="p">,</span><span class="n">labelsall</span><span class="p">)</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">"测试数字是："</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">thislabel</span><span class="p">)</span><span class="o">+</span><span class="s">"  识别出来的数字是："</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">label</span><span class="p">))</span>
+    <span class="k">if</span> <span class="n">label</span><span class="o">!=</span><span class="n">thislabel</span><span class="p">:</span>
+        <span class="n">x</span><span class="o">+=</span><span class="mi">1</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">"识别出错"</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="s">"出错率："</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">x</span><span class="o">/</span><span class="n">num</span><span class="p">))</span>
+
+<span class="n">end</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+<span class="n">running_time</span> <span class="o">=</span> <span class="n">end</span><span class="o">-</span><span class="n">start</span>
+<span class="k">print</span><span class="p">(</span><span class="s">'程序运行总耗时： </span><span class="si">%.5</span><span class="s">f sec'</span> <span class="o">%</span><span class="n">running_time</span><span class="p">)</span>
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<h2 id="学习网络">学习网络</h2>
+
+<h3 id="️-梯度下降">☣️ 梯度下降</h3>
+
+<h3 id="️-bp网络">☣️ BP网络</h3>
+
+<h3 id="️-rnn系列">☣️ RNN系列</h3>
+
+<h4 id="️-rnn模型">☣️ RNN模型</h4>
+
+<p><img src="https://caicai.science/images/attention/roolled%20rnn.png" alt="roolled RNN" /></p>
+
+<h4 id="️-lstm">☣️ LSTM</h4>
+
+<h4 id="️-gru">☣️ GRU</h4>
+
+<h2 id="相关内容">相关内容</h2>
+
+<h3 id="️-梯度爆炸问题">☣️ 梯度爆炸问题</h3>
+
+<h3 id="️-代价函数">☣️ 代价函数</h3>
+
+<h4 id="-二次代价函数">✅ 二次代价函数</h4>
+
+<p><img src="https://img-blog.csdn.net/20160402180717102" alt="img" /></p>
+
+<script type="math/tex; mode=display">C=\frac{1}{2n}\sum_x||y(x)-a^L(x)||</script>
+
+<script type="math/tex; mode=display">\frac{\partial C}{\partial w}</script>
+
+<p><img src="https://img-blog.csdn.net/20160402175137034" alt="img" /></p>
+
+<h4 id="-交叉熵损失函数">✅ 交叉熵损失函数</h4>
+
+<p><img src="https://img-blog.csdn.net/20160402172100739" alt="img" /></p>
+
+<p>参考资料：https://blog.csdn.net/u014313009/article/details/51043064</p>
+
+<h2 id="前沿研究">前沿研究</h2>
+
+<h3 id="-sequence-to-sequence">✅ Sequence to Sequence</h3>
+
+<p><img src="https://img-blog.csdn.net/20171101103708217" alt="这里写图片描述" /></p>
+
+<p><img src="https://images2018.cnblogs.com/blog/1192699/201808/1192699-20180806141638641-1078830067.png" alt="img" /></p>
+
+<p><strong>概述</strong>：一种函数映射模型，具有弱约束的多对多对应关系。</p>
+
+<p><strong>原理</strong>：左侧Encoder编码将输入序列转化成一个固定长度的向量编码，右侧Decoder解码将之前生成的固定向量再转化成输出序列，编解码部分可以采用CNN、RNN、LSTM、GRU、BLSTM等实现。可以预测任意的序列对应关系。</p>
+
+<p><strong>意义</strong>：第一次提出了Encoder-Decoder模型，主要用于序列预测</p>
+
+<p><strong>问题</strong>：Encoder是将输入内容压缩到一个固定长度的向量中，语义编码是固定长度，然后计算出内容进行Decoder</p>
+
+<h3 id="-attention-mechanism">✅ Attention Mechanism</h3>
+
+<p>《Sequence to Sequence Learning with Neural Networks》介绍了一种基于RNN的Seq2Seq模型，基于一个Encoder和一个Decoder来构建基于神经网络的End-to-End的机器翻译模型，其中，Encoder把输入X编码成一个固定长度的隐向量Z，Decoder基于隐向量Z解码出目标输出Y。这是一个非常经典的序列到序列的模型，但是却存在<strong>两个明显的问题</strong>：</p>
+
+<p>1、把输入X的所有信息有压缩到一个固定长度的隐向量Z，忽略了输入输入X的长度，当输入句子长度很长，特别是比训练集中最初的句子长度还长时，模型的性能急剧下降。</p>
+
+<p>2、把输入X编码成一个固定的长度，对于句子中每个词都赋予相同的权重，这样做是不合理的，比如，在机器翻译里，输入的句子与输出句子之间，往往是输入一个或几个词对应于输出的一个或几个词。因此，对输入的每个词赋予相同权重，这样做没有区分度，往往是模型性能下降。</p>
+
+<p><strong>模型示例</strong>：可以与Seq2Seq对比，中间增加了一个权重层，通过不同的语义编码实现（也就是不同长度的向量）</p>
+
+<p><img src="https://images2018.cnblogs.com/blog/1192699/201808/1192699-20180806142115912-1682939089.png" alt="img" style="zoom:70%;" /></p>
+
+<p><img src="https://images2018.cnblogs.com/blog/1192699/201808/1192699-20180806142159178-1634092293.png" alt="img" style="zoom:70%;" /></p>
+
+<p>参考资料：https://zhuanlan.zhihu.com/p/31547842（注意力模型汇总机及其应用）、https://www.cnblogs.com/guoyaohua/p/9429924.html（注意力机制解释及其应用）</p>
+
+<h3 id="️-pointer-network">☣️ Pointer Network</h3>
+
+<h3 id="️-graph-embedding">☣️ Graph Embedding</h3>
+
+<p>##迁移学习</p>
+
+<h2 id="强化学习reinforcement-learning">强化学习（Reinforcement Learning）</h2>
+
+<h3 id="️-介绍">☣️ 介绍</h3>
+
+<p><img src="https://user-gold-cdn.xitu.io/2019/8/18/16ca41b0a58edcee?imageView2/0/w/1280/h/960/ignore-error/1" alt="img" /></p>
+
+<p>如上图左边所示，一个agent(例如：玩家/智能体等)做出了一个action，对environment造成了影响，也就是改变了state，而environment为了反馈给agent，agent就得到了一个奖励(例如：积分/分数)，不断的进行这样的循环，直到结束为止。</p>
+
+<p>上述过程就相当于一个<strong>马尔可夫决策过程</strong></p>
+
+<p>上图右边所示，S0 状态经过了 a0 的行为后，获得了奖励 r1 ，变成了状态S1，后又经过了 a0 行为得到奖励 r2，变成了状态 S2 ，如此往复循环，直到结束为止。</p>
+
+<p>通过以上的描述，大家都已经确定了一个概念，也就是agent(智能体)在当下做出的决定肯定使得未来收益最大化，那么，一个马儿可夫决策过程对应的奖励总和为：</p>
+
+<script type="math/tex; mode=display">R=r_1+r_2+r_3+...+r_n</script>
+
+<p>t 时刻(当下)的未来奖励，只考虑后面的奖励，前面的改变不了：</p>
+
+<p>$R_t=r_t+r_{t+1}+r_{t+2}+…+r_n$</p>
+
+<p>当前的行为对于未来是不确定性的，要打一个折扣，也就是加入一个系数gamma，是一个 0 到 1 的值：</p>
+
+<script type="math/tex; mode=display">R_t=r_1+\gamma_{}r_{t+1}+\gamma^2r_{t+2}+...+\gamma^{n-1}r_n</script>
+
+<p>离当前越远的时间，gamma的惩罚系数就会越大，也就是越不确定。为的就是在当前和未来的决策中取得一个平衡。gamma取 0 ，相当于不考虑未来，只考虑当下，是一种很短视的做法；而gamma取 1 ，则完全考虑了未来，又有点过虑了。所以一般gamma会取 0 到 1 之间的一个值。</p>
+
+<p>Rt 可以用 Rt+1 来表示，写成递推式：</p>
+
+<script type="math/tex; mode=display">R_t=r_t+\gamma(r_{t+1}+\gamma(r_{t+2}+...))=r_t+\gamma_{}R_{t+1}</script>
+
+<p>参考：https://juejin.im/post/5d591d6af265da03c8151f4f、https://easyai.tech/ai-definition/reinforcement-learning/</p>
+
+<h3 id="️-q-learning">☣️ Q-Learning</h3>
+
+<p><strong>Q(s, a)函数(Quality)，质量函数用来表示智能体在s状态下采用a动作并在之后采取最优动作条件下</strong>的打折的未来奖励(先不管未来的动作如何选择)：</p>
+
+<script type="math/tex; mode=display">Q(s_t,a_t)=maxR_{t+1}</script>
+
+<p>假设有了这个Q函数，那么我们就能够求得在当前 t 时刻当中，做出各个决策的最大收益值，通过对比这些收益值，就能够<strong>得到 t 时刻某个决策是这些决策当中收益最高。</strong></p>
+
+<p>$\pi(s)=argmax_aQ(s,a)$</p>
+
+<p>于是乎，根据Q函数的递推公式可以得到：</p>
+
+<script type="math/tex; mode=display">Q(s_t,a_t)=r+\gamma_{}max_aQ(s_{t+1},a_{t+1})</script>
+
+<p><strong>这就是注明的贝尔曼公式。</strong>贝尔曼公式实际非常合理。对于某个状态来讲，最大化未来奖励相当于最大化即刻奖励与下一状态最大未来奖励之和。</p>
+
+<p><strong>Q-learning的核心思想是：</strong>我们能够通过贝尔曼公式迭代地近似Q-函数。</p>
+
+<p>参考：https://juejin.im/post/5d591d6af265da03c8151f4f</p>
+
+<h3 id="️-dqn">☣️ DQN</h3>
+
+<p>Deep Q Learning(DQN)是一种融合了神经网络和的Q-Learning方法。</p>
+
+<p><strong>神经网络的作用</strong></p>
+
+<p><img src="https://user-gold-cdn.xitu.io/2019/8/18/16ca41b0dc74ff8e?imageView2/0/w/1280/h/960/ignore-error/1" alt="img" /></p>
+
+<p>使用表格来存储每一个状态 state, 和在这个 state 每个行为 action 所拥有的 Q 值. 而当今问题是在太复杂, 状态可以多到比天上的星星还多(比如下围棋). 如果全用表格来存储它们, 恐怕我们的计算机有再大的内存都不够, 而且每次在这么大的表格中搜索对应的状态也是一件很耗时的事. 不过, 在机器学习中, 有一种方法对这种事情很在行, 那就是神经网络.</p>
+
+<p>我们可以将状态和动作当成神经网络的输入, 然后经过神经网络分析后得到动作的 Q 值, 这样我们就没必要在表格中记录 Q 值, 而是直接使用神经网络生成 Q 值.</p>
+
+<p>还有一种形式的是这样, 我们也能只输入状态值, 输出所有的动作值, 然后按照 Q learning 的原则, 直接选择拥有最大值的动作当做下一步要做的动作.</p>
+
+<p>我们可以想象, 神经网络接受外部的信息, 相当于眼睛鼻子耳朵收集信息, 然后通过大脑加工输出每种动作的值, 最后通过强化学习的方式选择动作.</p>
+
+<p><strong>神经网络计算Q值</strong></p>
+
+<p>这一部分就跟监督学习的神经网络一样了我，输入状态值，输出为Q值，根据大量的数据去训练神经网络的参数，最终得到Q-Learning的计算模型，这时候我们就可以利用这个模型来进行强化学习了。</p>
+
+<p><img src="https://user-gold-cdn.xitu.io/2019/8/18/16ca41b1338135c6?imageView2/0/w/1280/h/960/ignore-error/1" alt="img" /></p>
+
+<p>参考：https://juejin.im/post/5d591d6af265da03c8151f4f</p>
+
+<h2 id="推荐系统">推荐系统</h2>
+
+<h3 id="-协同过滤模型">✅ 协同过滤模型</h3>
+
+<p><strong>相似性度量方法</strong></p>
+
+<p>1.欧几里得距离：该距离只有当两者特征向量中每个特征都较小时，特征向量间距离才比较小。</p>
+
+<p>2.皮尔森相关系数：该系数度量两个特征向量之间的线性相关性，二者线性相关程度越强，该度量值越高。该度量适用于不同特征的范围不一样的情况。</p>
+
+<p><strong>基于用户相似度的推荐</strong></p>
+
+<p>为用户A提供推荐，首先选择皮尔森相关系数进行度量，计算与A最相似的N个人，然后计算每部电影在相似度加权平均下的加权平均值，以该分值作为每部电影的推荐值。</p>
+
+<p><strong>基于物品的协作型过滤</strong></p>
+
+<p>首先将原始字典的键和值进行调换，此时键为物品，值为一个字典，字典的键为用户，值为分值。根据此字典运行上述的算法，先求物品之间的相似度。</p>
+
+<p>比如要给用户A提供推荐，A做出评价的物品有1，2，3.未作出评价的物品有4，5，6。计算物品4的分值，需要先计算物品4与物品1，2，3的相似度，以相似度作为权值，对物品1，2，3的评分进行加权平均，以此作为对物品4 评分。</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80
+81
+82
+83
+84
+85
+86
+87
+88
+89
+90
+91
+92
+93
+94
+95
+96
+97
+98
+99
+100
+101
+102
+103
+104
+105
+106
+107
+108
+109
+110
+111
+112
+113
+114
+115
+116
+117
+118
+119
+120
+121
+122
+123
+124
+125
+126
+127
+128
+129
+130
+131
+132
+133
+134
+135
+136
+137
+138
+139
+140
+141
+142
+143
+144
+145
+146
+147
+148
+149
+150
+151
+152
+153
+154
+155
+156
+157
+158
+159
+160
+161
+162
+163
+164
+165
+166
+167
+168
+169
+170
+171
+172
+173
+174
+175
+176
+177
+178
+179
+180
+181
+182
+183
+184
+185
+186
+187
+188
+189
+190
+191
+192
+193
+194
+195
+196
+197
+198
+199
+200
+201
+202
+203
+204
+205
+206
+</pre></td><td class="rouge-code"><pre><span class="c1"># -*- coding: utf-8 -*-
+</span><span class="n">__author__</span> <span class="o">=</span> <span class="s">'Bai Chenjia'</span>
+<span class="kn">from</span> <span class="nn">math</span> <span class="kn">import</span> <span class="o">*</span>
+
+
+<span class="k">class</span> <span class="nc">recommendation</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">critics</span> <span class="o">=</span> <span class="p">{</span><span class="s">'Lisa Rose'</span><span class="p">:</span> <span class="p">{</span><span class="s">'Lady in the Water'</span><span class="p">:</span> <span class="mf">2.5</span><span class="p">,</span> <span class="s">'Snakes on a Plane'</span><span class="p">:</span> <span class="mf">3.5</span><span class="p">,</span> <span class="s">'Just My Luck'</span><span class="p">:</span> <span class="mf">3.0</span><span class="p">,</span>
+                                      <span class="s">'Superman Returns'</span><span class="p">:</span> <span class="mf">3.5</span><span class="p">,</span> <span class="s">'You, Me and Dupree'</span><span class="p">:</span> <span class="mf">2.5</span><span class="p">,</span> <span class="s">'The Night Listener'</span><span class="p">:</span> <span class="mf">3.0</span><span class="p">},</span>
+                        <span class="s">'Gene Seymour'</span><span class="p">:</span> <span class="p">{</span><span class="s">'Lady in the Water'</span><span class="p">:</span> <span class="mf">3.0</span><span class="p">,</span> <span class="s">'Snakes on a Plane'</span><span class="p">:</span> <span class="mf">3.5</span><span class="p">,</span> <span class="s">'Just My Luck'</span><span class="p">:</span> <span class="mf">1.5</span><span class="p">,</span>
+                                         <span class="s">'Superman Returns'</span><span class="p">:</span> <span class="mf">5.0</span><span class="p">,</span> <span class="s">'The Night Listener'</span><span class="p">:</span> <span class="mf">3.0</span><span class="p">,</span> <span class="s">'You, Me and Dupree'</span><span class="p">:</span> <span class="mf">3.5</span><span class="p">},</span>
+                        <span class="s">'Michael Phillips'</span><span class="p">:</span> <span class="p">{</span><span class="s">'Lady in the Water'</span><span class="p">:</span> <span class="mf">2.5</span><span class="p">,</span> <span class="s">'Snakes on a Plane'</span><span class="p">:</span> <span class="mf">3.0</span><span class="p">,</span>
+                                             <span class="s">'Superman Returns'</span><span class="p">:</span> <span class="mf">3.5</span><span class="p">,</span> <span class="s">'The Night Listener'</span><span class="p">:</span> <span class="mf">4.0</span><span class="p">},</span>
+                        <span class="s">'Claudia Puig'</span><span class="p">:</span> <span class="p">{</span><span class="s">'Snakes on a Plane'</span><span class="p">:</span> <span class="mf">3.5</span><span class="p">,</span> <span class="s">'Just My Luck'</span><span class="p">:</span> <span class="mf">3.0</span><span class="p">,</span> <span class="s">'The Night Listener'</span><span class="p">:</span> <span class="mf">4.5</span><span class="p">,</span>
+                                         <span class="s">'Superman Returns'</span><span class="p">:</span> <span class="mf">4.0</span><span class="p">,</span> <span class="s">'You, Me and Dupree'</span><span class="p">:</span> <span class="mf">2.5</span><span class="p">},</span>
+                        <span class="s">'Mick LaSalle'</span><span class="p">:</span> <span class="p">{</span><span class="s">'Lady in the Water'</span><span class="p">:</span> <span class="mf">3.0</span><span class="p">,</span> <span class="s">'Snakes on a Plane'</span><span class="p">:</span> <span class="mf">4.0</span><span class="p">,</span> <span class="s">'Just My Luck'</span><span class="p">:</span> <span class="mf">2.0</span><span class="p">,</span>
+                                         <span class="s">'Superman Returns'</span><span class="p">:</span> <span class="mf">3.0</span><span class="p">,</span> <span class="s">'The Night Listener'</span><span class="p">:</span> <span class="mf">3.0</span><span class="p">,</span> <span class="s">'You, Me and Dupree'</span><span class="p">:</span> <span class="mf">2.0</span><span class="p">},</span>
+                        <span class="s">'Jack Matthews'</span><span class="p">:</span> <span class="p">{</span><span class="s">'Lady in the Water'</span><span class="p">:</span> <span class="mf">3.0</span><span class="p">,</span> <span class="s">'Snakes on a Plane'</span><span class="p">:</span> <span class="mf">4.0</span><span class="p">,</span> <span class="s">'The Night Listener'</span><span class="p">:</span> <span class="mf">3.0</span><span class="p">,</span>
+                                          <span class="s">'Superman Returns'</span><span class="p">:</span> <span class="mf">5.0</span><span class="p">,</span> <span class="s">'You, Me and Dupree'</span><span class="p">:</span> <span class="mf">3.5</span><span class="p">},</span>
+                        <span class="s">'Toby'</span><span class="p">:</span> <span class="p">{</span><span class="s">'Snakes on a Plane'</span><span class="p">:</span> <span class="mf">4.5</span><span class="p">,</span> <span class="s">'You, Me and Dupree'</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span> <span class="s">'Superman Returns'</span><span class="p">:</span> <span class="mf">4.0</span><span class="p">}}</span>
+
+    <span class="k">def</span> <span class="nf">sim_distance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">person1</span><span class="p">,</span> <span class="n">person2</span><span class="p">,</span> <span class="n">new_critics</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+        <span class="s">"""
+        使用欧氏距离计算相似度. 返回相似度是一个浮点数值. 返回值为0代表没有相似性.
+        首先计算两个人所看相同电影评分的欧氏距离L. 如两人没有观看相同电影则返回0,否则计算相似度公式为 1/(L+1).
+        其中分母使用L+1是为了防止出现分母为0的情况. 欧氏距离越大，相似度越小;欧氏距离越小，相似度越大
+        """</span>
+        <span class="k">if</span> <span class="n">new_critics</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">new_critics</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">transformPrefs</span><span class="p">()</span>
+            <span class="n">movielist1</span> <span class="o">=</span> <span class="n">new_critics</span><span class="p">[</span><span class="n">person1</span><span class="p">]</span>
+            <span class="n">movielist2</span> <span class="o">=</span> <span class="n">new_critics</span><span class="p">[</span><span class="n">person2</span><span class="p">]</span>   <span class="c1"># dict
+</span>            <span class="n">commonlist</span> <span class="o">=</span> <span class="p">[]</span>        <span class="c1"># list
+</span>            <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">movielist1</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">movielist2</span><span class="p">:</span>
+                    <span class="n">commonlist</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">commonlist</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>   <span class="c1"># 没有公共元素，相似度为0
+</span>                <span class="k">return</span> <span class="mi">0</span>
+            <span class="c1"># 计算欧氏距离(使用列表生成式)
+</span>            <span class="n">distance</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">([</span><span class="nb">pow</span><span class="p">(</span><span class="n">movielist1</span><span class="p">[</span><span class="n">item</span><span class="p">]</span> <span class="o">-</span> <span class="n">movielist2</span><span class="p">[</span><span class="n">item</span><span class="p">],</span> <span class="mi">2</span><span class="p">)</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">commonlist</span><span class="p">])</span>
+            <span class="n">sim</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">/</span> <span class="p">(</span><span class="n">sqrt</span><span class="p">(</span><span class="n">distance</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">sim</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">movielist1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">critics</span><span class="p">[</span><span class="n">person1</span><span class="p">]</span>
+            <span class="n">movielist2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">critics</span><span class="p">[</span><span class="n">person2</span><span class="p">]</span>   <span class="c1"># dict
+</span>            <span class="n">commonlist</span> <span class="o">=</span> <span class="p">[]</span>        <span class="c1"># list
+</span>            <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">movielist1</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">movielist2</span><span class="p">:</span>
+                    <span class="n">commonlist</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">commonlist</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>   <span class="c1"># 没有公共元素，相似度为0
+</span>                <span class="k">return</span> <span class="mi">0</span>
+            <span class="c1"># 计算欧氏距离(使用列表生成式)
+</span>            <span class="n">distance</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">([</span><span class="nb">pow</span><span class="p">(</span><span class="n">movielist1</span><span class="p">[</span><span class="n">item</span><span class="p">]</span> <span class="o">-</span> <span class="n">movielist2</span><span class="p">[</span><span class="n">item</span><span class="p">],</span> <span class="mi">2</span><span class="p">)</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">commonlist</span><span class="p">])</span>
+            <span class="n">sim</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">/</span> <span class="p">(</span><span class="n">sqrt</span><span class="p">(</span><span class="n">distance</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">sim</span>
+
+    <span class="k">def</span> <span class="nf">sim_pearson</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">person1</span><span class="p">,</span> <span class="n">person2</span><span class="p">):</span>
+        <span class="s">"""
+        计算皮尔森相关系数.   度量两个向量之间的线性相关性.
+        如果一个人总是给出比另一个人更高的分支，但二者的分值只差基本保持一致，则他们仍然存在很好的相关性.
+        :return:两个向量之间的皮尔森相关系数，返回浮点数
+        """</span>
+        <span class="n">movielist1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">critics</span><span class="p">[</span><span class="n">person1</span><span class="p">]</span>
+        <span class="n">movielist2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">critics</span><span class="p">[</span><span class="n">person2</span><span class="p">]</span>
+        <span class="n">commonlist</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">movielist1</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">movielist2</span><span class="p">:</span>
+                <span class="n">commonlist</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>  <span class="c1"># key
+</span>        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">commonlist</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>  <span class="c1"># 没有共同项
+</span>            <span class="k">return</span> <span class="mi">0</span>
+
+        <span class="n">sum1</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">critics</span><span class="p">[</span><span class="n">person1</span><span class="p">][</span><span class="n">item</span><span class="p">]</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">commonlist</span><span class="p">])</span>   <span class="c1"># person1评分和
+</span>        <span class="n">sum2</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">critics</span><span class="p">[</span><span class="n">person2</span><span class="p">][</span><span class="n">item</span><span class="p">]</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">commonlist</span><span class="p">])</span>   <span class="c1"># person2评分和
+</span>
+        <span class="n">sum1sq</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">([</span><span class="nb">pow</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">critics</span><span class="p">[</span><span class="n">person1</span><span class="p">][</span><span class="n">item</span><span class="p">],</span> <span class="mi">2</span><span class="p">)</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">commonlist</span><span class="p">])</span>  <span class="c1"># person1评分平方和
+</span>        <span class="n">sum2sq</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">([</span><span class="nb">pow</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">critics</span><span class="p">[</span><span class="n">person2</span><span class="p">][</span><span class="n">item</span><span class="p">],</span> <span class="mi">2</span><span class="p">)</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">commonlist</span><span class="p">])</span>  <span class="c1"># person2评分平方和
+</span>
+        <span class="n">psum</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">critics</span><span class="p">[</span><span class="n">person1</span><span class="p">][</span><span class="n">item</span><span class="p">]</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">critics</span><span class="p">[</span><span class="n">person2</span><span class="p">][</span><span class="n">item</span><span class="p">]</span>
+                    <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">commonlist</span><span class="p">])</span>  <span class="c1"># 交叉项乘积和
+</span>
+        <span class="c1"># calculate perarson
+</span>        <span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">commonlist</span><span class="p">)</span>
+        <span class="n">num</span> <span class="o">=</span> <span class="p">(</span><span class="n">psum</span> <span class="o">-</span> <span class="p">(</span><span class="n">sum1</span> <span class="o">*</span> <span class="n">sum2</span> <span class="o">/</span> <span class="n">n</span><span class="p">))</span>
+        <span class="n">den</span> <span class="o">=</span> <span class="n">sqrt</span><span class="p">((</span><span class="n">sum1sq</span> <span class="o">-</span> <span class="nb">pow</span><span class="p">(</span><span class="n">sum1</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span> <span class="o">/</span> <span class="n">n</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">sum2sq</span> <span class="o">-</span> <span class="nb">pow</span><span class="p">(</span><span class="n">sum2</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span> <span class="o">/</span> <span class="n">n</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">den</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="mi">0</span>
+        <span class="n">r</span> <span class="o">=</span> <span class="n">num</span> <span class="o">/</span> <span class="n">den</span>
+        <span class="k">return</span> <span class="n">r</span>
+
+    <span class="k">def</span> <span class="nf">topMatches</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">person</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">similarity</span><span class="o">=</span><span class="n">sim_pearson</span><span class="p">):</span>
+        <span class="s">"""
+        返回与person最相似的n个人的姓名和相似度. 相似度度量选用 皮尔森相关系数
+        :param person: 要计算的人的姓名
+        :param n: 与person相似度最高的n个人
+        :param similarity: 相似度度量方法
+        :return: 返回一个list，list中元组存储的形式为（相关性, 姓名）
+        """</span>
+        <span class="k">if</span> <span class="n">person</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">critics</span><span class="p">:</span>
+            <span class="k">print</span> <span class="s">"person input error!"</span>
+            <span class="k">return</span> <span class="mi">0</span>
+        <span class="n">scores</span> <span class="o">=</span> <span class="p">[(</span><span class="n">similarity</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">person</span><span class="p">,</span> <span class="n">item</span><span class="p">),</span> <span class="n">item</span><span class="p">)</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">critics</span> <span class="k">if</span> <span class="n">item</span> <span class="o">!=</span> <span class="n">person</span><span class="p">]</span>
+        <span class="c1"># print scores[:]
+</span>        <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">scores</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">it</span><span class="p">:</span> <span class="o">-</span><span class="n">it</span><span class="p">[</span><span class="mi">0</span><span class="p">])[</span><span class="mi">0</span><span class="p">:</span><span class="n">n</span><span class="p">]</span>  <span class="c1"># 取相似度最高的n位
+</span>
+    <span class="k">def</span> <span class="nf">getRecommendations</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">person</span><span class="p">,</span> <span class="n">similarity</span><span class="o">=</span><span class="n">sim_pearson</span><span class="p">):</span>
+        <span class="s">"""
+        用与person的相似度对其他人对person未看过的影片进行加权平均，对person未看影片进行加权打分
+        :param person:
+        :param similarity: 相似度度量方法
+        :return: 返回对 person 未看影片的推荐评分，按评分排序进行推荐
+        """</span>
+        <span class="n">moviescore_dict</span> <span class="o">=</span> <span class="p">{}</span>  <span class="c1"># 影片--影片对应的评分和
+</span>        <span class="n">moviesim_dict</span> <span class="o">=</span> <span class="p">{}</span>  <span class="c1"># 影片--影片对应的相似度和
+</span>        <span class="k">for</span> <span class="n">other</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">critics</span><span class="p">:</span>
+            <span class="n">sim</span> <span class="o">=</span> <span class="n">similarity</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">,</span> <span class="n">person</span><span class="p">)</span>  <span class="c1"># 人之间的相似度
+</span>            <span class="k">if</span> <span class="n">other</span> <span class="o">==</span> <span class="n">person</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="k">if</span> <span class="n">sim</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">critics</span><span class="p">[</span><span class="n">other</span><span class="p">]:</span>
+                <span class="k">if</span> <span class="n">item</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">critics</span><span class="p">[</span><span class="n">person</span><span class="p">]:</span>  <span class="c1"># 如果person未对该电影进行评价
+</span>                    <span class="n">moviescore_dict</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+                    <span class="n">moviescore_dict</span><span class="p">[</span><span class="n">item</span><span class="p">]</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">critics</span><span class="p">[</span><span class="n">other</span><span class="p">][</span><span class="n">item</span><span class="p">]</span> <span class="o">*</span> <span class="n">sim</span>
+
+                    <span class="n">moviesim_dict</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+                    <span class="n">moviesim_dict</span><span class="p">[</span><span class="n">item</span><span class="p">]</span> <span class="o">+=</span> <span class="n">sim</span>
+
+        <span class="n">result</span> <span class="o">=</span> <span class="p">[(</span><span class="nb">float</span><span class="p">(</span><span class="n">moviescore_dict</span><span class="p">[</span><span class="n">item</span><span class="p">]</span> <span class="o">/</span> <span class="n">moviesim_dict</span><span class="p">[</span><span class="n">item</span><span class="p">]),</span> <span class="n">item</span><span class="p">)</span>
+                  <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">moviescore_dict</span><span class="p">]</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">e1</span><span class="p">:</span> <span class="o">-</span><span class="n">e1</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="k">return</span> <span class="n">result</span>
+
+    <span class="k">def</span> <span class="nf">transformPrefs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="s">"""
+        将self.critics中的 人--电影 的键和值进行调换，反向构造字典
+        :return: 键值调换后的 dict
+        """</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">person</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">critics</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">critics</span><span class="p">[</span><span class="n">person</span><span class="p">]:</span>
+                <span class="n">result</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="p">{})</span>
+                <span class="n">result</span><span class="p">[</span><span class="n">item</span><span class="p">][</span><span class="n">person</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">critics</span><span class="p">[</span><span class="n">person</span><span class="p">][</span><span class="n">item</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">result</span>
+
+    <span class="k">def</span> <span class="nf">calculateSimilarItems</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">similarity</span><span class="o">=</span><span class="n">sim_distance</span><span class="p">):</span>
+        <span class="s">"""
+        利用反向构造的 物品--人  字典，构造一个物品相似度字典
+        字典的键是物品，值是与该物品最相似的n个物品以及物品之间的相似度
+        :param n: 与物品最相似的n个物品
+        :return: dict
+        """</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">reverse_critics</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">transformPrefs</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">movie</span> <span class="ow">in</span> <span class="n">reverse_critics</span><span class="p">:</span>
+            <span class="n">scores</span> <span class="o">=</span> <span class="p">[(</span><span class="n">similarity</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">movie</span><span class="p">,</span> <span class="n">item</span><span class="p">,</span> <span class="mi">100</span><span class="p">),</span> <span class="n">item</span><span class="p">)</span>
+                      <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">reverse_critics</span> <span class="k">if</span> <span class="n">item</span> <span class="o">!=</span> <span class="n">movie</span><span class="p">]</span>
+            <span class="n">scores</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">scores</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">it</span><span class="p">:</span> <span class="o">-</span><span class="n">it</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>       <span class="c1"># 取相似度最高的n位
+</span>            <span class="n">result</span><span class="p">[</span><span class="n">movie</span><span class="p">]</span> <span class="o">=</span> <span class="n">scores</span>
+        <span class="k">return</span> <span class="n">result</span>
+
+    <span class="k">def</span> <span class="nf">getRecommendedItems</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">user</span><span class="p">):</span>
+        <span class="s">"""
+        指定一个名字user，计算对该用户的电影推荐
+        首先利用 calculateSimilarItems方法计算物品之间的相似度dict
+        根据该用户对曾经看过的影片的评分以及该电影与未看过电影的相似度估计用户对未看电影的评分，根据评分进行推荐
+        :param user: 指定的人
+        :return:
+        """</span>
+        <span class="n">userRatings</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">critics</span><span class="p">[</span><span class="n">user</span><span class="p">]</span>  <span class="c1"># 返回该用户所看电影和评分
+</span>        <span class="n">itemMatch</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">calculateSimilarItems</span><span class="p">()</span>  <span class="c1"># 返回物品的相似度字典
+</span>        <span class="n">scores</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">totalsim</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">item</span><span class="p">,</span> <span class="n">rating</span> <span class="ow">in</span> <span class="n">userRatings</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">for</span> <span class="n">similarity</span><span class="p">,</span> <span class="n">item2</span> <span class="ow">in</span> <span class="n">itemMatch</span><span class="p">[</span><span class="n">item</span><span class="p">]:</span>
+                <span class="k">if</span> <span class="n">item2</span> <span class="ow">in</span> <span class="n">userRatings</span><span class="p">:</span>   <span class="c1"># 若该电影被用户评分
+</span>                    <span class="k">continue</span>
+                <span class="n">scores</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="n">item2</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+                <span class="n">scores</span><span class="p">[</span><span class="n">item2</span><span class="p">]</span> <span class="o">+=</span> <span class="n">similarity</span> <span class="o">*</span> <span class="n">rating</span>
+                <span class="n">totalsim</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="n">item2</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+                <span class="n">totalsim</span><span class="p">[</span><span class="n">item2</span><span class="p">]</span> <span class="o">+=</span> <span class="n">similarity</span>
+        <span class="n">ranking</span> <span class="o">=</span> <span class="p">[(</span><span class="n">score</span> <span class="o">/</span> <span class="n">totalsim</span><span class="p">[</span><span class="n">item</span><span class="p">],</span> <span class="n">item</span><span class="p">)</span> <span class="k">for</span> <span class="n">item</span><span class="p">,</span> <span class="n">score</span> <span class="ow">in</span> <span class="n">scores</span><span class="o">.</span><span class="n">items</span><span class="p">()]</span>
+        <span class="n">ranking</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">ranking</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">it</span><span class="p">:</span> <span class="o">-</span><span class="n">it</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="k">return</span> <span class="n">ranking</span>
+
+
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">'__main__'</span><span class="p">:</span>
+    <span class="n">system</span> <span class="o">=</span> <span class="n">recommendation</span><span class="p">()</span>
+
+    <span class="c1"># 1.欧几里得距离计算相似度
+</span>    <span class="k">print</span> <span class="s">"</span><span class="se">\n</span><span class="s">欧几里得相似度:"</span><span class="p">,</span> <span class="n">system</span><span class="o">.</span><span class="n">sim_distance</span><span class="p">(</span><span class="s">'Lisa Rose'</span><span class="p">,</span> <span class="s">'Gene Seymour'</span><span class="p">)</span>
+
+    <span class="c1"># 2.皮尔森相关系数计算
+</span>    <span class="k">print</span> <span class="s">"</span><span class="se">\n</span><span class="s">皮尔森相关系数:"</span><span class="p">,</span> <span class="n">system</span><span class="o">.</span><span class="n">sim_pearson</span><span class="p">(</span><span class="s">'Lisa Rose'</span><span class="p">,</span> <span class="s">'Gene Seymour'</span><span class="p">)</span>
+
+    <span class="c1"># 3.计算与某人相似度最高的n个人
+</span>    <span class="k">print</span> <span class="s">"</span><span class="se">\n</span><span class="s">与 Toby 相似度最高的n个人"</span><span class="p">,</span> <span class="n">system</span><span class="o">.</span><span class="n">topMatches</span><span class="p">(</span><span class="s">'Toby'</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="mi">3</span><span class="p">)[:]</span>
+
+    <span class="c1"># 4.输入人名，对该人未观看的影片推荐
+</span>    <span class="k">print</span> <span class="s">"</span><span class="se">\n</span><span class="s">给 Toby 未观看影片的推荐是"</span><span class="p">,</span> <span class="n">system</span><span class="o">.</span><span class="n">getRecommendations</span><span class="p">(</span><span class="s">'Toby'</span><span class="p">)[:]</span>
+
+    <span class="c1"># 5.构建物品相似度字典
+</span>    <span class="k">print</span> <span class="s">"</span><span class="se">\n</span><span class="s">电影之间的相似度字典是："</span>
+    <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">system</span><span class="o">.</span><span class="n">calculateSimilarItems</span><span class="p">()</span><span class="o">.</span><span class="n">iteritems</span><span class="p">():</span>
+        <span class="k">print</span> <span class="n">key</span><span class="p">,</span> <span class="s">":"</span><span class="p">,</span> <span class="n">value</span><span class="p">[:]</span>
+
+    <span class="c1"># 6.根据物品相似度，输入人名，推荐影片
+</span>    <span class="k">print</span> <span class="s">"</span><span class="se">\n</span><span class="s">根据电影相似度给 Toby 推荐的影片是："</span><span class="p">,</span> <span class="n">system</span><span class="o">.</span><span class="n">getRecommendedItems</span><span class="p">(</span><span class="s">'Toby'</span><span class="p">)[:]</span>
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>参考资料：https://blog.csdn.net/bcj296050240/article/details/50810662</p>
+
+<h2 id="回归模型">回归模型</h2>
+
+<h3 id="️-线性规划linear-regression">☣️ 线性规划（Linear Regression）</h3>
+
+<h3 id="-逻辑回归logistic-regression">✅ 逻辑回归（Logistic Regression）</h3>
+
+<p><img src="https://yuanxiaosc.github.io/2018/06/21/%E6%94%B9%E8%BF%9B%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C%E7%9A%84%E5%AD%A6%E4%B9%A0%E6%96%B9%E6%B3%95%E2%80%94%E2%80%94%E4%BA%A4%E5%8F%89%E7%86%B5/one_1.png" alt="img" /></p>
+
+<h3 id="-softmax">✅ SoftMax</h3>
+
+<p><img src="https://pic1.zhimg.com/v2-11758fbc2fc5bbbc60106926625b3a4f_1200x500.jpg" style="zoom:70%" /></p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+</pre></td><td class="rouge-code"><pre><span class="n">scores</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">123</span><span class="p">,</span> <span class="mi">456</span><span class="p">,</span> <span class="mi">789</span><span class="p">])</span>    <span class="c1"># example with 3 classes and each having large scores
+</span><span class="n">scores</span> <span class="o">-=</span> <span class="n">np</span><span class="o">.</span><span class="nb">max</span><span class="p">(</span><span class="n">scores</span><span class="p">)</span>    <span class="c1"># scores becomes [-666, -333, 0]
+</span><span class="n">p</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">scores</span><span class="p">)</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="nb">sum</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">scores</span><span class="p">))</span>
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>主要用于多分类回归，可以对向量进行处理，最后得出的概率总和是1</p>
+
+<p>参考资料：https://zhuanlan.zhihu.com/p/25723112（softmax应用）</p>
+
+<h3 id="️-似然函数likelihood-function">☣️ 似然函数（Likelihood Function）</h3>
+
+<h3 id="️-贝叶斯网络bayes-network">☣️ 贝叶斯网络（Bayes Network）</h3>
+
+<p>参考资料：https://cloud.tencent.com/developer/article/1102103（分类算法总结）</p>
+
+<h2 id="统计模型-蒙圈">统计模型-蒙圈</h2>
+
+<h3 id="️-条件随机场conditional-random-field">☣️ 条件随机场（Conditional Random Field）</h3>
+
+<h3 id="-马尔可夫模型markov-models">✅ 马尔可夫模型（Markov Models）</h3>
+
+<p><strong>概述</strong>：马尔可夫过程中，任何一个状态，只与前一个状态相关</p>
+
+<p><img src="https://pic4.zhimg.com/80/648a55725e67d718d97d6a475891d70b_hd.jpg" style="width:50%" /></p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+</pre></td><td class="rouge-code"><pre><span class="c1"># 关系矩阵
+</span><span class="n">transfer_matrix</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">0.6</span><span class="p">,</span><span class="mf">0.2</span><span class="p">,</span><span class="mf">0.2</span><span class="p">],[</span><span class="mf">0.3</span><span class="p">,</span><span class="mf">0.4</span><span class="p">,</span><span class="mf">0.3</span><span class="p">],[</span><span class="mi">0</span><span class="p">,</span><span class="mf">0.3</span><span class="p">,</span><span class="mf">0.7</span><span class="p">]],</span><span class="n">dtype</span><span class="o">=</span><span class="s">'float32'</span><span class="p">)</span> 
+<span class="c1"># 
+</span><span class="n">start_matrix</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">0.5</span><span class="p">,</span><span class="mf">0.3</span><span class="p">,</span><span class="mf">0.2</span><span class="p">]],</span><span class="n">dtype</span><span class="o">=</span><span class="s">'float32'</span><span class="p">)</span> 
+
+<span class="n">value1</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">value2</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">value3</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">30</span><span class="p">):</span>
+    <span class="n">start_matrix</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">start_matrix</span><span class="p">,</span><span class="n">transfer_matrix</span><span class="p">)</span>
+    <span class="n">value1</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">start_matrix</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span>
+    <span class="n">value2</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">start_matrix</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">])</span>
+    <span class="n">value3</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">start_matrix</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">2</span><span class="p">])</span>
+<span class="k">print</span><span class="p">(</span><span class="n">start_matrix</span><span class="p">)</span>
+
+<span class="c1"># 输出[[0.23076934 0.30769244 0.4615386 ]]
+</span></pre></td></tr></tbody></table></code></pre></div></div>
+
+<h3 id="-隐马尔可夫模型hidden-markov-models">💤 隐马尔可夫模型（Hidden Markov Models）</h3>
+
+<h4 id="-前言-1">✅ 前言</h4>
+
+<p>隐马尔可夫模型即马尔可夫链上加了一层随机过程，一般采用Baum-Welch算法和Viterbi算法进行求解</p>
+
+<p><img src="https://pic2.zhimg.com/792e033ff9b0418b3b6c9bbaef30fd83_r.jpg" alt="preview" /></p>
+
+<h4 id="-baum-welch算法">🆘 Baum-Welch算法</h4>
+
+<p>一种EM算法</p>
+
+<h4 id="-viterbi算法">🆘 Viterbi算法</h4>
+
+<h4 id="-源码-baum-welch算法">🆘 源码-Baum-Welch算法</h4>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80
+81
+82
+83
+84
+85
+86
+87
+88
+89
+90
+91
+92
+93
+94
+95
+96
+97
+98
+99
+100
+101
+102
+103
+104
+105
+106
+107
+108
+109
+110
+111
+112
+113
+114
+115
+116
+117
+118
+119
+120
+121
+122
+123
+124
+125
+126
+127
+128
+129
+130
+131
+132
+133
+134
+135
+136
+137
+138
+139
+140
+141
+142
+143
+144
+145
+146
+147
+148
+149
+150
+151
+152
+153
+154
+155
+156
+157
+158
+159
+160
+161
+162
+163
+164
+165
+166
+167
+168
+169
+170
+171
+172
+173
+174
+175
+176
+177
+178
+179
+180
+181
+182
+183
+184
+185
+186
+187
+188
+189
+190
+191
+192
+193
+194
+195
+196
+197
+198
+199
+200
+201
+202
+203
+204
+205
+206
+207
+208
+209
+210
+211
+212
+213
+214
+215
+216
+217
+218
+219
+220
+221
+222
+223
+224
+225
+226
+227
+228
+229
+230
+231
+232
+233
+234
+</pre></td><td class="rouge-code"><pre><span class="s">"""
+隐马尔科夫模型
+三类问题：1.概率计算 2.学习问题（参数估计） 3.预测问题（状态序列的预测）
+"""</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="n">np</span>
+<span class="kn">from</span> <span class="nn">itertools</span> <span class="kn">import</span> <span class="n">accumulate</span>
+
+<span class="k">class</span> <span class="nc">GenData</span><span class="p">:</span>
+    <span class="s">"""
+    根据隐马尔科夫模型生成相应的观测数据
+    """</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">hmm</span><span class="p">,</span> <span class="n">n_sample</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hmm</span> <span class="o">=</span> <span class="n">hmm</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">n_sample</span> <span class="o">=</span> <span class="n">n_sample</span>
+
+    <span class="k">def</span> <span class="nf">_locate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prob_arr</span><span class="p">):</span>
+        <span class="c1"># 给定概率向量，返回状态
+</span>        <span class="n">seed</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">state</span><span class="p">,</span> <span class="n">cdf</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">accumulate</span><span class="p">(</span><span class="n">prob_arr</span><span class="p">)):</span>
+            <span class="k">if</span> <span class="n">seed</span> <span class="o">&lt;=</span> <span class="n">cdf</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">state</span>
+        <span class="k">return</span>
+
+    <span class="k">def</span> <span class="nf">init_state</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># 根据初始状态概率向量，生成初始状态
+</span>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_locate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">hmm</span><span class="o">.</span><span class="n">S</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">state_trans</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">current_state</span><span class="p">):</span>
+        <span class="c1"># 转移状态
+</span>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_locate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">hmm</span><span class="o">.</span><span class="n">A</span><span class="p">[</span><span class="n">current_state</span><span class="p">])</span>
+
+    <span class="k">def</span> <span class="nf">gen_obs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">current_state</span><span class="p">):</span>
+        <span class="c1"># 生成观测
+</span>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_locate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">hmm</span><span class="o">.</span><span class="n">B</span><span class="p">[</span><span class="n">current_state</span><span class="p">])</span>
+
+    <span class="k">def</span> <span class="nf">gen_data</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># 根据模型产生观测数据
+</span>        <span class="n">current_state</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">init_state</span><span class="p">()</span>
+        <span class="n">start_obs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">gen_obs</span><span class="p">(</span><span class="n">current_state</span><span class="p">)</span>
+        <span class="n">state</span> <span class="o">=</span> <span class="p">[</span><span class="n">current_state</span><span class="p">]</span>
+        <span class="n">obs</span> <span class="o">=</span> <span class="p">[</span><span class="n">start_obs</span><span class="p">]</span>
+        <span class="n">n</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">while</span> <span class="n">n</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_sample</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">n</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="n">current_state</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">state_trans</span><span class="p">(</span><span class="n">current_state</span><span class="p">)</span>
+            <span class="n">state</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">current_state</span><span class="p">)</span>
+            <span class="n">obs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">gen_obs</span><span class="p">(</span><span class="n">current_state</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">state</span><span class="p">,</span> <span class="n">obs</span>
+
+
+<span class="k">class</span> <span class="nc">HMM</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_state</span><span class="p">,</span> <span class="n">n_obs</span><span class="p">,</span> <span class="n">S</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">A</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">B</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">n_state</span> <span class="o">=</span> <span class="n">n_state</span>  <span class="c1"># 状态的个数n
+</span>        <span class="bp">self</span><span class="o">.</span><span class="n">n_obs</span> <span class="o">=</span> <span class="n">n_obs</span>  <span class="c1"># 观测的种类数m
+</span>        <span class="bp">self</span><span class="o">.</span><span class="n">S</span> <span class="o">=</span> <span class="n">S</span>  <span class="c1"># 1*n, 初始状态概率向量
+</span>        <span class="bp">self</span><span class="o">.</span><span class="n">A</span> <span class="o">=</span> <span class="n">A</span>  <span class="c1"># n*n, 状态转移概率矩阵
+</span>        <span class="bp">self</span><span class="o">.</span><span class="n">B</span> <span class="o">=</span> <span class="n">B</span>  <span class="c1"># n*m, 观测生成概率矩阵
+</span>
+<span class="k">def</span> <span class="nf">_alpha</span><span class="p">(</span><span class="n">hmm</span><span class="p">,</span> <span class="n">obs</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+    <span class="c1"># 计算时刻t各个状态的前向概率
+</span>    <span class="n">b</span> <span class="o">=</span> <span class="n">hmm</span><span class="o">.</span><span class="n">B</span><span class="p">[:,</span> <span class="n">obs</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span>
+    <span class="n">alpha</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">hmm</span><span class="o">.</span><span class="n">S</span> <span class="o">*</span> <span class="n">b</span><span class="p">])</span>  <span class="c1"># n*1
+</span>    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">t</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+        <span class="n">alpha</span> <span class="o">=</span> <span class="p">(</span><span class="n">alpha</span> <span class="o">@</span> <span class="n">hmm</span><span class="o">.</span><span class="n">A</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">hmm</span><span class="o">.</span><span class="n">B</span><span class="p">[:,</span> <span class="n">obs</span><span class="p">[</span><span class="n">i</span><span class="p">]]])</span>
+    <span class="k">return</span> <span class="n">alpha</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+<span class="k">def</span> <span class="nf">forward_prob</span><span class="p">(</span><span class="n">hmm</span><span class="p">,</span> <span class="n">obs</span><span class="p">):</span>
+    <span class="c1"># 前向算法计算最终生成观测序列的概率, 即各个状态下概率之和
+</span>    <span class="n">alpha</span> <span class="o">=</span> <span class="n">_alpha</span><span class="p">(</span><span class="n">hmm</span><span class="p">,</span> <span class="n">obs</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">obs</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="nb">sum</span><span class="p">(</span><span class="n">alpha</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">_beta</span><span class="p">(</span><span class="n">hmm</span><span class="p">,</span> <span class="n">obs</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+    <span class="c1"># 计算时刻t各个状态的后向概率
+</span>    <span class="n">beta</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">hmm</span><span class="o">.</span><span class="n">n_state</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">reversed</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">t</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">obs</span><span class="p">))):</span>
+        <span class="n">beta</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="nb">sum</span><span class="p">(</span><span class="n">hmm</span><span class="o">.</span><span class="n">A</span> <span class="o">*</span> <span class="n">hmm</span><span class="o">.</span><span class="n">B</span><span class="p">[:,</span> <span class="n">obs</span><span class="p">[</span><span class="n">i</span><span class="p">]]</span> <span class="o">*</span> <span class="n">beta</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">beta</span>
+
+<span class="k">def</span> <span class="nf">backward_prob</span><span class="p">(</span><span class="n">hmm</span><span class="p">,</span> <span class="n">obs</span><span class="p">):</span>
+    <span class="c1"># 后向算法计算生成观测序列的概率
+</span>    <span class="n">beta</span> <span class="o">=</span> <span class="n">_beta</span><span class="p">(</span><span class="n">hmm</span><span class="p">,</span> <span class="n">obs</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="nb">sum</span><span class="p">(</span><span class="n">hmm</span><span class="o">.</span><span class="n">S</span> <span class="o">*</span> <span class="n">hmm</span><span class="o">.</span><span class="n">B</span><span class="p">[:,</span> <span class="n">obs</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span> <span class="o">*</span> <span class="n">beta</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">fb_prob</span><span class="p">(</span><span class="n">hmm</span><span class="p">,</span> <span class="n">obs</span><span class="p">,</span> <span class="n">t</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="c1"># 将前向和后向合并
+</span>    <span class="k">if</span> <span class="n">t</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="n">t</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">res</span> <span class="o">=</span> <span class="n">_alpha</span><span class="p">(</span><span class="n">hmm</span><span class="p">,</span> <span class="n">obs</span><span class="p">,</span> <span class="n">t</span><span class="p">)</span> <span class="o">*</span> <span class="n">_beta</span><span class="p">(</span><span class="n">hmm</span><span class="p">,</span> <span class="n">obs</span><span class="p">,</span> <span class="n">t</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">res</span><span class="o">.</span><span class="nb">sum</span><span class="p">()</span>
+
+<span class="k">def</span> <span class="nf">_gamma</span><span class="p">(</span><span class="n">hmm</span><span class="p">,</span> <span class="n">obs</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+    <span class="c1"># 计算时刻t处于各个状态的概率
+</span>    <span class="n">alpha</span> <span class="o">=</span> <span class="n">_alpha</span><span class="p">(</span><span class="n">hmm</span><span class="p">,</span> <span class="n">obs</span><span class="p">,</span> <span class="n">t</span><span class="p">)</span>
+    <span class="n">beta</span> <span class="o">=</span> <span class="n">_beta</span><span class="p">(</span><span class="n">hmm</span><span class="p">,</span> <span class="n">obs</span><span class="p">,</span> <span class="n">t</span><span class="p">)</span>
+    <span class="n">prob</span> <span class="o">=</span> <span class="n">alpha</span> <span class="o">*</span> <span class="n">beta</span>
+    <span class="k">return</span> <span class="n">prob</span> <span class="o">/</span> <span class="n">prob</span><span class="o">.</span><span class="nb">sum</span><span class="p">()</span>
+
+
+<span class="k">def</span> <span class="nf">point_prob</span><span class="p">(</span><span class="n">hmm</span><span class="p">,</span> <span class="n">obs</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">i</span><span class="p">):</span>
+    <span class="c1"># 计算时刻t处于状态i的概率
+</span>    <span class="n">prob</span> <span class="o">=</span> <span class="n">_gamma</span><span class="p">(</span><span class="n">hmm</span><span class="p">,</span> <span class="n">obs</span><span class="p">,</span> <span class="n">t</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">prob</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+
+<span class="k">def</span> <span class="nf">_xi</span><span class="p">(</span><span class="n">hmm</span><span class="p">,</span> <span class="n">obs</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+    <span class="n">alpha</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mat</span><span class="p">(</span><span class="n">_alpha</span><span class="p">(</span><span class="n">hmm</span><span class="p">,</span> <span class="n">obs</span><span class="p">,</span> <span class="n">t</span><span class="p">))</span>
+    <span class="n">beta_p</span> <span class="o">=</span> <span class="n">_beta</span><span class="p">(</span><span class="n">hmm</span><span class="p">,</span> <span class="n">obs</span><span class="p">,</span> <span class="n">t</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="n">obs_prob</span> <span class="o">=</span> <span class="n">hmm</span><span class="o">.</span><span class="n">B</span><span class="p">[:,</span> <span class="n">obs</span><span class="p">[</span><span class="n">t</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]]</span>
+    <span class="n">obs_beta</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mat</span><span class="p">(</span><span class="n">obs_prob</span> <span class="o">*</span> <span class="n">beta_p</span><span class="p">)</span>
+    <span class="n">alpha_obs_beta</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">alpha</span><span class="o">.</span><span class="n">T</span> <span class="o">*</span> <span class="n">obs_beta</span><span class="p">)</span>
+    <span class="n">xi</span> <span class="o">=</span> <span class="n">alpha_obs_beta</span> <span class="o">*</span> <span class="n">hmm</span><span class="o">.</span><span class="n">A</span>
+    <span class="k">return</span> <span class="n">xi</span> <span class="o">/</span> <span class="n">xi</span><span class="o">.</span><span class="nb">sum</span><span class="p">()</span>
+
+
+<span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="n">hmm</span><span class="p">,</span> <span class="n">obs_data</span><span class="p">,</span> <span class="n">maxstep</span><span class="o">=</span><span class="mi">100</span><span class="p">):</span>
+    <span class="c1"># 利用Baum-Welch算法学习
+</span>    <span class="n">hmm</span><span class="o">.</span><span class="n">A</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="n">hmm</span><span class="o">.</span><span class="n">n_state</span><span class="p">,</span> <span class="n">hmm</span><span class="o">.</span><span class="n">n_state</span><span class="p">))</span> <span class="o">/</span> <span class="n">hmm</span><span class="o">.</span><span class="n">n_state</span>
+    <span class="n">hmm</span><span class="o">.</span><span class="n">B</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="n">hmm</span><span class="o">.</span><span class="n">n_state</span><span class="p">,</span> <span class="n">hmm</span><span class="o">.</span><span class="n">n_obs</span><span class="p">))</span> <span class="o">/</span> <span class="n">hmm</span><span class="o">.</span><span class="n">n_obs</span>
+    <span class="n">hmm</span><span class="o">.</span><span class="n">S</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="n">hmm</span><span class="o">.</span><span class="n">n_state</span><span class="p">)</span>  <span class="c1"># 初始状态概率矩阵（向量），的初始化必须随机状态，否则容易陷入局部最优
+</span>    <span class="n">hmm</span><span class="o">.</span><span class="n">S</span> <span class="o">=</span> <span class="n">hmm</span><span class="o">.</span><span class="n">S</span> <span class="o">/</span> <span class="n">hmm</span><span class="o">.</span><span class="n">S</span><span class="o">.</span><span class="nb">sum</span><span class="p">()</span>
+    <span class="n">step</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">while</span> <span class="n">step</span> <span class="o">&lt;</span> <span class="n">maxstep</span><span class="p">:</span>
+        <span class="n">xi</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">hmm</span><span class="o">.</span><span class="n">A</span><span class="p">)</span>
+        <span class="n">gamma</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">hmm</span><span class="o">.</span><span class="n">S</span><span class="p">)</span>
+        <span class="n">B</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">hmm</span><span class="o">.</span><span class="n">B</span><span class="p">)</span>
+        <span class="n">S</span> <span class="o">=</span> <span class="n">_gamma</span><span class="p">(</span><span class="n">hmm</span><span class="p">,</span> <span class="n">obs_data</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">obs_data</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">):</span>
+            <span class="n">tmp_gamma</span> <span class="o">=</span> <span class="n">_gamma</span><span class="p">(</span><span class="n">hmm</span><span class="p">,</span> <span class="n">obs_data</span><span class="p">,</span> <span class="n">t</span><span class="p">)</span>
+            <span class="n">gamma</span> <span class="o">+=</span> <span class="n">tmp_gamma</span>
+            <span class="n">xi</span> <span class="o">+=</span> <span class="n">_xi</span><span class="p">(</span><span class="n">hmm</span><span class="p">,</span> <span class="n">obs_data</span><span class="p">,</span> <span class="n">t</span><span class="p">)</span>
+            <span class="n">B</span><span class="p">[:,</span> <span class="n">obs_data</span><span class="p">[</span><span class="n">t</span><span class="p">]]</span> <span class="o">+=</span> <span class="n">tmp_gamma</span>
+
+        <span class="c1"># 更新 A
+</span>        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">hmm</span><span class="o">.</span><span class="n">n_state</span><span class="p">):</span>
+            <span class="n">hmm</span><span class="o">.</span><span class="n">A</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">xi</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">/</span> <span class="n">gamma</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+        <span class="c1"># 更新 B
+</span>        <span class="n">tmp_gamma_end</span> <span class="o">=</span> <span class="n">_gamma</span><span class="p">(</span><span class="n">hmm</span><span class="p">,</span> <span class="n">obs_data</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">obs_data</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">gamma</span> <span class="o">+=</span> <span class="n">tmp_gamma_end</span>
+        <span class="n">B</span><span class="p">[:,</span> <span class="n">obs_data</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]]</span> <span class="o">+=</span> <span class="n">tmp_gamma_end</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">hmm</span><span class="o">.</span><span class="n">n_state</span><span class="p">):</span>
+            <span class="n">hmm</span><span class="o">.</span><span class="n">B</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">B</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">/</span> <span class="n">gamma</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+        <span class="c1"># 更新 S
+</span>        <span class="n">hmm</span><span class="o">.</span><span class="n">S</span> <span class="o">=</span> <span class="n">S</span>
+        <span class="n">step</span> <span class="o">+=</span> <span class="mi">1</span>
+    <span class="k">return</span> <span class="n">hmm</span>
+
+<span class="k">def</span> <span class="nf">predict</span><span class="p">(</span><span class="n">hmm</span><span class="p">,</span> <span class="n">obs</span><span class="p">):</span>
+    <span class="c1"># 采用Viterbi算法预测状态序列
+</span>    <span class="n">N</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">obs</span><span class="p">)</span>
+    <span class="n">nodes_graph</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">hmm</span><span class="o">.</span><span class="n">n_state</span><span class="p">,</span> <span class="n">N</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>  <span class="c1"># 存储时刻t且状态为i时， 前一个时刻t-1的状态，用于构建最终的状态序列
+</span>    <span class="n">delta</span> <span class="o">=</span> <span class="n">hmm</span><span class="o">.</span><span class="n">S</span> <span class="o">*</span> <span class="n">hmm</span><span class="o">.</span><span class="n">B</span><span class="p">[:,</span> <span class="n">obs</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span>  <span class="c1"># 存储到t时刻，且此刻状态为i的最大概率
+</span>    <span class="n">nodes_graph</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="n">hmm</span><span class="o">.</span><span class="n">n_state</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">N</span><span class="p">):</span>
+        <span class="n">new_delta</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">hmm</span><span class="o">.</span><span class="n">n_state</span><span class="p">):</span>
+            <span class="n">temp</span> <span class="o">=</span> <span class="p">[</span><span class="n">hmm</span><span class="o">.</span><span class="n">A</span><span class="p">[</span><span class="n">j</span><span class="p">,</span> <span class="n">i</span><span class="p">]</span> <span class="o">*</span> <span class="n">d</span> <span class="k">for</span> <span class="n">j</span><span class="p">,</span> <span class="n">d</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">delta</span><span class="p">)]</span>  <span class="c1"># 当前状态为i时， 选取最优的前一时刻状态
+</span>            <span class="n">max_d</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">temp</span><span class="p">)</span>
+            <span class="n">new_delta</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">max_d</span> <span class="o">*</span> <span class="n">hmm</span><span class="o">.</span><span class="n">B</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">obs</span><span class="p">[</span><span class="n">t</span><span class="p">]])</span>
+            <span class="n">nodes_graph</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">t</span><span class="p">]</span> <span class="o">=</span> <span class="n">temp</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">max_d</span><span class="p">)</span>
+        <span class="n">delta</span> <span class="o">=</span> <span class="n">new_delta</span>
+
+    <span class="n">current_state</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">nodes_graph</span><span class="p">[:,</span> <span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+    <span class="n">path</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">t</span> <span class="o">=</span> <span class="n">N</span>
+    <span class="k">while</span> <span class="n">t</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">current_state</span><span class="p">)</span>
+        <span class="n">current_state</span> <span class="o">=</span> <span class="n">nodes_graph</span><span class="p">[</span><span class="n">current_state</span><span class="p">,</span> <span class="n">t</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span>
+        <span class="n">t</span> <span class="o">-=</span> <span class="mi">1</span>
+    <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="nb">reversed</span><span class="p">(</span><span class="n">path</span><span class="p">))</span>
+
+
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">'__main__'</span><span class="p">:</span>
+    <span class="c1"># S = np.array([0.2, 0.4, 0.4])
+</span>    <span class="c1"># A = np.array([[0.5, 0.2, 0.3], [0.3, 0.5, 0.2], [0.2, 0.3, 0.5]])
+</span>    <span class="c1"># B = np.array([[0.5, 0.2, 0.3], [0.4, 0.2, 0.4], [0.6, 0.3, 0.1]])
+</span>    <span class="c1"># hmm_real = HMM(3, 3, S, A, B)
+</span>    <span class="c1"># g = GenData(hmm_real, 500)
+</span>    <span class="c1"># state, obs = g.gen_data()
+</span>    <span class="c1"># 检测生成的数据
+</span>    <span class="c1"># state, obs = np.array(state), np.array(obs)
+</span>    <span class="c1"># ind = np.where(state==2)[0]
+</span>    <span class="c1"># from collections import Counter
+</span>    <span class="c1"># obs_ind = obs[ind]
+</span>    <span class="c1"># c1 = Counter(obs_ind)
+</span>    <span class="c1"># n = sum(c1.values())
+</span>    <span class="c1"># for o, val in c.items():
+</span>    <span class="c1">#     print(o, val/n)
+</span>    <span class="c1"># ind_next = ind + 1
+</span>    <span class="c1"># ind_out = np.where(ind_next==1000)
+</span>    <span class="c1"># ind_next = np.delete(ind_next, ind_out)
+</span>    <span class="c1"># state_next = state[ind_next]
+</span>    <span class="c1"># c2 = Counter(state_next)
+</span>    <span class="c1"># n = sum(c2.values())
+</span>    <span class="c1"># for s, val in c2.items():
+</span>    <span class="c1">#     print(s, val/n)
+</span>
+    <span class="c1"># 预测
+</span>    <span class="n">S</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">])</span>
+    <span class="n">A</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">0.8</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mf">0.8</span><span class="p">,</span> <span class="mf">0.8</span><span class="p">]])</span>
+    <span class="n">B</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">0.2</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.8</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mf">0.8</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">]])</span>
+    <span class="n">hmm</span> <span class="o">=</span> <span class="n">HMM</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">)</span>
+    <span class="n">g</span> <span class="o">=</span> <span class="n">GenData</span><span class="p">(</span><span class="n">hmm</span><span class="p">,</span> <span class="mi">200</span><span class="p">)</span>
+    <span class="n">state</span><span class="p">,</span> <span class="n">obs</span> <span class="o">=</span> <span class="n">g</span><span class="o">.</span><span class="n">gen_data</span><span class="p">()</span>
+    <span class="k">print</span><span class="p">(</span><span class="n">obs</span><span class="p">)</span>
+    <span class="n">path</span> <span class="o">=</span> <span class="n">predict</span><span class="p">(</span><span class="n">hmm</span><span class="p">,</span> <span class="n">obs</span><span class="p">)</span>
+    <span class="n">score</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">([</span><span class="nb">int</span><span class="p">(</span><span class="n">i</span> <span class="o">==</span> <span class="n">j</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">state</span><span class="p">,</span> <span class="n">path</span><span class="p">)])</span>
+    <span class="k">print</span><span class="p">(</span><span class="n">score</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">path</span><span class="p">))</span>
+
+    <span class="c1"># 学习
+</span>    <span class="c1"># import matplotlib.pyplot as plt
+</span>    <span class="c1">#
+</span>    <span class="c1">#
+</span>    <span class="c1"># def triangle_data(n_sample):
+</span>    <span class="c1">#     # 生成三角波形状的序列
+</span>    <span class="c1">#     data = []
+</span>    <span class="c1">#     for x in range(n_sample):
+</span>    <span class="c1">#         x = x % 6
+</span>    <span class="c1">#         if x &lt;= 3:
+</span>    <span class="c1">#             data.append(x)
+</span>    <span class="c1">#         else:
+</span>    <span class="c1">#             data.append(6 - x)
+</span>    <span class="c1">#     return data
+</span>    <span class="c1">#
+</span>    <span class="c1">#
+</span>    <span class="c1"># hmm = HMM(10, 4)
+</span>    <span class="c1"># data = triangle_data(30)
+</span>    <span class="c1"># hmm = fit(hmm, data)
+</span>    <span class="c1"># g = GenData(hmm, 30)
+</span>    <span class="c1"># state, obs = g.gen_data()
+</span>    <span class="c1">#
+</span>    <span class="c1"># x = [i for i in range(30)]
+</span>    <span class="c1"># plt.scatter(x, obs, marker='*', color='r')
+</span>    <span class="c1"># plt.plot(x, data, color='g')
+</span>    <span class="c1"># plt.show()
+</span></pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>参考资料：https://www.zhihu.com/question/20962240（马尔可夫）、https://blog.csdn.net/slx_share/article/details/80237566（隐马尔可夫）、https://blog.csdn.net/slx_share/article/details/80237566（源码案例）</p>
+
+<h3 id="-蒙特卡罗方法monte-carlo-method">💤 蒙特卡罗方法（<strong>Monte Carlo</strong> Method）</h3>
+
+<h4 id="-基础模型">✅ 基础模型</h4>
+
+<p><strong>概述</strong>：通过大量随机样本，去了解一个系统，进而得到所要计算的值。它非常强大和灵活，又相当简单易懂，很容易实现。对于许多问题来说，它往往是最简单的计算方法，有时甚至是唯一可行的方法。</p>
+
+<p><strong>举例</strong>：在区域内随机产生10000个点，落在圆内的点与圆外的点比例计划，可以推导𝝅的近似值</p>
+
+<p><img src="http://www.ruanyifeng.com/blogimg/asset/2015/bg2015072604.jpg" style="width:30%" /></p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+</pre></td><td class="rouge-code"><pre><span class="kn">import</span> <span class="nn">random</span>
+<span class="k">def</span> <span class="nf">calpai</span><span class="p">():</span>
+    <span class="n">n</span> <span class="o">=</span> <span class="mi">1000000</span>
+    <span class="n">r</span> <span class="o">=</span> <span class="mf">1.0</span>
+    <span class="n">a</span><span class="p">,</span> <span class="n">b</span> <span class="o">=</span> <span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span>
+    <span class="n">x_neg</span><span class="p">,</span> <span class="n">x_pos</span> <span class="o">=</span> <span class="n">a</span> <span class="o">-</span> <span class="n">r</span><span class="p">,</span> <span class="n">a</span> <span class="o">+</span> <span class="n">r</span>
+    <span class="n">y_neg</span><span class="p">,</span> <span class="n">y_pos</span> <span class="o">=</span> <span class="n">b</span> <span class="o">-</span> <span class="n">r</span><span class="p">,</span> <span class="n">b</span> <span class="o">+</span> <span class="n">r</span>
+
+    <span class="n">count</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">n</span><span class="p">):</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="n">x_neg</span><span class="p">,</span> <span class="n">x_pos</span><span class="p">)</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="n">y_neg</span><span class="p">,</span> <span class="n">y_pos</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">x</span><span class="o">*</span><span class="n">x</span> <span class="o">+</span> <span class="n">y</span><span class="o">*</span><span class="n">y</span> <span class="o">&lt;=</span> <span class="mf">1.0</span><span class="p">:</span>
+            <span class="n">count</span> <span class="o">+=</span> <span class="mi">1</span>
+
+    <span class="k">print</span> <span class="p">(</span><span class="n">count</span> <span class="o">/</span> <span class="nb">float</span><span class="p">(</span><span class="n">n</span><span class="p">))</span> <span class="o">*</span> <span class="mi">4</span>
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<h4 id="-inverse-cdf-方法">🆘 Inverse CDF 方法</h4>
+
+<p><strong>原理</strong>：经典且常见的模型如指数分布、𝛾 分布、t 分布、F 分布、β 分布、Dirichlet 分布都是有的，可以方便采样，但是对于相对复杂的分布，就需要设计采样策略，比如Inverse CDF（Cumulative Distribution Function）方法，CDF可以由概率密度函数（PDF，Probability Density Function）进行积分得到</p>
+
+<p>editing…..</p>
+
+<h4 id="-拒绝接受采样">🆘 拒绝接受采样</h4>
+
+<p><strong>案例</strong>：假设使用 <img src="https://www.zhihu.com/equation?tex=U%280%2C1%29" alt="[公式]" /> 来作为“proposal distribution” <img src="https://www.zhihu.com/equation?tex=G" alt="[公式]" /> ，这样 <img src="https://www.zhihu.com/equation?tex=g%28x%29%3D1%5Cforall+x%5Cin+%5B0%2C1%5D" alt="[公式]" /> 。如下图所示，我们每次生成的两个样本 <img src="https://www.zhihu.com/equation?tex=Y" alt="[公式]" /> 与 <img src="https://www.zhihu.com/equation?tex=U" alt="[公式]" /> ，对应下图中矩形内的一点 <img src="https://www.zhihu.com/equation?tex=P%28Y%2CU%E2%88%97c%E2%88%97g%28Y%29%29" alt="[公式]" /> 。接受条件 <img src="https://www.zhihu.com/equation?tex=U%5Cleqslant+f%28Y%29c%E2%88%97g%28Y%29" alt="[公式]" /> ，即 <img src="https://www.zhihu.com/equation?tex=U%E2%88%97c%E2%88%97g%28Y%29%5Cleqslant+f%28Y%29" alt="[公式]" /> 的几何意义是点 <img src="https://www.zhihu.com/equation?tex=P" alt="[公式]" /> 在 <img src="https://www.zhihu.com/equation?tex=f%28x%29" alt="[公式]" /> 下方，不接受 <img src="https://www.zhihu.com/equation?tex=Y" alt="[公式]" /> 的几何意义是点 <img src="https://www.zhihu.com/equation?tex=P" alt="[公式]" /> 在 <img src="https://www.zhihu.com/equation?tex=f%28x%29" alt="[公式]" /> 的上方。在 <img src="https://www.zhihu.com/equation?tex=f%28x%29" alt="[公式]" /> 下方的点(o形状)满足接受条件，上方的点(+形状)不满足接受条件。</p>
+
+<p><img src="https://pic1.zhimg.com/80/v2-ba61bc580f87754f4e35675c6ac1b23c_hd.jpg" style="width:50%" /></p>
+
+<p><strong>代码实现</strong>：假如我们的目标概率密度函数是 <img src="https://www.zhihu.com/equation?tex=f%28x%29%3D%5Cfrac%7B%28x-0.4%29%5E%7B4%7D%7D%7B%5Cint_%7B0%7D%5E%7B1%7D%28x-0.4%29%5E%7B4%7Ddx%7D" alt="[公式]" /> ，对此分布生成样本。</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+</pre></td><td class="rouge-code"><pre><span class="kn">import</span> <span class="nn">random</span>
+<span class="kn">import</span> <span class="nn">math</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="n">plt</span>
+<span class="kn">import</span> <span class="nn">seaborn</span> <span class="k">as</span> <span class="n">sns</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="n">np</span>
+
+<span class="o">%</span><span class="n">matplotlib</span> <span class="n">inline</span>
+<span class="n">sns</span><span class="o">.</span><span class="n">set_style</span><span class="p">(</span><span class="s">'darkgrid'</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">rcParams</span><span class="p">[</span><span class="s">'figure.figsize'</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">8</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">AceeptReject</span><span class="p">(</span><span class="n">split_val</span><span class="p">):</span>
+    <span class="k">global</span> <span class="n">c</span>
+    <span class="k">global</span> <span class="n">power</span>
+    <span class="k">while</span> <span class="bp">True</span><span class="p">:</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">y</span><span class="o">*</span><span class="n">c</span> <span class="o">&lt;=</span> <span class="n">math</span><span class="o">.</span><span class="nb">pow</span><span class="p">(</span><span class="n">x</span> <span class="o">-</span> <span class="n">split_val</span><span class="p">,</span> <span class="n">power</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">x</span>
+
+<span class="n">power</span> <span class="o">=</span> <span class="mi">4</span>
+<span class="n">t</span> <span class="o">=</span> <span class="mf">0.4</span>  
+<span class="n">sum_</span> <span class="o">=</span> <span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="nb">pow</span><span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="n">t</span><span class="p">,</span> <span class="n">power</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">-</span> <span class="n">math</span><span class="o">.</span><span class="nb">pow</span><span class="p">(</span><span class="o">-</span><span class="n">t</span><span class="p">,</span> <span class="n">power</span> <span class="o">+</span> <span class="mi">1</span><span class="p">))</span> <span class="o">/</span> <span class="p">(</span><span class="n">power</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>  <span class="c1">#求积分
+</span><span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span>
+<span class="c1">#常数值c
+</span><span class="n">c</span> <span class="o">=</span> <span class="mf">0.6</span><span class="o">**</span><span class="mi">4</span><span class="o">/</span><span class="n">sum_</span>
+<span class="n">cc</span> <span class="o">=</span> <span class="p">[</span><span class="n">c</span> <span class="k">for</span> <span class="n">xi</span> <span class="ow">in</span> <span class="n">x</span><span class="p">]</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">cc</span><span class="p">,</span> <span class="s">'--'</span><span class="p">,</span><span class="n">label</span><span class="o">=</span><span class="s">'c*f(x)'</span><span class="p">)</span>
+<span class="c1">#目标概率密度函数的值f(x)
+</span><span class="n">y</span> <span class="o">=</span> <span class="p">[</span><span class="n">math</span><span class="o">.</span><span class="nb">pow</span><span class="p">(</span><span class="n">xi</span> <span class="o">-</span> <span class="n">t</span><span class="p">,</span> <span class="n">power</span><span class="p">)</span><span class="o">/</span><span class="n">sum_</span> <span class="k">for</span> <span class="n">xi</span> <span class="ow">in</span> <span class="n">x</span><span class="p">]</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span><span class="n">label</span><span class="o">=</span><span class="s">'f(x)'</span><span class="p">)</span>
+<span class="c1">#采样10000个点
+</span><span class="n">samples</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span>  <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10000</span><span class="p">):</span>
+    <span class="n">samples</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">AceeptReject</span><span class="p">(</span><span class="n">t</span><span class="p">))</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">hist</span><span class="p">(</span><span class="n">samples</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">normed</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span><span class="n">label</span><span class="o">=</span><span class="s">'sampling'</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p><img src="https://pic2.zhimg.com/80/v2-8ca3019c1c1b0a878f44f51458c5b15d_hd.jpg" alt="img" style="zoom:70%;" /></p>
+
+<h4 id="-自适应的拒绝采样adaptive-rejection-sampling">🆘 自适应的拒绝采样（Adaptive Rejection Sampling）</h4>
+
+<p>editing…..</p>
+
+<p>参考资料：http://www.ruanyifeng.com/blog/2015/07/monte-carlo-method.html 蒙特卡洛、https://blog.csdn.net/baimafujinji/article/details/51407703 蒙特卡洛采样之拒绝采样（Reject Sampling）</p>
+
+<h3 id="-马尔可夫链蒙特卡洛markov-chain-monte-carlo">💤 马尔可夫链蒙特卡洛（Markov chain Monte Carlo）</h3>
+
+<h4 id="-背景">✅ 背景</h4>
+
+<p><strong>动机一</strong></p>
+
+<p>假如你需要对一维随机变量$X$进行采样， <img src="https://www.zhihu.com/equation?tex=X" alt="[公式]" /> 的样本空间是 <img src="https://www.zhihu.com/equation?tex=%5C%7B1%2C2%2C3%5C%7D" alt="[公式]" /> ，且概率分别是 <img src="https://www.zhihu.com/equation?tex=%5C%7B1%2F2%2C1%2F4%2C1%2F4%5C%7D" alt="[公式]" /> ，这很简单，只需写这样简单的程序：首先根据各离散取值的概率大小对 <img src="https://www.zhihu.com/equation?tex=%5B0%2C1%5D" alt="[公式]" />区间进行等比例划分，如划分为 <img src="https://www.zhihu.com/equation?tex=%5B0%2C0.5%5D%2C%5B0%2C5%2C0.75%5D%2C%5B0.75%2C1%5D" alt="[公式]" /> 这三个区间，再通过计算机产生 <img src="https://www.zhihu.com/equation?tex=%5B0%2C1%5D" alt="[公式]" /> 之间的伪随机数，根据伪随机数的落点即可完成一次采样。接下来，假如 <img src="https://www.zhihu.com/equation?tex=X" alt="[公式]" /> 是连续分布的呢，概率密度是 <img src="https://www.zhihu.com/equation?tex=f%28X%29" alt="[公式]" /> ，那该如何进行采样呢？聪明的你肯定会想到累积分布函数， <img src="https://www.zhihu.com/equation?tex=P%28X%3Ct%29%3D%5Cint+_%7B-%5Cinfty%7D%5E%7Bt%7Df%28x%29dx" alt="[公式]" /> ，即在 <img src="https://www.zhihu.com/equation?tex=%5B0%2C1%5D" alt="[公式]" /> 间随机生成一个数 <img src="https://www.zhihu.com/equation?tex=a" alt="[公式]" /> ，然后求使得使 <img src="https://www.zhihu.com/equation?tex=P%28x%3Ct%29%3Da" alt="[公式]" /> 成立的 <img src="https://www.zhihu.com/equation?tex=t" alt="[公式]" /> ， <img src="https://www.zhihu.com/equation?tex=t" alt="[公式]" /> 即可以视作从该分部中得到的一个采样结果。这里有两个前提：一是概率密度函数可积；第二个是累积分布函数有反函数。假如条件不成立怎么办呢？MCMC就登场了。</p>
+
+<p><strong>动机二</strong></p>
+
+<p>假如对于高维随机变量，比如 <img src="https://www.zhihu.com/equation?tex=%5Cmathbb%7BR%7D%5E%7B50%7D" alt="[公式]" /> ，若每一维取100个点，则总共要取 <img src="https://www.zhihu.com/equation?tex=10%5E%7B100%7D" alt="[公式]" /> ，而已知宇宙的基本粒子大约有 <img src="https://www.zhihu.com/equation?tex=10%5E%7B87%7D" alt="[公式]" /> 个，对连续的也同样如此。因此MCMC可以解决“维数灾难”问题。</p>
+
+<h4 id="-m-h采样">🆘 M-H采样</h4>
+
+<h4 id="-gibbs采样">🆘 Gibbs采样</h4>
+
+<p>参考资料：https://zhuanlan.zhihu.com/p/37121528 MCMC——其实没太看懂</p>
+:ET

@@ -211,10 +211,9 @@ $ \| $
 
 ```
 $$\left(\sum_{k=\frac{1}{2}}^{N^2}\frac{1}{k}\right)$$
-复制代码
 ```
 
-![\left(\sum_{k=\frac{1}{2}}^{N^2}\frac{1}{k}\right)](https://juejin.im/equation?tex=%5Cleft(%5Csum_%7Bk%3D%5Cfrac%7B1%7D%7B2%7D%7D%5E%7BN%5E2%7D%5Cfrac%7B1%7D%7Bk%7D%5Cright))
+$$\left(\sum_{k=\frac{1}{2}}^{N^2}\frac{1}{k}\right)$$
 
 #### 1.2.7 矩阵
 
@@ -471,3 +470,76 @@ $$
 $$
 
 其他的详见 [PDF](https://github.com/mk43/BlogResource/blob/master/LaTex/LATEX数学符号表.pdf)
+
+
+
+## 其他补充-Sean
+
+$$\begin{equation}  
+\left\{  
+             \begin{array}{**lr**}  
+             x=\dfrac{3\pi}{2}(1+2t)\cos(\dfrac{3\pi}{2}(1+2t)), &  \\  
+             y=s, & 0\leq s\leq L,|t|\leq1.\\  
+             z=\dfrac{3\pi}{2}(1+2t)\sin(\dfrac{3\pi}{2}(1+2t)), &    
+             \end{array}  
+\right.  
+\end{equation}  $$
+
+```
+\begin{equation}  
+\left\{  
+             \begin{array}{**lr**}  
+             x=\dfrac{3\pi}{2}(1+2t)\cos(\dfrac{3\pi}{2}(1+2t)), &  \\  
+             y=s, & 0\leq s\leq L,|t|\leq1.\\  
+             z=\dfrac{3\pi}{2}(1+2t)\sin(\dfrac{3\pi}{2}(1+2t)), &    
+             \end{array}  
+\right.  
+\end{equation}  
+```
+
+$$\begin{equation}  
+\left\{  
+\begin{array}{**rcl**}
+    IF_{k}(\hat{t}_{k,m})=IF_{m}(\hat{t}_{k,m}), & \\
+    IF_{k}(\hat{t}_{k,m}) \pm h= IF_{m}(\hat{t}_{k,m}) \pm h  , &\\
+    \left |IF'_{k}(\hat{t}_{k,m} - IF'_{m}(\hat{t}_{k,m} \right |\geq d , &   
+\end{array}
+\right.  
+\end{equation} $$
+
+```
+\begin{equation}  
+\left\{  
+\begin{array}{**rcl**}
+    IF_{k}(\hat{t}_{k,m})=IF_{m}(\hat{t}_{k,m}), & \\
+    IF_{k}(\hat{t}_{k,m}) \pm h= IF_{m}(\hat{t}_{k,m}) \pm h  , &\\
+    \left |IF'_{k}(\hat{t}_{k,m} - IF'_{m}(\hat{t}_{k,m} \right |\geq d , &   
+\end{array}
+\right.  
+\end{equation} 
+```
+
+$$ f(x)=\left\{
+\begin{aligned}
+x & = & \cos(t) \\
+y & = & \sin(t) \\
+z & = & \frac xy
+\end{aligned}
+\right.$$
+
+```
+$$f(x)=\left\{
+\begin{aligned}
+x & = & \cos(t) \\
+y & = & \sin(t) \\
+z & = & \frac xy
+\end{aligned}
+\right.$$
+```
+
+$$\Bigg ( \bigg [ \Big \{ \big \langle \left | \| x \| \right | \big \rangle \Big \} \bigg ] \Bigg )$$
+
+```
+\Bigg ( \bigg [ \Big \{ \big \langle \left | \| x \| \right | \big \rangle \Big \} \bigg ] \Bigg )
+```
+

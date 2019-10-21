@@ -73,9 +73,7 @@ tags:
 
 **案例**：对于有K个类别的分类问题来说，假定样本集合D中第 k 类样本所占的比例为pk（k=1,2,...,K）,则样本集合D的信息熵定义为: 
 
-$$Ent(D)=-$$
-
-<img src="https://tva1.sinaimg.cn/large/006y8mN6ly1g83aclz7lhj30d602it8q.jpg" alt="image-20191019100957943" style="zoom:50%;" />
+$$Ent(D)=-\sum_{k=1}^KP_k·log_2p_k$$
 
 **简单概括**：分叉树上的熵的加权平均值
 
@@ -174,11 +172,11 @@ if __name__=='__main__':
 
 **背景**：我们知道信息增益会偏向取值较多的特征，使用信息增益比可以对这一问题进行校正。
 
-**信息增益**：Gain(D,A) = H(D) – H(D|A)，用于ID3的判断
+**信息增益**：$Gain(D,A) = H(D) – H(D|A)$，用于ID3的判断
 
 **信息增益比**：特征A对训练数据集D的信息增益比GainRatio(D,A)定义为其信息增益Gain(D,A)与训练数据集D的经验熵H(D)之比：
 
-<img src="https://shuwoom.com/wp-content/uploads/2018/10/aae983046e32f250faf6daaaf376ec90.png" alt="img" style="zoom:50%;" />
+$$GainRatio(D,A)=\frac{Gain(D,A)}{H(D)}$$
 
 ```python
 def choose_best_feature_to_split(data_set):
@@ -219,11 +217,11 @@ def choose_best_feature_to_split(data_set):
 
 **概率分布的基尼指数定义**：假设有K个类，样本点属于第k个类的概率为Pk
 
-![img](https://pic3.zhimg.com/80/v2-780d955260d9a2ba8508c1601588b88a_hd.jpg)
+$$Gini(p)=\sum_{k=1}^mp_k(1-p_k)=1-\sum_{k=1}^Kp_k^2$$
 
 **集合D的基尼指数**：
 
-![img](https://pic2.zhimg.com/80/v2-95300197189b4b1b65eb42d1a6bbd7fd_hd.jpg)
+$$Gini(D)=1-\sum_{k=1}^K(\frac{|C_k|}{D})^2$$
 
 **过程概述**：计算基尼系数的加权平均，求min
 
@@ -633,11 +631,15 @@ print('程序运行总耗时： %.5f sec' %running_time)
 
 ![img](https://img-blog.csdn.net/20160402180717102)
 
-![img](https://img-blog.csdn.net/20160402175137034)
+$$C=\frac{1}{2n}\sum_x||y(x)-a^L(x)||$$
+
+$$\frac{\partial C}{\partial w}=(a-y)\sigma'(z)x $$
+
+$$\frac{\partial C}{\partial b}=(a-y)\sigma'(z)$$
 
 #### ✅ 交叉熵损失函数
 
-![img](https://img-blog.csdn.net/20160402172100739)
+$$C=-\frac{1}{n}\sum_x[y\,ln\,a+(1-y)ln(1-a)]$$
 
 参考资料：https://blog.csdn.net/u014313009/article/details/51043064
 
@@ -1429,7 +1431,7 @@ editing.....
 
 **动机一**
 
-假如你需要对一维随机变量$X$进行采样， ![[公式]](https://www.zhihu.com/equation?tex=X) 的样本空间是 ![[公式]](https://www.zhihu.com/equation?tex=%5C%7B1%2C2%2C3%5C%7D) ，且概率分别是 ![[公式]](https://www.zhihu.com/equation?tex=%5C%7B1%2F2%2C1%2F4%2C1%2F4%5C%7D) ，这很简单，只需写这样简单的程序：首先根据各离散取值的概率大小对 ![[公式]](https://www.zhihu.com/equation?tex=%5B0%2C1%5D)区间进行等比例划分，如划分为 ![[公式]](https://www.zhihu.com/equation?tex=%5B0%2C0.5%5D%2C%5B0%2C5%2C0.75%5D%2C%5B0.75%2C1%5D) 这三个区间，再通过计算机产生 ![[公式]](https://www.zhihu.com/equation?tex=%5B0%2C1%5D) 之间的伪随机数，根据伪随机数的落点即可完成一次采样。接下来，假如 ![[公式]](https://www.zhihu.com/equation?tex=X) 是连续分布的呢，概率密度是 ![[公式]](https://www.zhihu.com/equation?tex=f%28X%29) ，那该如何进行采样呢？聪明的你肯定会想到累积分布函数， ![[公式]](https://www.zhihu.com/equation?tex=P%28X%3Ct%29%3D%5Cint+_%7B-%5Cinfty%7D%5E%7Bt%7Df%28x%29dx) ，即在 ![[公式]](https://www.zhihu.com/equation?tex=%5B0%2C1%5D) 间随机生成一个数 ![[公式]](https://www.zhihu.com/equation?tex=a) ，然后求使得使 ![[公式]](https://www.zhihu.com/equation?tex=P%28x%3Ct%29%3Da) 成立的 ![[公式]](https://www.zhihu.com/equation?tex=t) ， ![[公式]](https://www.zhihu.com/equation?tex=t) 即可以视作从该分部中得到的一个采样结果。这里有两个前提：一是概率密度函数可积；第二个是累积分布函数有反函数。假如条件不成立怎么办呢？MCMC就登场了。
+假如你需要对一维随机变量$X$进行采样， ![[公式]](https://www.zhihu.com/equation?tex=X) 的样本空间是$\{1,2,3\}$ ，且概率分别是 $\{1/2,1/4,1/4\}$ ，这很简单，只需写这样简单的程序：首先根据各离散取值的概率大小对 ![[公式]](https://www.zhihu.com/equation?tex=%5B0%2C1%5D)区间进行等比例划分，如划分为 ![[公式]](https://www.zhihu.com/equation?tex=%5B0%2C0.5%5D%2C%5B0%2C5%2C0.75%5D%2C%5B0.75%2C1%5D) 这三个区间，再通过计算机产生[0,1]之间的伪随机数，根据伪随机数的落点即可完成一次采样。接下来，假如 ![[公式]](https://www.zhihu.com/equation?tex=X) 是连续分布的呢，概率密度是$f(X)$，那该如何进行采样呢？聪明的你肯定会想到累积分布函数， $P(X<t)=\int_{-\infty}^tf(x)dx$ ，即在  间随机生[0,1]成一个数 a ，然后求使得使$P(s<t)=a$成立的 ![[公式]](https://www.zhihu.com/equation?tex=t) ， ![[公式]](https://www.zhihu.com/equation?tex=t) 即可以视作从该分部中得到的一个采样结果。这里有两个前提：一是概率密度函数可积；第二个是累积分布函数有反函数。假如条件不成立怎么办呢？MCMC就登场了。
 
 **动机二**
 
