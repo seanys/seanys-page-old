@@ -1,0 +1,633 @@
+I"�k<h2 id="markdown公式转载">Markdown公式（转载）</h2>
+
+<p>网站：http://latex.codecogs.com/eqneditor/editor.php</p>
+
+<h2 id="0-前言">0. 前言</h2>
+
+<blockquote>
+  <p>最近在学习一些机器学习相关的知识，想把自己学习的东西通过 MD 的形式在线记录下来，但是之前一直没有开始行动，因为里面的公式什么的感觉实在是麻烦。于是今天打算花点时间了解一下<a href="http://blog.csdn.net/xiahouzuoxin/article/details/26478179"><code class="highlighter-rouge">如何在 markdown 中插入数学公式</code></a>，发现其实很简单，大概花一个小时左右就能知道如何编写了。</p>
+</blockquote>
+
+<h2 id="1-基础认识">1. 基础认识</h2>
+
+<blockquote>
+  <p>笔者认为所谓插入数学公式其实就是引入一种规则，然后通过<code class="highlighter-rouge">模板？</code>渲染成公式，不知道这个理解对不对，不对望指正。其实你以前可能就看到过有的博客本该出现公式的时候不显示，点击后会链接到一个 new tab 然后显示一张公式的图片，有时却出现一大堆的代码。这里就是通过这段代码解析成公式然后显示的。</p>
+</blockquote>
+
+<p>这里我们选取 MathJax 引擎。 引入脚本，把下面代码插入 MD 文件里面，如果你怕这份在线文件源别人访问不到的话，可以把这个下下来自己做一个源，这样比较稳定缺点是要自己手动更新源。</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+</pre></td><td class="rouge-code"><pre>&lt;script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=default"&gt;&lt;/script&gt;
+复制代码
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>好了到这里就可以插入公式了，如果你懂 LaTeX 的话那看一两个例子就知道了，不懂也没关系，自己写一写代码就知道了，可以找一个可以预览 MD 的工具一直尝试。</p>
+
+<h3 id="11-插入方式">1.1 插入方式</h3>
+
+<blockquote>
+  <p>这里分两种，一种是行间插入，另一种是另取一行</p>
+</blockquote>
+
+<h4 id="111-行间插入">1.1.1 行间插入</h4>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre>\\(a + b\\)
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>这里是行间插入公式 a + b : (a + b)，特点就是通过<code class="highlighter-rouge">(</code> 和 <code class="highlighter-rouge">)</code> 包含公式，然后为了模板引擎能够区分该 <code class="highlighter-rouge">(</code> 不是普通文本的 <code class="highlighter-rouge">(</code> 而是公式的 <code class="highlighter-rouge">(</code>，通过 <code class="highlighter-rouge">\\</code> 转义一下。这样应该就很好理解这个语法构成了。注意这里方式不唯一，这是笔者喜欢的方式，其他的使用方式自行搜索。下面的介绍同样是这样。</p>
+
+<p>PS: 这里掘金使用的是 <code class="highlighter-rouge">$a + b$</code> : <img src="https://juejin.im/equation?tex=a%20%2B%20b" alt="a + b" />，如果对您的阅读产生印象，请看最后说明，这里就不做一一更改了。谢谢。</p>
+
+<h4 id="112-另取一行">1.1.2 另取一行</h4>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre>$$a + b$$
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>这里是另取一行</p>
+
+<p><img src="https://juejin.im/equation?tex=a%20%2B%20b" alt="a + b" /></p>
+
+<p>特点就是通过<code class="highlighter-rouge">$$</code>包含公式。</p>
+
+<p>笔者认为第二种方式更好，以下没看 JS 源码纯属猜测：行间的需要考虑到当前行的行高并对公式进行处理，而另取一行就更简单一些，可能解析起来更快。最最最最最最主要是看起来漂亮 ^_^ 不太要考虑空间不够换行。</p>
+
+<h3 id="12-基本类型的插入">1.2 基本类型的插入</h3>
+
+<blockquote>
+  <p>这里对 <a href="http://www.cnblogs.com/houkai/p/3399646.html">@houkai ：LATEX数学公式基本语法</a> 的思路稍加修改，然后进行介绍。</p>
+</blockquote>
+
+<h4 id="121-上下标">1.2.1 上、下标</h4>
+
+<p>先看结果再总结语法吧。</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+</pre></td><td class="rouge-code"><pre>$$x_1$$
+
+$$x_1^2$$
+
+$$x^2_1$$
+
+$$x_{22}^{(n)}$$
+
+$${}^*x^*$$
+
+$$x_{balabala}^{bala}$$
+复制代码
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<script type="math/tex; mode=display">x_1</script>
+
+<script type="math/tex; mode=display">x_1^2</script>
+
+<script type="math/tex; mode=display">x^2_1</script>
+
+<script type="math/tex; mode=display">x_{22}^{(n)}</script>
+
+<script type="math/tex; mode=display">{}^*x^*</script>
+
+<p><img src="https://juejin.im/equation?tex=x_1%5E2" alt="x_1^2" />可以看到 <code class="highlighter-rouge">x</code> 元素的上标通过 <code class="highlighter-rouge">^</code> 符号后接的内容体现，下表通过 <code class="highlighter-rouge">_</code> 符号后接的内容体现，多于一位是要加 <code class="highlighter-rouge">{}</code> 包裹的。 笔者习惯先下标后上标的写法，和我的书写习惯一致：<code class="highlighter-rouge">x_{balabala}^{bala}</code>，不管你使用哪一种风格，最好自己注意统一，不要混用。</p>
+
+<h4 id="122-分式">1.2.2 分式</h4>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+</pre></td><td class="rouge-code"><pre>$$\frac{x+y}{2}$$
+
+$$\frac{1}{1+\frac{1}{2}}$$
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<script type="math/tex; mode=display">\frac{x+y}{2}</script>
+
+<script type="math/tex; mode=display">\frac{1}{1+\frac{1}{2}}</script>
+
+<p>这里就出现了一个 <code class="highlighter-rouge">frac{}{}</code> 函数的东西，同样，为了区分这是函数不是几个字母，通过 <code class="highlighter-rouge">\frac</code> 转义，于是 <code class="highlighter-rouge">frac</code>被解析成函数，然后第一个 <code class="highlighter-rouge">{}</code> 里面的被解析成分子，第二个 <code class="highlighter-rouge">{}</code> 被解析成分母。这里可以试试分数的行间解析<img src="https://juejin.im/equation?tex=%5Cfrac%7B1%7D%7B1%2B%5Cfrac%7B1%7D%7B2%7D%7D" alt="\frac{1}{1+\frac{1}{2}}" />。我要看行间填充效果我要看行间填充效果我要看行间填充效果我要看行间填充效果我要看行间填充效果我要看行间填充效果我要看行间填充效果我要看行间填充效果我要看行间填充效果我要看行间填充效果我要看行间填充效果我要看行间填充效果。</p>
+
+<h4 id="123-根式">1.2.3 根式</h4>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+</pre></td><td class="rouge-code"><pre>$$\sqrt{2}&lt;\sqrt[3]{3}$$
+
+$$\sqrt{1+\sqrt[p]{1+a^2}}$$
+
+$$\sqrt{1+\sqrt[^p\!]{1+a^2}}$$
+复制代码
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p><img src="https://juejin.im/equation?tex=%5Csqrt%7B2%7D%3C%5Csqrt%5B3%5D%7B3%7D" alt="\sqrt{2}&lt;\sqrt[3]{3}" /></p>
+
+<p><img src="https://juejin.im/equation?tex=%5Csqrt%7B1%2B%5Csqrt%5Bp%5D%7B1%2Ba%5E2%7D%7D" alt="\sqrt{1+\sqrt[p]{1+a^2}}" /></p>
+
+<p>![\sqrt{1+\sqrt[^p]{1+a^2}}](https://juejin.im/equation?tex=%5Csqrt%7B1%2B%5Csqrt%5B%5Ep%5D%7B1%2Ba%5E2%7D%7D)</p>
+
+<p>读到这里你已经了解了函数的概念，那么这历久很简单了，语法就是 <code class="highlighter-rouge">sqrt[]{}</code> 。<code class="highlighter-rouge">[]</code> 中代表是几次根式，<code class="highlighter-rouge">{}</code> 代表根号下的表达式。第二和第三个的区别在于为了美观微调位置 ^_^。</p>
+
+<h4 id="124-求和积分">1.2.4 求和、积分</h4>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+</pre></td><td class="rouge-code"><pre>$$\sum_{k=1}^{n}\frac{1}{k}$$
+
+$\sum_{k=1}^n\frac{1}{k}$
+
+$$\int_a^b f(x)dx$$
+
+$\int_a^b f(x)dx$
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<script type="math/tex; mode=display">\sum_{k=1}^{n}\frac{1}{k}</script>
+
+<p>$\sum_{k=1}^n\frac{1}{k}$</p>
+
+<script type="math/tex; mode=display">\int_a^b f(x)dx</script>
+
+<p>$\int_a^b f(x)dx$</p>
+
+<p>这里很容易看出求和函数表达式 <code class="highlighter-rouge">sum_{起点}^{终点}表达式</code>，积分函数表达式 <code class="highlighter-rouge">int_下限^上限 被积函数d被积量</code>。还有一个有趣的是行间的公式都被压缩了。</p>
+
+<h4 id="125-空格">1.2.5 空格</h4>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+</pre></td><td class="rouge-code"><pre>紧贴 $$a\!b$$
+没有空格 $$ab$$
+小空格 $$a\,b$$
+中等空格 $$a\;b$$
+大空格 $$a\ b$$
+quad空格 $$a\quad b$$
+两个quad空格 $$a\qquad b$$
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>紧贴 <script type="math/tex">a\!b</script>
+没有空格 <script type="math/tex">ab</script>
+小空格 <script type="math/tex">a\,b</script>
+中等空格 <script type="math/tex">a\;b</script>
+大空格 <script type="math/tex">a\ b</script>
+quad空格 <script type="math/tex">a\quad b</script>
+两个quad空格 <script type="math/tex">a\qquad b</script></p>
+
+<p>这个直接看上面的文字，介绍很清楚，主要指微调距离，使得公式更加漂亮。请比较下面的积分公式：</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+</pre></td><td class="rouge-code"><pre>$$\int_a^b f(x)\mathrm{d}x$$
+
+$$\int_a^b f(x)\,\mathrm{d}x$$
+复制代码
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<script type="math/tex; mode=display">\int_a^b f(x)\mathrm{d}x</script>
+
+<script type="math/tex; mode=display">\int_a^b f(x)\,\mathrm{d}x</script>
+
+<h4 id="126-公式界定符">1.2.6 公式界定符</h4>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+</pre></td><td class="rouge-code"><pre>\\( ( \\)
+\\( ) \\)
+\\( [ \\)
+\\( ] \\)
+\\( \\{ \\)
+\\( \\} \\)
+\\( | \\)
+\\( \\| \\)
+
+掘金：
+$ ( $
+$ ) $
+$ [ $
+$ ] $
+$ \{ $
+$ \} $
+$ | $
+$ \| $
+复制代码
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<table>
+  <tbody>
+    <tr>
+      <td>主要符号有 <img src="https://juejin.im/equation?tex=() ![" alt="(" />](https://juejin.im/equation?tex=)) <img src="https://juejin.im/equation?tex=%5D" alt="[](https://juejin.im/equation?tex=%5B) ![]" /> <img src="https://juejin.im/equation?tex=%5C%7B" alt="{" /> <img src="https://juejin.im/equation?tex=%5C%7D" alt="}" /> ![</td>
+      <td>](https://juejin.im/equation?tex=%7C) <img src="https://juejin.im/equation?tex=%5C%7C" alt="|" /> 那么如何使用呢？ 通过 <code class="highlighter-rouge">\left</code> 和 <code class="highlighter-rouge">\right</code> 后面跟界定符来对同时进行界定。</td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+</pre></td><td class="rouge-code"><pre>$$\left(\sum_{k=\frac{1}{2}}^{N^2}\frac{1}{k}\right)$$
+复制代码
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p><img src="https://juejin.im/equation?tex=%5Cleft(%5Csum_%7Bk%3D%5Cfrac%7B1%7D%7B2%7D%7D%5E%7BN%5E2%7D%5Cfrac%7B1%7D%7Bk%7D%5Cright)" alt="\left(\sum_{k=\frac{1}{2}}^{N^2}\frac{1}{k}\right)" /></p>
+
+<h4 id="127-矩阵">1.2.7 矩阵</h4>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+</pre></td><td class="rouge-code"><pre>$$\begin{matrix}1 &amp; 2\\\\3 &amp;4\end{matrix}$$
+
+$$\begin{pmatrix}1 &amp; 2\\\\3 &amp;4\end{pmatrix}$$
+
+$$\begin{bmatrix}1 &amp; 2\\\\3 &amp;4\end{bmatrix}$$
+
+$$\begin{Bmatrix}1 &amp; 2\\\\3 &amp;4\end{Bmatrix}$$
+
+$$\begin{vmatrix}1 &amp; 2\\\\3 &amp;4\end{vmatrix}$$
+
+$$\left|\begin{matrix}1 &amp; 2\\\\3 &amp;4\end{matrix}\right|$$
+
+$$\begin{Vmatrix}1 &amp; 2\\\\3 &amp;4\end{Vmatrix}$$
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<script type="math/tex; mode=display">% <![CDATA[
+\begin{matrix}1 & 2\\\\3 &4\end{matrix} %]]></script>
+
+<script type="math/tex; mode=display">% <![CDATA[
+\begin{pmatrix}1 & 2\\\\3 &4\end{pmatrix} %]]></script>
+
+<script type="math/tex; mode=display">% <![CDATA[
+\begin{bmatrix}1 & 2\\\\3 &4\end{bmatrix} %]]></script>
+
+<script type="math/tex; mode=display">% <![CDATA[
+\begin{Bmatrix}1 & 2\\\\3 &4\end{Bmatrix} %]]></script>
+
+<script type="math/tex; mode=display">% <![CDATA[
+\begin{vmatrix}1 & 2\\\\3 &4\end{vmatrix} %]]></script>
+
+<script type="math/tex; mode=display">% <![CDATA[
+\left|\begin{matrix}1 & 2\\\\3 &4\end{matrix}\right| %]]></script>
+
+<script type="math/tex; mode=display">% <![CDATA[
+\begin{Vmatrix}1 & 2\\\\3 &4\end{Vmatrix} %]]></script>
+
+<p>类似于 left right，这里是 begin 和 end。而且里面有具体的矩阵语法，<code class="highlighter-rouge">&amp;</code> 区分行间元素，<code class="highlighter-rouge">\\\\</code> 代表换行。可以理解为 HTML 的标签之类的。</p>
+
+<h4 id="128-排版数组">1.2.8 排版数组</h4>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+</pre></td><td class="rouge-code"><pre>$$\mathbf{X} =
+\left( \begin{array}{ccc}
+x\_{11} &amp; x\_{12} &amp; \ldots \\\\
+x\_{21} &amp; x\_{22} &amp; \ldots \\\\
+\vdots &amp; \vdots &amp; \ddots
+\end{array} \right)$$
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<script type="math/tex; mode=display">% <![CDATA[
+\mathbf{X} =
+\left( \begin{array}{ccc}
+x\_{11} & x\_{12} & \ldots \\\\
+x\_{21} & x\_{22} & \ldots \\\\
+\vdots & \vdots & \ddots
+\end{array} \right) %]]></script>
+
+<h2 id="2-常用公式举例">2. 常用公式举例</h2>
+
+<blockquote>
+  <p>持续更新……</p>
+</blockquote>
+
+<h3 id="21-多行公式">2.1 多行公式</h3>
+
+<blockquote>
+  <p>主要是各种方程的表达</p>
+</blockquote>
+
+<h4 id="211-长公式">2.1.1 长公式</h4>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+</pre></td><td class="rouge-code"><pre>$$
+\begin{multline}
+x = a+b+c+{} \\\\
+d+e+f+g
+\end{multline}
+$$
+
+$$
+\begin{aligned}
+x ={}&amp; a+b+c+{} \\\\
+&amp;d+e+f+g
+\end{aligned}
+$$
+复制代码
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>不对齐</p>
+
+<table>
+  <tbody>
+    <tr>
+      <td>![\left</td>
+      <td>\begin{multline} x = a+b+c+{} \\ d+e+f+g \end{multline} \right</td>
+      <td>](https://juejin.im/equation?tex=%5Cleft%7C%20%5Cbegin%7Bmultline%7D%0Ax%20%3D%20a%2Bb%2Bc%2B%7B%7D%20%5C%5C%5C%5C%0Ad%2Be%2Bf%2Bg%0A%5Cend%7Bmultline%7D%20%5Cright%7C)</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>对齐</p>
+
+<table>
+  <tbody>
+    <tr>
+      <td>![\left</td>
+      <td>\begin{aligned} x ={}&amp; a+b+c+{} \\ &amp;d+e+f+g \end{aligned} \right</td>
+      <td>](https://juejin.im/equation?tex=%5Cleft%7C%20%5Cbegin%7Baligned%7D%0Ax%20%3D%7B%7D%26%20a%2Bb%2Bc%2B%7B%7D%20%5C%5C%5C%5C%0A%26d%2Be%2Bf%2Bg%0A%5Cend%7Baligned%7D%20%5Cright%7C)</td>
+    </tr>
+  </tbody>
+</table>
+
+<h4 id="212-公式组">2.1.2 公式组</h4>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+</pre></td><td class="rouge-code"><pre>$$
+\begin{gather}
+a = b+c+d \\\\
+x = y+z
+\end{gather}
+$$
+
+$$
+\begin{align}
+a &amp;= b+c+d \\\\
+x &amp;= y+z
+\end{align}
+$$
+复制代码
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p><img src="https://juejin.im/equation?tex=%5Cbegin%7Bgather%7D%0Aa%20%3D%20b%2Bc%2Bd%20%5C%5C%5C%5C%0Ax%20%3D%20y%2Bz%0A%5Cend%7Bgather%7D" alt="\begin{gather} a = b+c+d \\ x = y+z \end{gather}" /></p>
+
+<p><img src="https://juejin.im/equation?tex=%5Cbegin%7Balign%7D%0Aa%20%26%3D%20b%2Bc%2Bd%20%5C%5C%5C%5C%0Ax%20%26%3D%20y%2Bz%0A%5Cend%7Balign%7D" alt="\begin{align} a &amp;= b+c+d \\ x &amp;= y+z \end{align}" /></p>
+
+<h4 id="213-分段函数">2.1.3 分段函数</h4>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+</pre></td><td class="rouge-code"><pre>$$
+y=\begin{cases}
+-x,\quad x\leq 0 \\\\
+x,\quad x&gt;0
+\end{cases}
+$$
+复制代码
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p><img src="https://juejin.im/equation?tex=y%3D%5Cbegin%7Bcases%7D%0A-x%2C%5Cquad%20x%5Cleq%200%20%5C%5C%5C%5C%0Ax%2C%5Cquad%20x%3E0%0A%5Cend%7Bcases%7D" alt="y=\begin{cases} -x,\quad x\leq 0 \\ x,\quad x&gt;0 \end{cases}" /></p>
+
+<p>里面用到了 (\leq) 符号，下一章会介绍常用数学符号。</p>
+
+<h3 id="22-数组的其他使用">2.2 数组的其他使用</h3>
+
+<h4 id="221-划线">2.2.1 划线</h4>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+</pre></td><td class="rouge-code"><pre>$$
+\left(\begin{array}{|c|c|}
+1 &amp; 2 \\\\
+\\hline
+3 &amp; 4
+\end{array}\right)
+$$
+复制代码
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<table>
+  <tbody>
+    <tr>
+      <td>![\left( \begin{array}{</td>
+      <td>c</td>
+      <td>c</td>
+      <td>} 1 &amp; \ldots \\ \hline \vdots &amp; \ddots  \end{array} \right)](https://juejin.im/equation?tex=%5Cleft(%20%5Cbegin%7Barray%7D%7B%7Cc%7Cc%7C%7D%0A1%20%26%20%5Cldots%20%5C%5C%5C%5C%0A%5Chline%0A%5Cvdots%20%26%20%5Cddots%20%0A%5Cend%7Barray%7D%20%5Cright))</td>
+    </tr>
+  </tbody>
+</table>
+
+<h4 id="222-制表">2.2.2 制表</h4>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+</pre></td><td class="rouge-code"><pre>$$
+\begin{array}{|c|c|}
+\hline
+{1111111111} &amp; 2 \\\\
+\hline
+3 &amp; 4 \\\\
+\hline
+\end{array}
+$$
+复制代码
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<table>
+  <tbody>
+    <tr>
+      <td>![\begin{array}{</td>
+      <td>c</td>
+      <td>c</td>
+      <td>} \hline {1111111111} &amp; 2 \\ \hline {balabala} &amp; 你好啊 \\ \hline \end{array}](https://juejin.im/equation?tex=%5Cbegin%7Barray%7D%7B%7Cc%7Cc%7C%7D%0A%5Chline%0A%7B1111111111%7D%20%26%202%20%5C%5C%5C%5C%0A%5Chline%0A%7Bbalabala%7D%20%26%20%E4%BD%A0%E5%A5%BD%E5%95%8A%20%5C%5C%5C%5C%0A%5Chline%0A%5Cend%7Barray%7D)</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>可以看到，其实其他很多东西都可以很灵活的表达出来。碰到其他有趣的我会继续写出来的。</p>
+
+<h2 id="3-常用数学符号">3. 常用数学符号</h2>
+
+<blockquote>
+  <p>这里提供一个<a href="http://files.cnblogs.com/houkai/LATEX数学符号表.rar">文档下载</a>，如果上面的链接失效，也可以到我的 <a href="https://github.com/mk43/BlogResource/blob/master/LaTex/LATEX数学符号表.pdf">GitHub 下载 pdf 版</a>。下面举几个例子。</p>
+</blockquote>
+
+<h3 id="31-希腊字母">3.1 希腊字母</h3>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+</pre></td><td class="rouge-code"><pre>$$
+\begin{array}{|c|c|c|c|c|c|c|c|}
+\hline
+{\alpha} &amp; {\backslash alpha} &amp; {\theta} &amp; {\backslash theta} &amp; {o} &amp; {o} &amp; {\upsilon} &amp; {\backslash upsilon} \\\\
+\hline
+{\beta} &amp; {\backslash beta} &amp; {\vartheta} &amp; {\backslash vartheta} &amp; {\pi} &amp; {\backslash pi} &amp; {\phi} &amp; {\backslash phi} \\\\
+\hline
+{\gamma} &amp; {\backslash gamma} &amp; {\iota} &amp; {\backslash iota} &amp; {\varpi} &amp; {\backslash varpi} &amp; {\varphi} &amp; {\backslash varphi} \\\\
+\hline
+{\delta} &amp; {\backslash delta} &amp; {\kappa} &amp; {\backslash kappa} &amp; {\rho} &amp; {\backslash rho} &amp; {\chi} &amp; {\backslash chi} \\\\
+\hline
+{\epsilon} &amp; {\backslash epsilon} &amp; {\lambda} &amp; {\backslash lambda} &amp; {\varrho} &amp; {\backslash varrho} &amp; {\psi} &amp; {\backslash psi} \\\\
+\hline
+{\varepsilon} &amp; {\backslash varepsilon} &amp; {\mu} &amp; {\backslash mu} &amp; {\sigma} &amp; {\backslash sigma} &amp; {\omega} &amp; {\backslash omega} \\\\
+\hline
+{\zeta} &amp; {\backslash zeta} &amp; {\nu} &amp; {\backslash nu} &amp; {\varsigma} &amp; {\backslash varsigma} &amp; {} &amp; {} \\\\
+\hline
+{\eta} &amp; {\backslash eta} &amp; {\xi} &amp; {\backslash xi} &amp; {\tau} &amp; {\backslash tau} &amp; {} &amp; {} \\\\
+\hline
+{\Gamma} &amp; {\backslash Gamma} &amp; {\Lambda} &amp; {\backslash Lambda} &amp; {\Sigma} &amp; {\backslash Sigma} &amp; {\Psi} &amp; {\backslash Psi} \\\\
+\hline
+{\Delta} &amp; {\backslash Delta} &amp; {\Xi} &amp; {\backslash Xi} &amp; {\Upsilon} &amp; {\backslash Upsilon} &amp; {\Omega} &amp; {\backslash Omega} \\\\
+\hline
+{\Omega} &amp; {\backslash Omega} &amp; {\Pi} &amp; {\backslash Pi} &amp; {\Phi} &amp; {\backslash Phi} &amp; {} &amp; {} \\\\
+\hline
+\end{array}
+$$
+复制代码
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<table>
+  <tbody>
+    <tr>
+      <td>![\begin{array}{</td>
+      <td>c</td>
+      <td>c</td>
+      <td>c</td>
+      <td>c</td>
+      <td>c</td>
+      <td>c</td>
+      <td>c</td>
+      <td>c</td>
+      <td>} \hline {\alpha} &amp; {\backslash alpha} &amp; {\theta} &amp; {\backslash theta} &amp; {o} &amp; {o} &amp; {\upsilon} &amp; {\backslash upsilon} \\ \hline {\beta} &amp; {\backslash beta} &amp; {\vartheta} &amp; {\backslash vartheta} &amp; {\pi} &amp; {\backslash pi} &amp; {\phi} &amp; {\backslash phi} \\ \hline {\gamma} &amp; {\backslash gamma} &amp; {\iota} &amp; {\backslash iota} &amp; {\varpi} &amp; {\backslash varpi} &amp; {\varphi} &amp; {\backslash varphi} \\ \hline {\delta} &amp; {\backslash delta} &amp; {\kappa} &amp; {\backslash kappa} &amp; {\rho} &amp; {\backslash rho} &amp; {\chi} &amp; {\backslash chi} \\ \hline {\epsilon} &amp; {\backslash epsilon} &amp; {\lambda} &amp; {\backslash lambda} &amp; {\varrho} &amp; {\backslash varrho} &amp; {\psi} &amp; {\backslash psi} \\ \hline {\varepsilon} &amp; {\backslash varepsilon} &amp; {\mu} &amp; {\backslash mu} &amp; {\sigma} &amp; {\backslash sigma} &amp; {\omega} &amp; {\backslash omega} \\ \hline {\zeta} &amp; {\backslash zeta} &amp; {\nu} &amp; {\backslash nu} &amp; {\varsigma} &amp; {\backslash varsigma} &amp; {} &amp; {} \\ \hline {\eta} &amp; {\backslash eta} &amp; {\xi} &amp; {\backslash xi} &amp; {\tau} &amp; {\backslash tau} &amp; {} &amp; {} \\ \hline {\Gamma} &amp; {\backslash Gamma} &amp; {\Lambda} &amp; {\backslash Lambda} &amp; {\Sigma} &amp; {\backslash Sigma} &amp; {\Psi} &amp; {\backslash Psi} \\ \hline {\Delta} &amp; {\backslash Delta} &amp; {\Xi} &amp; {\backslash Xi} &amp; {\Upsilon} &amp; {\backslash Upsilon} &amp; {\Omega} &amp; {\backslash Omega} \\ \hline {\Omega} &amp; {\backslash Omega} &amp; {\Pi} &amp; {\backslash Pi} &amp; {\Phi} &amp; {\backslash Phi} &amp; {} &amp; {} \\ \hline \end{array}](https://juejin.im/equation?tex=%5Cbegin%7Barray%7D%7B%7Cc%7Cc%7Cc%7Cc%7Cc%7Cc%7Cc%7Cc%7C%7D%0A%5Chline%0A%7B%5Calpha%7D%20%26%20%7B%5Cbackslash%20alpha%7D%20%26%20%7B%5Ctheta%7D%20%26%20%7B%5Cbackslash%20theta%7D%20%26%20%7Bo%7D%20%26%20%7Bo%7D%20%26%20%7B%5Cupsilon%7D%20%26%20%7B%5Cbackslash%20upsilon%7D%20%5C%5C%5C%5C%0A%5Chline%0A%7B%5Cbeta%7D%20%26%20%7B%5Cbackslash%20beta%7D%20%26%20%7B%5Cvartheta%7D%20%26%20%7B%5Cbackslash%20vartheta%7D%20%26%20%7B%5Cpi%7D%20%26%20%7B%5Cbackslash%20pi%7D%20%26%20%7B%5Cphi%7D%20%26%20%7B%5Cbackslash%20phi%7D%20%5C%5C%5C%5C%0A%5Chline%0A%7B%5Cgamma%7D%20%26%20%7B%5Cbackslash%20gamma%7D%20%26%20%7B%5Ciota%7D%20%26%20%7B%5Cbackslash%20iota%7D%20%26%20%7B%5Cvarpi%7D%20%26%20%7B%5Cbackslash%20varpi%7D%20%26%20%7B%5Cvarphi%7D%20%26%20%7B%5Cbackslash%20varphi%7D%20%5C%5C%5C%5C%0A%5Chline%0A%7B%5Cdelta%7D%20%26%20%7B%5Cbackslash%20delta%7D%20%26%20%7B%5Ckappa%7D%20%26%20%7B%5Cbackslash%20kappa%7D%20%26%20%7B%5Crho%7D%20%26%20%7B%5Cbackslash%20rho%7D%20%26%20%7B%5Cchi%7D%20%26%20%7B%5Cbackslash%20chi%7D%20%5C%5C%5C%5C%0A%5Chline%0A%7B%5Cepsilon%7D%20%26%20%7B%5Cbackslash%20epsilon%7D%20%26%20%7B%5Clambda%7D%20%26%20%7B%5Cbackslash%20lambda%7D%20%26%20%7B%5Cvarrho%7D%20%26%20%7B%5Cbackslash%20varrho%7D%20%26%20%7B%5Cpsi%7D%20%26%20%7B%5Cbackslash%20psi%7D%20%5C%5C%5C%5C%0A%5Chline%0A%7B%5Cvarepsilon%7D%20%26%20%7B%5Cbackslash%20varepsilon%7D%20%26%20%7B%5Cmu%7D%20%26%20%7B%5Cbackslash%20mu%7D%20%26%20%7B%5Csigma%7D%20%26%20%7B%5Cbackslash%20sigma%7D%20%26%20%7B%5Comega%7D%20%26%20%7B%5Cbackslash%20omega%7D%20%5C%5C%5C%5C%0A%5Chline%0A%7B%5Czeta%7D%20%26%20%7B%5Cbackslash%20zeta%7D%20%26%20%7B%5Cnu%7D%20%26%20%7B%5Cbackslash%20nu%7D%20%26%20%7B%5Cvarsigma%7D%20%26%20%7B%5Cbackslash%20varsigma%7D%20%26%20%7B%7D%20%26%20%7B%7D%20%5C%5C%5C%5C%0A%5Chline%0A%7B%5Ceta%7D%20%26%20%7B%5Cbackslash%20eta%7D%20%26%20%7B%5Cxi%7D%20%26%20%7B%5Cbackslash%20xi%7D%20%26%20%7B%5Ctau%7D%20%26%20%7B%5Cbackslash%20tau%7D%20%26%20%7B%7D%20%26%20%7B%7D%20%5C%5C%5C%5C%0A%5Chline%0A%7B%5CGamma%7D%20%26%20%7B%5Cbackslash%20Gamma%7D%20%26%20%7B%5CLambda%7D%20%26%20%7B%5Cbackslash%20Lambda%7D%20%26%20%7B%5CSigma%7D%20%26%20%7B%5Cbackslash%20Sigma%7D%20%26%20%7B%5CPsi%7D%20%26%20%7B%5Cbackslash%20Psi%7D%20%5C%5C%5C%5C%0A%5Chline%0A%7B%5CDelta%7D%20%26%20%7B%5Cbackslash%20Delta%7D%20%26%20%7B%5CXi%7D%20%26%20%7B%5Cbackslash%20Xi%7D%20%26%20%7B%5CUpsilon%7D%20%26%20%7B%5Cbackslash%20Upsilon%7D%20%26%20%7B%5COmega%7D%20%26%20%7B%5Cbackslash%20Omega%7D%20%5C%5C%5C%5C%0A%5Chline%0A%7B%5COmega%7D%20%26%20%7B%5Cbackslash%20Omega%7D%20%26%20%7B%5CPi%7D%20%26%20%7B%5Cbackslash%20Pi%7D%20%26%20%7B%5CPhi%7D%20%26%20%7B%5Cbackslash%20Phi%7D%20%26%20%7B%7D%20%26%20%7B%7D%20%5C%5C%5C%5C%0A%5Chline%0A%5Cend%7Barray%7D)</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>写太累了😂😂😂。。。其他的详见 <a href="https://github.com/mk43/BlogResource/blob/master/LaTex/LATEX数学符号表.pdf">PDF</a>。</p>
+
+<p>原文链接：https://juejin.im/post/5a6721bd518825733201c4a2</p>
+:ET
