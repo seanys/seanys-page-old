@@ -364,7 +364,11 @@ plt.title('fitness curve')
 plt.show()
 ```
 
-参考：https://www.cnblogs.com/21207-iHome/p/6062535.html
+粒子群算法，也称粒子群优化算法或鸟群觅食算法（Particle Swarm Optimization），缩写为 PSO， 是近年来由J. Kennedy和R. C. Eberhart等开发的一种新的进化算法(Evolutionary Algorithm - EA)。PSO 算法属于进化算法的一种，和模拟退火算法相似，它也是从随机解出发，通过迭代寻找最优解，它也是通过适应度来评价解的品质，但它比遗传算法规则更为简单，它没有遗传算法的“交叉”(Crossover) 和“变异”(Mutation) 操作，它通过追随当前搜索到的最优值来寻找全局最优。这种算法以其实现容易、精度高、收敛快等优点引起了学术界的重视，并且在解决实际问题中展示了其优越性。粒子群算法是一种并行算法。
+
+PSO模拟的是鸟群的捕食行为。设想这样一个场景：一群鸟在随机搜索食物。在这个区域里只有一块食物。所有的鸟都不知道食物在那里。但是他们知道当前的位置离食物还有多远。那么找到食物的最优策略是什么呢。最简单有效的就是搜寻目前离食物最近的鸟的周围区域。
+
+参考：https://www.cnblogs.com/21207-iHome/p/6062535.html（源码）、https://www.jianshu.com/p/7e097bfb6390（通俗解释）
 
 ### ✅ 布谷鸟搜索（2009 Cuckoo Search）
 

@@ -43,19 +43,25 @@ tags:
 
 - [ ] Introduction
 
-  - [ ] Background
-- [ ] Literature Review
+  - [ ] 2D ISP问题是什么问题，如何解决，有什么应用
+  - [ ] 现阶段有哪些解决方案，一般是怎么解决的，遇到了什么问题（寻找算法麻烦，计算量大时间长）
+  - [ ] 一些方案因此提出，比如2013的那篇，通过布谷鸟算法来解决，但是仅限于两个pieces
+  - [ ] 由此受到启发，如果能够应用到更多的配件上就可以
+- [ ] Literature Review 暂时不写
 
   - [ ] 2D Irregular Strips Packing
-    - [ ] 
   - [ ] Neural Network in Combination Optimization
-    - [ ] 
-- [ ] The Difinition of the Problem
+- [ ] The Difinition of the Problem 暂时不写
+  - [ ] 需要具体研究一下再去写——有点麻烦
 - [ ] Algorithm Outline
-- [ ] Initialization and Classification Model
-
-  - [ ] Ajdust strips using lowest-gravity-center principle
-    - [ ] 参考 Algorithm for 2D irregular-shaped nesting problem based on the NFP algorithm and lowest-gravity-center principle
+  - [ ] 该节写算法内容
+  - [ ] 第一个部分是对样片进行分类的算法
+  - [ ] 第二个部分是通过BP以及数据集进行学习的算法——启发式排序算法放在后面，优化算法暂时不考虑
+- [ ] Initialization and Evaluation Model
+  - [ ] Introduction
+  - [ ] 这个部分主要说明如何说明和评价
+    - [ ] 主要先通过x x x
+  - [ ] Ajdust strips using lowest-gravity-center principle 
   - [ ] Clustering by features
     - [ ] 参考 Automatic Data Clustering Analysis of Arbitrary Shape with K-means and Enhanced Ant-based Template Mechanism或者直接处理
 - [ ] Neural Network Method and Heuristic Optimization
@@ -75,5 +81,10 @@ tags:
 
 
 
-![image-20191021005156381](https://tva1.sinaimg.cn/large/006y8mN6gy1g855gklphej31ju0rkwl6.jpg)
+### 刊物记录
 
+Journal of Zhejiang University-SCIENCE：2016年来看审稿比较快，平均3个月，发表另计，SCI 3区，影响因子1.879，官网www.springer.com/biomed/journal/11585，投稿地址www.editorialmanager.com/zusb/，那篇二维排料论文就是发表在这里
+
+COMPUTERS & OPERATIONS RESEARCH：SCI 3区，计算机跨学科应用/工业/运筹，方向完全匹配，应该有类似方向论文，但是据说变成水刊了.....
+
+Journal of Grey System：偏向于数学与应用数学，审稿比较快，4区
