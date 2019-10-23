@@ -589,8 +589,6 @@ running_time = end-start
 print('程序运行总耗时： %.5f sec' %running_time)
 ```
 
-
-
 ## 学习网络
 
 ### ☣️ 梯度下降
@@ -652,13 +650,131 @@ Hopfield最早提出的网络是二值神经网络，各神经元的激励函数
 
 ## 相关内容
 
-### ☣️ 梯度爆炸问题
+### ✅ 激活函数
 
+#### ✅ Relu
 
+![这里写图片描述](https://img-blog.csdn.net/20151015103947207)
 
+Relu激活函数的优点在于：
 
+1. 梯度不饱和。梯度计算公式为：。因此在反向传播过程中，减轻了梯度弥散的问题，神经网络前几层的参数也可以很快的更新。
+2. 计算速度快。正向传播过程中，sigmoid和tanh函数计算激活值时需要计算指数，而Relu函数仅需要设置阈值。如果，如果。加快了正向传播的计算速度。
 
-### ☣️ 代价函数
+因此，Relu激活函数可以极大地加快收敛速度，相比tanh函数，收敛速度可以加快6倍
+
+#### ✅ Tanh
+
+$$tanh(x)=2sigmoid(2x)-1$$
+
+$$tanhx=\frac{sinhx}{coshx}=\frac{e^x-e^{-x}}{e^x+e^{-x}}$$
+
+![img](https://upload-images.jianshu.io/upload_images/1531909-bee83ab606daa6e5.png?imageMogr2/auto-orient/strip|imageView2/2/w/494)
+
+tanh函数将一个实数输入映射到[-1,1]范围内，如上图（右）所示。当输入为0时，tanh函数输出为0，符合我们对激活函数的要求。然而，tanh函数也存在梯度饱和问题，导致训练效率低下。
+
+#### ✅ Sigmoid
+
+<img src="/Users/sean/Library/Application Support/typora-user-images/image-20191023195904166.png" alt="image-20191023195904166" style="zoom:50%;" />
+
+sigmoid将一个实数输入映射到[0,1]范围内，使用sigmoid作为激活函数存在以下几个问题：
+
+1. 梯度饱和。当函数激活值接近于0或者1时，函数的梯度接近于0。在反向传播计算梯度过程中：，每层残差接近于0，计算出的梯度也不可避免地接近于0。这样在参数微调过程中，会引起参数弥散问题，传到前几层的梯度已经非常靠近0了，参数几乎不会再更新。
+2. 函数输出不是以0为中心的。我们更偏向于当激活函数的输入是0时，输出也是0的函数。
+3. 因为上面两个问题的存在，导致参数收敛速度很慢，严重影响了训练的效率。因此在设计神经网络时，很少采用sigmoid激活函数。
+
+### ✅ 梯度问题
+
+#### ✅ 梯度爆炸
+
+原文：https://zhuanlan.zhihu.com/p/32154263
+
+**梯度爆炸是什么？**
+
+误差梯度在网络训练时被用来得到网络参数更新的方向和幅度，进而在正确的方向上以合适的幅度更新网络参数。在深层网络或递归神经网络中，**误差梯度在更新中累积得到一个非常大的梯度，这样的梯度会大幅度更新网络参数，进而导致网络不稳定**。**在极端情况下，权重的值变得特别大，以至于结果会溢出**（NaN值，[无穷与非数值](https://link.zhihu.com/?target=https%3A//baike.baidu.com/item/nan/7455322%3Ffr%3Daladdin)）。当梯度爆炸发生时，网络层之间反复乘以大于1.0的梯度值使得梯度值成倍增长。
+
+**梯度爆炸会引发哪些问题？**
+
+在深度多层感知机网络中，梯度爆炸会导致网络不稳定，最好的结果是无法从训练数据中学习，最坏的结果是由于权重值为NaN而无法更新权重。
+
+*梯度爆炸会使得学习不稳定；*
+
+—— [深度学习](https://link.zhihu.com/?target=http%3A//amzn.to/2fwdoKR)第282页
+
+在循环神经网络（RNN）中，梯度爆炸会导致网络不稳定，使得网络无法从训练数据中得到很好的学习，最好的结果是网络不能在长输入数据序列上学习。
+
+*梯度爆炸问题指的是训练过程中梯度大幅度增加，这是由于长期组件爆炸造成的；*
+
+——[训练循环神经网络中的困难](https://link.zhihu.com/?target=http%3A//proceedings.mlr.press/v28/pascanu13.pdf)
+
+**如何知道网络中是否有梯度爆炸问题？**
+
+在网络训练过程中，如果发生梯度爆炸，那么会有一些明显的迹象表明这一点，例如：
+
+- 模型无法在训练数据上收敛（比如，损失函数值非常差）；
+- 模型不稳定，在更新的时候损失有较大的变化；
+- 模型的损失函数值在训练过程中变成NaN值； 
+
+如果你遇到上述问题，我们就可以深入分析网络是否存在梯度爆炸问题。还有一些不太为明显的迹象可以用来确认网络中是否存在梯度爆炸问题：
+
+- 模型在训练过程中，权重变化非常大；
+- 模型在训练过程中，权重变成NaN值； 
+- 每层的每个节点在训练时，其误差梯度值一直是大于1.0； 
+
+**如何解决梯度爆炸问题？**
+
+解决梯度爆炸问题的方法有很多，本部分将介绍一些有效的实践方法：
+
+**1.重新设计网络模型**
+
+在深层神经网络中，梯度爆炸问题可以通过将网络模型的层数变少来解决。此外，在训练网络时，使用较小批量也有一些好处。在循环神经网络中，训练时使用较小时间步长更新（也被称作[截断反向传播](https://link.zhihu.com/?target=https%3A//machinelearningmastery.com/gentle-introduction-backpropagation-time/)）可能会降低梯度爆炸发生的概率。
+
+**2.使用修正线性激活函数**
+
+在深度多层感知机中，当激活函数选择为一些之前常用的Sigmoid或Tanh时，网络模型会发生梯度爆炸问题。而使用修正线性激活函数（ReLU）能够减少梯度爆炸发生的概率，对于隐藏层而言，使用修正线性激活函数（ReLU）是一个比较合适的激活函数，当然ReLU函数有许多变体，大家在实践过程中可以逐一使用以找到最合适的激活函数。
+
+**3.使用长短周期记忆网络**
+
+由于循环神经网络中存在的固有不稳定性，梯度爆炸可能会发生。比如，通过时间反向传播，其本质是将循环网络转变为深度多层感知神经网络。通过使用长短期记忆单元（LSTM）或相关的门控神经结构能够减少梯度爆炸发生的概率。
+
+对于循环神经网络的时间序列预测而言，采用LSTM是新的最佳实践。
+
+**4.使用梯度裁剪**
+
+在深度多层感知网络中，当有大批量数据以及LSTM是用于很长时间序列时，梯度爆炸仍然会发生。当梯度爆炸发生时，可以在网络训练时检查并限制梯度的大小，这被称作梯度裁剪。
+
+*梯度裁剪是处理梯度爆炸问题的一个简单但非常有效的解决方案，如果梯度值大于某个阈值，我们就进行梯度裁剪。*
+
+——[自然语言处理中的神经网络方法的第5.2.4节](https://link.zhihu.com/?target=http%3A//amzn.to/2fwTPCn)
+
+具体而言，检查误差梯度值就是与一个阈值进行比较，若误差梯度值超过设定的阈值，则截断或设置为阈值。
+
+*在某种程度上，梯度爆炸问题可以通过梯度裁剪来缓解（在执行梯度下降步骤之前对梯度进行阈值操作）*
+
+——深度学习第294页
+
+在Keras深度学习库中，在训练网络之前，可以对优化器的clipnorm和 clipvalue参数进行设置来使用梯度裁剪，一般而言，默认将clipnorm和 clipvalue分别设置为1和0.5.
+
+- [在Keras API中使用优化器](https://link.zhihu.com/?target=https%3A//keras.io/optimizers/)
+
+**5.使用权重正则化**
+
+如果梯度爆炸问题仍然发生，另外一个方法是对网络权重的大小进行校验，并对大权重的损失函数增添一项惩罚项，这也被称作权重正则化，常用的有L1（权重的绝对值和）正则化与L2（权重的绝对值平方和再开方）正则化。
+
+*使用L1或L2惩罚项会减少梯度爆炸的发生概率*
+
+——[训练循环神经网络中的困难](https://link.zhihu.com/?target=http%3A//proceedings.mlr.press/v28/pascanu13.pdf%3Fspm%3D5176.100239.blogcont292826.13.57KVN0%26file%3Dpascanu13.pdf)
+
+在Keras深度学习库中，可以在每层上使用L1或L2正则器设置kernel_regularizer参数来完成权重的正则化操作。
+
+- [在Keras API中使用正则器](https://link.zhihu.com/?target=https%3A//keras.io/regularizers/)
+
+#### ✅ 梯度消失
+
+误差反向传播（BP）算法中为什么会产生梯度消失？ - 维吉特伯的回答 - 知乎
+https://www.zhihu.com/question/49812013/answer/148825073
+
+### ✅ 代价函数
 
 #### ✅ 二次代价函数
 
@@ -668,13 +784,331 @@ $$\frac{\partial C}{\partial w}=(a-y)\sigma'(z)x $$
 
 $$\frac{\partial C}{\partial b}=(a-y)\sigma'(z)$$
 
-#### ✅ 交叉熵损失函数
+### 损失函数
+
+#### 交叉熵损失函数
 
 $$C=-\frac{1}{n}\sum_x[y\,ln\,a+(1-y)ln(1-a)]$$
 
 参考资料：https://blog.csdn.net/u014313009/article/details/51043064
 
+损失函数（loss function）是用来**估量模型的预测值f(x)与真实值Y的不一致程度**，它是一个非负实值函数,通常使用L(Y, f(x))来表示，损失函数越小，模型的鲁棒性就越好。损失函数是**经验风险函数**的核心部分，也是**结构风险函数**重要组成部分。模型的结构风险函数包括了经验风险项和正则项，通常可以表示成如下式子：
 
+![img](https://ask.qcloudimg.com/http-save/yehe-1881084/vchxtyghby.png?imageView2/2/w/1620)
+
+　　其中，前面的均值函数表示的是经验风险函数，L代表的是损失函数，后面的Φ是正则化项（regularizer）或者叫惩罚项（penalty term），它可以是L1，也可以是L2，或者其他的正则函数。整个式子表示的意思是**找到使目标函数最小时的θ值**。下面主要列出几种常见的损失函数。
+
+ 理解：损失函数旨在表示出logit和label的差异程度，不同的损失函数有不同的表示意义，也就是在最小化损失函数过程中，logit逼近label的方式不同，得到的结果可能也不同。
+
+一般情况下，softmax和sigmoid使用交叉熵损失（logloss），hingeloss是SVM推导出的，hingeloss的输入使用原始logit即可。
+
+下文参考资料：https://cloud.tencent.com/developer/article/1165263
+
+#### 一、LogLoss对数损失函数（逻辑回归，交叉熵损失）
+
+　　有些人可能觉得逻辑回归的损失函数就是平方损失，其实并不是。**平方损失函数可以通过线性回归在假设样本是高斯分布的条件下推导得到**，而逻辑回归得到的并不是平方损失。在逻辑回归的推导中，它假设样本服从**伯努利分布（0-1分布）**，然后求得满足该分布的似然函数，接着取对数求极值等等。而逻辑回归并没有求似然函数的极值，而是把极大化当做是一种思想，进而推导出它的经验风险函数为：**最小化负的似然函数（即max F(y, f(x)) —> min -F(y, f(x)))**。从损失函数的视角来看，它就成了log损失函数了。
+
+**log损失函数的标准形式**：
+
+![img](https://ask.qcloudimg.com/http-save/yehe-1881084/mblanzbpz4.png?imageView2/2/w/1620)
+
+　　刚刚说到，取对数是为了方便计算极大似然估计，因为在MLE（最大似然估计）中，直接求导比较困难，所以通常都是先取对数再求导找极值点。损失函数L(Y, P(Y|X))表达的是样本X在分类Y的情况下，使概率P(Y|X)达到最大值（换言之，**就是利用已知的样本分布，找到最有可能（即最大概率）导致这种分布的参数值；或者说什么样的参数才能使我们观测到目前这组数据的概率最大**）。因为log函数是单调递增的，所以logP(Y|X)也会达到最大值，因此在前面加上负号之后，最大化P(Y|X)就等价于最小化L了。
+
+　　逻辑回归的P(Y=y|x)表达式如下（为了将类别标签y统一为1和0，下面将表达式分开表示）：
+
+![img](https://ask.qcloudimg.com/http-save/yehe-1881084/3uwkib8pna.png?imageView2/2/w/1620)
+
+　　将它带入到上式，通过推导可以得到logistic的损失函数表达式，如下：
+
+![img](https://ask.qcloudimg.com/http-save/yehe-1881084/clufn12j5o.png?imageView2/2/w/1620)
+
+　　逻辑回归最后得到的目标式子如下：
+
+![img](https://ask.qcloudimg.com/http-save/yehe-1881084/ywnixwm44c.png?imageView2/2/w/1620)
+
+　　上面是针对二分类而言的。这里需要解释一下：**之所以有人认为逻辑回归是平方损失，是因为在使用梯度下降来求最优解的时候，它的迭代式子与平方损失求导后的式子非常相似，从而给人一种直观上的错觉**。
+
+这里有个PDF可以参考一下：[Lecture 6: logistic regression.pdf](https://www.cs.berkeley.edu/~russell/classes/cs194/f11/lectures/CS194 Fall 2011 Lecture 06.pdf).
+
+ **注意：softmax使用的即为交叉熵损失函数，binary_cossentropy为二分类交叉熵损失，categorical_crossentropy为多分类交叉熵损失，当使用多分类交叉熵损失函数时，标签应该为多分类模式，即使用one-hot编码的向量。**
+
+#### 二、平方损失函数（最小二乘法, Ordinary Least Squares ）
+
+　　最小二乘法是线性回归的一种，最小二乘法（OLS）将问题转化成了一个凸优化问题。在线性回归中，它假设样本和噪声都服从高斯分布（为什么假设成高斯分布呢？其实这里隐藏了一个小知识点，就是**中心极限定理**，可以参考[【central limit theorem】](https://en.wikipedia.org/wiki/Central_limit_theorem)），最后通过极大似然估计（MLE）可以推导出最小二乘式子。最小二乘的基本原则是：**最优拟合直线应该是使各点到回归直线的距离和最小的直线，即平方和最小**。换言之，OLS是基于距离的，而这个距离就是我们用的最多的**欧几里得距离**。为什么它会选择使用欧式距离作为误差度量呢（即Mean squared error， MSE），主要有以下几个原因：
+
+- 简单，计算方便；
+- 欧氏距离是一种很好的相似性度量标准；
+- 在不同的表示域变换后特征性质不变。
+
+**平方损失（Square loss）的标准形式如下：**
+
+![img](https://ask.qcloudimg.com/http-save/yehe-1881084/0a6qmutmgz.png?imageView2/2/w/1620)
+
+当样本个数为n时，此时的损失函数变为：
+
+![img](https://ask.qcloudimg.com/http-save/yehe-1881084/yijq5f7pf6.png?imageView2/2/w/1620)
+
+`Y-f(X)`表示的是残差，整个式子表示的是**残差的平方和**，而我们的目的就是最小化这个目标函数值（注：该式子未加入正则项），也就是**最小化残差的平方和（residual sum of squares，RSS）**。
+
+而在实际应用中，通常会使用均方差（MSE）作为一项衡量指标，公式如下：
+
+![img](https://ask.qcloudimg.com/http-save/yehe-1881084/40i7usorao.png?imageView2/2/w/1620)
+
+上面提到了线性回归，这里额外补充一句，我们通常说的线性有两种情况，一种是因变量y是自变量x的线性函数，一种是因变量y是参数α的线性函数。在机器学习中，通常指的都是后一种情况。
+
+#### 三、指数损失函数（Adaboost）
+
+学过Adaboost算法的人都知道，它是前向分步加法算法的特例，是一个加和模型，损失函数就是指数函数。在Adaboost中，经过m此迭代之后，可以得到fm(x):
+
+![img](https://ask.qcloudimg.com/http-save/yehe-1881084/9csxlzc8kc.png?imageView2/2/w/1620)
+
+Adaboost每次迭代时的目的是为了找到最小化下列式子时的参数α 和G：
+
+![img](https://ask.qcloudimg.com/http-save/yehe-1881084/s5jxlbyyu9.png?imageView2/2/w/1620)
+
+**而指数损失函数（exp-loss）的标准形式如下**
+
+![img](https://ask.qcloudimg.com/http-save/yehe-1881084/1w1scqkvld.png?imageView2/2/w/1620)
+
+可以看出，Adaboost的目标式子就是指数损失，在给定n个样本的情况下，Adaboost的损失函数为：
+
+![img](https://ask.qcloudimg.com/http-save/yehe-1881084/rcsuvb3aom.png?imageView2/2/w/1620)
+
+关于Adaboost的推导，可以参考Wikipedia：[AdaBoost](https://en.wikipedia.org/wiki/AdaBoost)或者《统计学习方法》P145.
+
+#### 四、Hinge损失函数（SVM）
+
+在机器学习算法中，hinge损失函数和SVM是息息相关的。在**线性支持向量机**中，最优化问题可以等价于下列式子：
+
+![img](https://ask.qcloudimg.com/http-save/yehe-1881084/jpaf847fuj.png?imageView2/2/w/1620)
+
+下面来对式子做个变形，令：
+
+![img](https://ask.qcloudimg.com/http-save/yehe-1881084/fof2ryr62o.png?imageView2/2/w/1620)
+
+于是，原式就变成了：
+
+![img](https://ask.qcloudimg.com/http-save/yehe-1881084/dwnvocjbj0.png?imageView2/2/w/1620)
+
+如若取λ=1/(2C)，式子就可以表示成： 
+
+![img](https://ask.qcloudimg.com/http-save/yehe-1881084/fr0tcbmweo.png?imageView2/2/w/1620)
+
+可以看出，该式子与下式非常相似：
+
+![img](https://ask.qcloudimg.com/http-save/yehe-1881084/gwesvh36xu.png?imageView2/2/w/1620)
+
+前半部分中的 l 就是hinge损失函数，而后面相当于L2正则项。
+
+**Hinge 损失函数的标准形式**
+
+![img](https://ask.qcloudimg.com/http-save/yehe-1881084/9wh4maztst.png?imageView2/2/w/1620)
+
+可以看出，当|y|>=1时，L(y)=0。
+
+更多内容，参考[Hinge-loss](https://en.wikipedia.org/wiki/Hinge_loss)。
+
+补充一下：在libsvm中一共有4中核函数可以选择，对应的是`-t`参数分别是：
+
+- 0-线性核；
+- 1-多项式核；
+- 2-RBF核；
+- 3-sigmoid核。
+
+#### 五、其它损失函数
+
+除了以上这几种损失函数，常用的还有：
+
+**0-1损失函数**
+
+![img](https://ask.qcloudimg.com/http-save/yehe-1881084/j8j9f45t58.png?imageView2/2/w/1620)
+
+**绝对值损失函数**
+
+![img](https://ask.qcloudimg.com/http-save/yehe-1881084/pq3irn4nn6.png?imageView2/2/w/1620)
+
+下面来看看几种损失函数的可视化图像，对着图看看横坐标，看看纵坐标，再看看每条线都表示什么损失函数，多看几次好好消化消化。
+
+![img](https://ask.qcloudimg.com/http-save/yehe-1881084/nkhl6fmtst.png?imageView2/2/w/1620)
+
+#### 六、Keras / TensorFlow 中常用 Cost Function 总结
+
+-  mean_squared_error或mse  
+-  mean_absolute_error或mae  
+-  mean_absolute_percentage_error或mape  
+-  mean_squared_logarithmic_error或msle  
+-  squared_hinge  
+-  hinge  
+-  categorical_hinge  
+-  binary_crossentropy（亦称作对数损失，logloss）  
+-  logcosh  
+-  categorical_crossentropy：亦称作多类的对数损失，注意使用该目标函数时，需要将标签转化为形如`(nb_samples, nb_classes)`的二值序列  
+-  sparse_categorical_crossentrop：如上，但接受稀疏标签。注意，使用该函数时仍然需要你的标签与输出值的维度相同，你可能需要在标签数据上增加一个维度：`np.expand_dims(y,-1)`  
+-  kullback_leibler_divergence:从预测值概率分布Q到真值概率分布P的信息增益,用以度量两个分布的差异.  
+-  poisson：即`(predictions - targets * log(predictions))`的均值  
+-  cosine_proximity：即预测值与真实标签的余弦距离平均值的相反数  
+
+　　需要记住的是：**参数越多，模型越复杂，而越复杂的模型越容易过拟合**。过拟合就是说模型在训练数据上的效果远远好于在测试集上的性能。此时可以考虑正则化，通过设置正则项前面的hyper parameter，来权衡损失函数和正则项，减小参数规模，达到模型简化的目的，从而使模型具有更好的泛化能力。
+
+### ✅ 优化器
+
+#### ✅ Batch Gradient Descent （BGD）
+
+**梯度更新规则:**
+
+BGD 采用整个训练集的数据来计算 cost function 对参数的梯度：
+
+![img](https://ask.qcloudimg.com/http-save/yehe-1881084/83gnmlzeqe.png?imageView2/2/w/1620)
+
+**缺点：**
+
+**由于这种方法是在一次更新中，就对整个数据集计算梯度，所以计算起来非常慢，遇到很大量的数据集也会非常棘手，而且不能投入新数据实时更新模型。**
+
+```javascript
+for i in range(nb_epochs):
+  params_grad = evaluate_gradient(loss_function, data, params)
+  params = params - learning_rate * params_grad
+```
+
+我们会事先定义一个迭代次数 epoch，首先计算梯度向量 params_grad，然后沿着梯度的方向更新参数 params，learning rate 决定了我们每一步迈多大。
+
+**Batch gradient descent 对于凸函数可以收敛到全局极小值，对于非凸函数可以收敛到局部极小值。**
+
+#### ✅ Stochastic Gradient Descent (SGD)
+
+**梯度更新规则:**
+
+和 BGD 的一次用所有数据计算梯度相比，SGD 每次更新时对每个样本进行梯度更新，对于很大的数据集来说，可能会有相似的样本，这样 BGD 在计算梯度时会出现冗余，而 **SGD 一次只进行一次更新，就没有冗余，而且比较快，并且可以新增样本。**
+
+![img](https://ask.qcloudimg.com/http-save/yehe-1881084/oa4bsslnd8.png?imageView2/2/w/1620)
+
+```javascript
+for i in range(nb_epochs):
+  np.random.shuffle(data)
+  for example in data:
+    params_grad = evaluate_gradient(loss_function, example, params)
+    params = params - learning_rate * params_grad
+```
+
+ 看代码，可以看到区别，就是整体数据集是个循环，其中对每个样本进行一次参数更新。
+
+![img](https://ask.qcloudimg.com/http-save/yehe-1881084/y5mhqxi8vr.png?imageView2/2/w/1620)
+
+随机梯度下降是通过每个样本来迭代更新一次，如果样本量很大的情况，那么可能只用其中部分的样本，就已经将theta迭代到最优解了，对比上面的批量梯度下降，迭代一次需要用到十几万训练样本，一次迭代不可能最优，如果迭代10次的话就需要遍历训练样本10次。**缺点是SGD的噪音较BGD要多，使得SGD并不是每次迭代都向着整体最优化方向**。**所以虽然训练速度快，但是准确度下降，并不是全局最优**。**虽然包含一定的随机性，但是从期望上来看，它是等于正确的导数的。**
+
+**缺点：**
+
+**SGD 因为更新比较频繁，会造成 cost function 有严重的震荡。**
+
+**BGD 可以收敛到局部极小值，当然 SGD 的震荡可能会跳到更好的局部极小值处。**
+
+**当我们稍微减小 learning rate，SGD 和 BGD 的收敛性是一样的。**
+
+#### Mini-Batch Gradient Descent （MBGD）
+
+**梯度更新规则：**
+
+**MBGD 每一次利用一小批样本，即 n 个样本进行计算，这样它可以降低参数更新时的方差，收敛更稳定，另一方面可以充分地利用深度学习库中高度优化的矩阵操作来进行更有效的梯度计算。**
+
+![img](https://ask.qcloudimg.com/http-save/yehe-1881084/755zvm0j1o.png?imageView2/2/w/1620)
+
+和 SGD 的区别是每一次循环不是作用于每个样本，而是具有 n 个样本的批次。
+
+```javascript
+for i in range(nb_epochs):
+  np.random.shuffle(data)
+  for batch in get_batches(data, batch_size=50):
+    params_grad = evaluate_gradient(loss_function, batch, params)
+    params = params - learning_rate * params_grad
+```
+
+ **超参数设定值:  n 一般取值在 50～256**
+
+**缺点：（两大缺点）**
+
+1. **不过 Mini-batch gradient descent 不能保证很好的收敛性，learning rate 如果选择的太小，收敛速度会很慢，如果太大，loss function 就会在极小值处不停地震荡甚至偏离。（有一种措施是先设定大一点的学习率，当两次迭代之间的变化低于某个阈值后，就减小 learning rate，不过这个阈值的设定需要提前写好，这样的话就不能够适应数据集的特点。）**对于非凸函数，还要避免陷于局部极小值处，或者鞍点处，因为鞍点周围的error是一样的，所有维度的梯度都接近于0，SGD 很容易被困在这里。（**会在鞍点或者局部最小点震荡跳动，因为在此点处，如果是训练集全集带入即BGD，则优化会停止不动，如果是mini-batch或者SGD，每次找到的梯度都是不同的，就会发生震荡，来回跳动。**）
+2. SGD对所有参数更新时应用同样的 learning rate，如果我们的数据是稀疏的，**我们更希望对出现频率低的特征进行大一点的更新。LR会随着更新的次数逐渐变小。**
+
+鞍点就是：一个光滑函数的鞍点邻域的曲线，曲面，或超曲面，都位于这点的切线的不同边。例如这个二维图形，像个马鞍：在x-轴方向往上曲，在y-轴方向往下曲，鞍点就是（0，0）。
+
+![img](https://ask.qcloudimg.com/http-save/yehe-1881084/2cxevj8bpb.png?imageView2/2/w/1620)
+
+#### ✅ 其他优化算法
+
+- [ ] Momentum
+- [ ] Nesterov Accelerated Gradient
+- [ ] Adagrad （Adaptive gradient algorithm）
+- [ ] Adadelta
+- [ ] RMSprop
+- [ ] Adam：Adaptive Moment Estimation
+
+#### ✅ 如何选择优化算法
+
+**如果数据是稀疏的，就用自适用方法，即 Adagrad, Adadelta, RMSprop, Adam。**
+
+**RMSprop, Adadelta, Adam 在很多情况下的效果是相似的。**
+
+**Adam 就是在 RMSprop 的基础上加了 bias-correction 和 momentum，**
+
+**随着梯度变的稀疏，Adam 比 RMSprop 效果会好。**
+
+整体来讲，**Adam 是最好的选择**。
+
+很多论文里都会用 SGD，没有 momentum 等。**SGD 虽然能达到极小值，但是比其它算法用的时间长，而且可能会被困在鞍点**。
+
+如果需要更快的收敛，或者是训练更深更复杂的神经网络，需要用一种自适应的算法。
+
+原文：https://cloud.tencent.com/developer/article/1118673
+
+### Dropout
+
+原文：https://blog.csdn.net/stdcoutzyx/article/details/49022443、https://zhuanlan.zhihu.com/p/38200980
+
+大规模的神经网络有两个缺点：
+
+- 费时
+- 容易过拟合
+
+这两个缺点真是抱在深度学习大腿上的两个大包袱，一左一右，相得益彰，额不，臭气相投。过拟合是很多机器学习的通病，过拟合了，得到的模型基本就废了。而为了解决过拟合问题，一般会采用ensemble方法，即训练多个模型做组合，此时，费时就成为一个大问题，不仅训练起来费时，测试起来多个模型也很费时。总之，几乎形成了一个死锁。
+
+Dropout的出现很好的可以解决这个问题，每次做完dropout，相当于从原始的网络中找到一个更瘦的网络，如下图所示：
+
+![img](https://raw.githubusercontent.com/stdcoutzyx/Blogs/master/blogs/imgs/n7-1.png)
+
+因而，对于一个有N个节点的神经网络，有了dropout后，就可以看做是2n个模型的集合了，但此时要训练的参数数目却是不变的，这就解脱了费时的问题。
+
+dropout带来的模型的变化
+
+而为了达到ensemble的特性，有了dropout后，神经网络的训练和预测就会发生一些变化。
+
+训练层面
+
+![img2](https://raw.githubusercontent.com/stdcoutzyx/Blogs/master/blogs/imgs/n7-5.png)
+
+无可避免的，训练网络的每个单元要添加一道概率流程。 
+
+
+对应的公式变化如下如下：
+
+没有dropout的神经网络
+
+![img3](https://raw.githubusercontent.com/stdcoutzyx/Blogs/master/blogs/imgs/n7-3.png) 
+
+有dropout的神经网络 
+
+![img4](https://raw.githubusercontent.com/stdcoutzyx/Blogs/master/blogs/imgs/n7-4.png)
+
+测试层面
+
+预测的时候，每一个单元的参数要预乘以p。 
+
+### ![img5](https://raw.githubusercontent.com/stdcoutzyx/Blogs/master/blogs/imgs/n7-2.png)区分Loss/Cost/Object函数
+
+Loss Function 是定义在单个样本上的，算的是一个样本的误差。
+
+Cost Function 是定义在整个训练集上的，是所有样本误差的平均，也就是损失函数的平均。
+
+Object Function（目标函数 ）定义为：Cost Function + 正则化项。
 
 ## 前沿研究
 
