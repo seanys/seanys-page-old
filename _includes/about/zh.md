@@ -2,7 +2,7 @@
 
 你好，我是Sean Yang，[同济大学经济管理学院管理科学与工程系](http://sem.tongji.edu.cn/semch/学术科研/管理科学与工程系)本科在读，主要研究方向为整数规划与组合优化，正在准备美国运筹学方向的博士申请，希望应用领域为大规模排程问题做出自己贡献，欢迎交流！
 
-现阶段的主要研究为 Fast Algorithm for 2D Irregular Packing Problem Based on Deep Reinforcement Learning，算法已经进入测试阶段，预计可以提高二维排料匹配速度。
+现阶段的主要研究为 A Fast Algorithm for 2D Irregular Packing Based on Pattern Evaluating and Neural Network，算法已经进入测试阶段，预计可以提高二维排料匹配速度。
 
 **主要擅长**：算法、运筹优化（排程/装箱问题）、网页前端开发（Vue.js/Sketch）、网络爬虫（Scrapy/大规模爬虫）、平面设计（PPT/UI）
 

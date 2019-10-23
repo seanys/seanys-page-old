@@ -617,6 +617,12 @@ print('程序运行总耗时： %.5f sec' %running_time)
 
 
 
+### ☣️ GAN
+
+https://zhuanlan.zhihu.com/p/24767059
+
+
+
 ## 相关内容
 
 ### ☣️ 梯度爆炸问题
@@ -628,8 +634,6 @@ print('程序运行总耗时： %.5f sec' %running_time)
 ### ☣️ 代价函数
 
 #### ✅ 二次代价函数
-
-![img](https://img-blog.csdn.net/20160402180717102)
 
 $$C=\frac{1}{2n}\sum_x||y(x)-a^L(x)||$$
 
