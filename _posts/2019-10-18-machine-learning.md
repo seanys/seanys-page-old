@@ -26,9 +26,9 @@ tags:
 
 ## 机器学习与数据挖掘
 
-### ✅ 决策树（Decision Tree）
+### 决策树（Decision Tree）
 
-#### ✅ 前言
+#### 前言
 
 **基本概念**
 
@@ -67,7 +67,7 @@ tags:
 
 参考资料：https://shuwoom.com/?p=1452
 
-#### ✅ ID3算法
+#### ID3算法
 
 熵这个概念最早起源于物理学，在物理学中是用来度量一个热力学系统的无序程度，而在信息学里面，熵是对不确定性的度量。在1948年，香农引入了信息熵（information entropy），将其定义为离散随机事件出现的概率，一个系统越是有序，信息熵就越低，反之一个系统越是混乱，它的信息熵就越高。所以信息熵可以被认为是系统有序化程度的一个度量。
 
@@ -168,7 +168,7 @@ if __name__=='__main__':
     print(createTree(dataSet, labels))  # 输出决策树模型结果
 ```
 
-#### ✅ C4.5算法
+#### C4.5算法
 
 **背景**：我们知道信息增益会偏向取值较多的特征，使用信息增益比可以对这一问题进行校正。
 
@@ -211,7 +211,7 @@ def choose_best_feature_to_split(data_set):
     return best_feature_idx
 ```
 
-#### ✅ CART算法
+#### CART算法
 
 **概述**：CART分类树预测分类离散型数据，采用基尼指数选择最优特征，同时决定该特征的最优二值切分点。
 
@@ -589,70 +589,131 @@ running_time = end-start
 print('程序运行总耗时： %.5f sec' %running_time)
 ```
 
-## 学习网络
-
-### ☣️ 梯度下降
-
-
-
-### ☣️ BP网络
-
-
-
-### ☣️ RNN系列
-
-#### ☣️ RNN模型
-
-
-
-![roolled RNN](https://caicai.science/images/attention/roolled%20rnn.png)
-
-#### ☣️ LSTM
-
-
-
-#### ☣️ GRU
-
-
-
-### ☣️ GAN
-
-https://zhuanlan.zhihu.com/p/24767059
-
-
-
-### ☣️ Hopfield
-
-![img](https://upload.wikimedia.org/wikipedia/commons/9/95/Hopfield-net.png)
-
-Hopfield网络的单元是二元的（binary），即这些单元只能接受两个不同的值，并且值取决于输入的大小是否达到阈值。Hopfield网络通常接受值为-1或1，也可以是0或者1。输入是由[sigmoid函数](https://zh.wikipedia.org/wiki/Sigmoid函数)处理得到的。 sigmoid函数定义为：
-
-$$S(t) = \frac{1}{1 + e^{-t}}$$
-
-用于将输入化简为两个极值。
-
-每一对Hopfiled网络的单元*i*和*j*间都有一对以一定权重（weight）的连接$ w_{ij} $。因此，Hopfiled网络可被描述为一个完整的无向图$ G = <V, f> $，其中$V$是人工神经元集合。 
-
-Hopfiled网络的连接有以下特征：
-
-- $$w_{ii}=0, \forall i$$
-- $$w_{ij} = w_{ji}, \forall i,j$$（连接权重是对称的）
-
-权重对称的要求是一个重要特征，因为它保证了能量方程（称向函数某一点收敛的过程为势能转化为能量）在神经元激活时单调递减，而不对称的权重可能导致周期性的递增或者噪声。然而，Hopfiled网络也证明噪声过程会被局限在很小的范围，并且并不影响网络的最终性能
-
-Hopfield最早提出的网络是二值神经网络，各神经元的激励函数为阶跃函数或双极值函数,神经元的输入、输出只取{0，1}或者{ -1，1}，所以也称为**离散型Hopfield神经网络DHNN**（Discrete Hopfiled Neural Network）。在DHNN中，所采用的神经元是二值神经元；因此，所输出的离散值1和0或者1和-1分别表示神经元处于激活状态和抑制状态。
-
-离散Hopfield神经网络DHNN是一个**单层**网络，有n个神经元节点，每个神经元的输出均接到其它神经元的输入。各节点**没有自反馈**。每个节点都可处于一种可能的状态（1或－1），即当该神经元所受的刺激超过其阀值时，神经元就处于一种状态（比如1），否则神经元就始终处于另一状态（比如－1）。
-
-备注：没看懂
-
-参考资料：https://www.ofweek.com/ai/2018-05/ART-201717-11001-30228892.html
+```flow
+st=>start: 开始
+op=>operation: My Operation
+cond=>condition: Yes or No?
+e=>end
+st->op->cond
+cond(yes)->e
+cond(no)->op
+```
 
 ## 相关内容
 
-### ✅ 激活函数
+### 归一化
 
-#### ✅ Relu
+归一化一般是将数据映射到指定的范围，用于去除不同维度数据的量纲以及量纲单位。
+
+常见的映射范围有 [0, 1] 和 [-1, 1] ，最常见的归一化方法就是 **Min-Max 归一化**：
+
+![[公式]](https://www.zhihu.com/equation?tex=x_{new}%3D\frac{x-x_{min}}{x_{max}-x_{min}})
+
+举个例子，我们判断一个人的身体状况是否健康，那么我们会采集人体的很多指标，比如说：身高、体重、红细胞数量、白细胞数量等。
+
+一个人身高 180cm，体重 70kg，白细胞计数 $7.50\times10^9/L$ ，etc.
+
+衡量两个人的状况时，白细胞计数就会起到主导作用从而**遮盖住其他的特征**，归一化后就不会有这样的问题。 
+
+参考：https://zhuanlan.zhihu.com/p/29957294
+
+### **标准化 Normalization**
+
+> 归一化和标准化的英文翻译是一致的，但是根据其用途（或公式）的不同去理解（或翻译）
+
+下面我们将探讨最常见的标准化方法： **Z-Score 标准化**。
+
+#### **Z-Score 标准化**
+
+![[公式]](https://www.zhihu.com/equation?tex=x_{new}%3D\frac{x-\mu+}{\sigma+})
+
+其中 ![[公式]](https://www.zhihu.com/equation?tex=%5Cmu) 是样本数据的**均值（mean）**， ![[公式]](https://www.zhihu.com/equation?tex=%5Csigma) 是样本数据的**标准差（std）**。
+
+![img](https://tva1.sinaimg.cn/large/006y8mN6gy1g8938kwyxgj30k0053749.jpg)
+
+
+
+上图则是一个散点序列的标准化过程：原图->减去均值->除以标准差。
+
+显而易见，变成了一个**均值为 0 ，方差为 1 的分布**，下图通过 Cost 函数让我们更好的理解标准化的作用。
+
+<img src="https://tva1.sinaimg.cn/large/006y8mN6gy1g8938e6pv9j30k00b9q3g.jpg" alt="img" style="zoom:80%;" />
+
+
+
+机器学习的目标无非就是不断优化损失函数，使其值最小。在上图中$J(w,b)$就是我们要优化的目标函数
+
+我们不难看出，**标准化后可以更加容易地得出最优参数$w$和$b$以及计算出 $J(w,b)$ 的最小值，从而达到加速收敛的效果**。 ![[公式]](https://www.zhihu.com/equation?tex=%5E%7B%5B1%5D%7D)
+
+*注：上图来源于 Andrew Ng 的课程讲义*
+
+#### **Batch Normalization**
+
+在机器学习中，**最常用标准化的地方**莫过于神经网络的 **BN 层（Batch Normalization）**，因此我们简单的谈谈 BN 层的原理和作用，想要更深入的了解可以[查看论文](https://link.zhihu.com/?target=https%3A//arxiv.org/abs/1502.03167)。
+
+我们知道数据预处理做标准化可以加速收敛，同理，在神经网络使用标准化也可以**加速收敛**，而且还有如下好处：
+
+- 具有正则化的效果（Batch Normalization reglarizes the model）
+- 提高模型的泛化能力（Be advantageous to the generalization of network）
+- 允许更高的学习速率从而加速收敛（Batch Normalization enables higher learning rates）
+
+其原理是**利用正则化减少内部相关变量分布的偏移（Reducing Internal Covariate Shift）**，从而**提高了算法的鲁棒性**。 ![[公式]](https://www.zhihu.com/equation?tex=%5E%7B%5B2%5D%7D)
+
+Batch Normalization 由两部分组成，第一部分是**缩放与平移（scale and shift）**，第二部分是**训练缩放尺度和平移的参数（train a BN Network）**，算法步骤如下：
+
+<img src="https://tva1.sinaimg.cn/large/006y8mN6gy1g8938vogvcj30k00gcmyg.jpg" alt="img" style="zoom:50%;" />
+
+接下来训练 BN 层参数 $\gamma$ 和  $\beta$ ，限于篇幅的原因按下不表，有兴趣的读者可以拜读[这篇论文](https://link.zhihu.com/?target=https%3A//arxiv.org/abs/1502.03167)。
+
+参考：https://zhuanlan.zhihu.com/p/29957294
+
+### 正则处理
+
+监督机器学习一般可以用一个公式来代表，右侧就是正则处理，为了防止过拟合
+$$w^∗=arg_wmin∑_iL(yi,f(x_i;w))+λΩ(w)$$
+
+其中，第 1 项是**经验风险**，第 2 项是**正则项**， ![[公式]](https://www.zhihu.com/equation?tex=%CE%BB%E2%89%A50) 为调整两者之间关系的系数。
+
+第 1 项的经验风险较小的模型可能较复杂（有多个非零参数），这时第 2 项的模型复杂度会较大。
+
+常见的有正则项有 **L1 正则** 和 **L2 正则** ，其中 **L2 正则** 的控制过拟合的效果比 **L1 正则** 的好。
+
+**正则化的作用是选择经验风险与模型复杂度同时较小的模型**。 
+
+常见的有正则项有 **L1 正则** 和 **L2 正则** 以及 **Dropout** ，其中 **L2 正则** 的控制过拟合的效果比 **L1 正则** 的好。
+
+- L1正则化可以使得参数稀疏化，即得到的参数是一个稀疏矩阵，可以用于特征选择。
+  - **稀疏性**，说白了就是模型的很多参数是0。通常机器学习中特征数量很多，例如文本处理时，如果将一个词组（term）作为一个特征，那么特征数量会达到上万个（bigram）。在预测或分类时，那么多特征显然难以选择，但是如果代入这些特征得到的模型是一个稀疏模型，很多参数是0，表示只有少数特征对这个模型有贡献，绝大部分特征是没有贡献的，即使去掉对模型也没有什么影响，此时我们就可以只关注系数是非零值的特征。这相当于对模型进行了一次特征选择，只留下一些比较重要的特征，提高模型的泛化能力，降低过拟合的可能。
+- L2正则化可以防止模型过拟合（overfitting）；一定程度上，L1也可以防止过拟合
+
+参考：https://zhuanlan.zhihu.com/p/29957294、https://www.cnblogs.com/zingp/p/10375691.html
+
+#### **L1范数**
+
+$$||X||_0=∑^n_{i=0}|X_i|$$
+
+![[公式]](https://www.zhihu.com/equation?tex=J(w%2Cb)%3D\frac{1}{m}+\sum_{i%3D1}^{m}L(\hat{y}%2Cy)%2B\frac{\lambda+}{m}\left+\|+w+\right+\|_{1})
+
+L1 范数是向量中各个元素绝对值之和，也被称作“Lasso regularization”（稀疏规则算子）。
+
+凸函数，不是处处可微分
+
+得到的是稀疏解（最优解常出现在顶点上，且顶点上的 w 只有很少的元素是非零的）
+
+#### L2范数
+
+$$||X||_2=\sqrt{∑^n_{i=0}X^2_i}$$
+
+![[公式]](https://www.zhihu.com/equation?tex=J(w%2Cb)%3D\frac{1}{m}+\sum_{i%3D1}^{m}L(\hat{y}%2Cy)%2B\frac{\lambda+}{m}\left+\|+w+\right+\|_{1})
+
+Euclid范数（欧几里得范数，常用计算向量长度），即向量元素绝对值的平方和再开方。 
+
+- 凸函数，处处可微分
+- 易于优化
+
+### 激活函数
+
+#### Relu
 
 ![这里写图片描述](https://img-blog.csdn.net/20151015103947207)
 
@@ -663,7 +724,7 @@ Relu激活函数的优点在于：
 
 因此，Relu激活函数可以极大地加快收敛速度，相比tanh函数，收敛速度可以加快6倍
 
-#### ✅ Tanh
+#### Tanh
 
 $$tanh(x)=2sigmoid(2x)-1$$
 
@@ -673,7 +734,7 @@ $$tanhx=\frac{sinhx}{coshx}=\frac{e^x-e^{-x}}{e^x+e^{-x}}$$
 
 tanh函数将一个实数输入映射到[-1,1]范围内，如上图（右）所示。当输入为0时，tanh函数输出为0，符合我们对激活函数的要求。然而，tanh函数也存在梯度饱和问题，导致训练效率低下。
 
-#### ✅ Sigmoid
+#### Sigmoid
 
 <img src="/Users/sean/Library/Application Support/typora-user-images/image-20191023195904166.png" alt="image-20191023195904166" style="zoom:50%;" />
 
@@ -683,9 +744,9 @@ sigmoid将一个实数输入映射到[0,1]范围内，使用sigmoid作为激活�
 2. 函数输出不是以0为中心的。我们更偏向于当激活函数的输入是0时，输出也是0的函数。
 3. 因为上面两个问题的存在，导致参数收敛速度很慢，严重影响了训练的效率。因此在设计神经网络时，很少采用sigmoid激活函数。
 
-### ✅ 梯度问题
+### 梯度问题
 
-#### ✅ 梯度爆炸
+#### 梯度爆炸
 
 原文：https://zhuanlan.zhihu.com/p/32154263
 
@@ -769,22 +830,12 @@ sigmoid将一个实数输入映射到[0,1]范围内，使用sigmoid作为激活�
 
 - [在Keras API中使用正则器](https://link.zhihu.com/?target=https%3A//keras.io/regularizers/)
 
-#### ✅ 梯度消失
+#### 梯度消失
 
 误差反向传播（BP）算法中为什么会产生梯度消失？ - 维吉特伯的回答 - 知乎
 https://www.zhihu.com/question/49812013/answer/148825073
 
-### ✅ 代价函数
-
-#### ✅ 二次代价函数
-
-$$C=\frac{1}{2n}\sum_x||y(x)-a^L(x)||$$
-
-$$\frac{\partial C}{\partial w}=(a-y)\sigma'(z)x $$
-
-$$\frac{\partial C}{\partial b}=(a-y)\sigma'(z)$$
-
-### 损失函数
+### 损失函数（Loss Function）
 
 #### 交叉熵损失函数
 
@@ -802,9 +853,19 @@ $$C=-\frac{1}{n}\sum_x[y\,ln\,a+(1-y)ln(1-a)]$$
 
 一般情况下，softmax和sigmoid使用交叉熵损失（logloss），hingeloss是SVM推导出的，hingeloss的输入使用原始logit即可。
 
+#### 二次代价函数
+
+$$C=\frac{1}{2n}\sum_x||y(x)-a^L(x)||$$
+
+$$\frac{\partial C}{\partial w}=(a-y)\sigma'(z)x $$
+
+$$\frac{\partial C}{\partial b}=(a-y)\sigma'(z)$$
+
 下文参考资料：https://cloud.tencent.com/developer/article/1165263
 
-#### 一、LogLoss对数损失函数（逻辑回归，交叉熵损失）
+其他参考：https://www.csuldw.com/2016/03/26/2016-03-26-loss-function/
+
+#### LogLoss对数损失函数（逻辑回归，交叉熵损失）
 
 　　有些人可能觉得逻辑回归的损失函数就是平方损失，其实并不是。**平方损失函数可以通过线性回归在假设样本是高斯分布的条件下推导得到**，而逻辑回归得到的并不是平方损失。在逻辑回归的推导中，它假设样本服从**伯努利分布（0-1分布）**，然后求得满足该分布的似然函数，接着取对数求极值等等。而逻辑回归并没有求似然函数的极值，而是把极大化当做是一种思想，进而推导出它的经验风险函数为：**最小化负的似然函数（即max F(y, f(x)) —> min -F(y, f(x)))**。从损失函数的视角来看，它就成了log损失函数了。
 
@@ -832,7 +893,7 @@ $$C=-\frac{1}{n}\sum_x[y\,ln\,a+(1-y)ln(1-a)]$$
 
  **注意：softmax使用的即为交叉熵损失函数，binary_cossentropy为二分类交叉熵损失，categorical_crossentropy为多分类交叉熵损失，当使用多分类交叉熵损失函数时，标签应该为多分类模式，即使用one-hot编码的向量。**
 
-#### 二、平方损失函数（最小二乘法, Ordinary Least Squares ）
+#### 平方损失函数（最小二乘法, Ordinary Least Squares ）
 
 　　最小二乘法是线性回归的一种，最小二乘法（OLS）将问题转化成了一个凸优化问题。在线性回归中，它假设样本和噪声都服从高斯分布（为什么假设成高斯分布呢？其实这里隐藏了一个小知识点，就是**中心极限定理**，可以参考[【central limit theorem】](https://en.wikipedia.org/wiki/Central_limit_theorem)），最后通过极大似然估计（MLE）可以推导出最小二乘式子。最小二乘的基本原则是：**最优拟合直线应该是使各点到回归直线的距离和最小的直线，即平方和最小**。换言之，OLS是基于距离的，而这个距离就是我们用的最多的**欧几里得距离**。为什么它会选择使用欧式距离作为误差度量呢（即Mean squared error， MSE），主要有以下几个原因：
 
@@ -856,7 +917,7 @@ $$C=-\frac{1}{n}\sum_x[y\,ln\,a+(1-y)ln(1-a)]$$
 
 上面提到了线性回归，这里额外补充一句，我们通常说的线性有两种情况，一种是因变量y是自变量x的线性函数，一种是因变量y是参数α的线性函数。在机器学习中，通常指的都是后一种情况。
 
-#### 三、指数损失函数（Adaboost）
+#### 指数损失函数（Adaboost）
 
 学过Adaboost算法的人都知道，它是前向分步加法算法的特例，是一个加和模型，损失函数就是指数函数。在Adaboost中，经过m此迭代之后，可以得到fm(x):
 
@@ -876,7 +937,7 @@ Adaboost每次迭代时的目的是为了找到最小化下列式子时的参数
 
 关于Adaboost的推导，可以参考Wikipedia：[AdaBoost](https://en.wikipedia.org/wiki/AdaBoost)或者《统计学习方法》P145.
 
-#### 四、Hinge损失函数（SVM）
+#### Hinge损失函数（SVM）
 
 在机器学习算法中，hinge损失函数和SVM是息息相关的。在**线性支持向量机**中，最优化问题可以等价于下列式子：
 
@@ -915,7 +976,7 @@ Adaboost每次迭代时的目的是为了找到最小化下列式子时的参数
 - 2-RBF核；
 - 3-sigmoid核。
 
-#### 五、其它损失函数
+#### 其它损失函数
 
 除了以上这几种损失函数，常用的还有：
 
@@ -931,28 +992,9 @@ Adaboost每次迭代时的目的是为了找到最小化下列式子时的参数
 
 ![img](https://ask.qcloudimg.com/http-save/yehe-1881084/nkhl6fmtst.png?imageView2/2/w/1620)
 
-#### 六、Keras / TensorFlow 中常用 Cost Function 总结
+### 优化器
 
--  mean_squared_error或mse  
--  mean_absolute_error或mae  
--  mean_absolute_percentage_error或mape  
--  mean_squared_logarithmic_error或msle  
--  squared_hinge  
--  hinge  
--  categorical_hinge  
--  binary_crossentropy（亦称作对数损失，logloss）  
--  logcosh  
--  categorical_crossentropy：亦称作多类的对数损失，注意使用该目标函数时，需要将标签转化为形如`(nb_samples, nb_classes)`的二值序列  
--  sparse_categorical_crossentrop：如上，但接受稀疏标签。注意，使用该函数时仍然需要你的标签与输出值的维度相同，你可能需要在标签数据上增加一个维度：`np.expand_dims(y,-1)`  
--  kullback_leibler_divergence:从预测值概率分布Q到真值概率分布P的信息增益,用以度量两个分布的差异.  
--  poisson：即`(predictions - targets * log(predictions))`的均值  
--  cosine_proximity：即预测值与真实标签的余弦距离平均值的相反数  
-
-　　需要记住的是：**参数越多，模型越复杂，而越复杂的模型越容易过拟合**。过拟合就是说模型在训练数据上的效果远远好于在测试集上的性能。此时可以考虑正则化，通过设置正则项前面的hyper parameter，来权衡损失函数和正则项，减小参数规模，达到模型简化的目的，从而使模型具有更好的泛化能力。
-
-### ✅ 优化器
-
-#### ✅ Batch Gradient Descent （BGD）
+#### Batch Gradient Descent （BGD）
 
 **梯度更新规则:**
 
@@ -974,7 +1016,7 @@ for i in range(nb_epochs):
 
 **Batch gradient descent 对于凸函数可以收敛到全局极小值，对于非凸函数可以收敛到局部极小值。**
 
-#### ✅ Stochastic Gradient Descent (SGD)
+#### Stochastic Gradient Descent (SGD)
 
 **梯度更新规则:**
 
@@ -1033,7 +1075,7 @@ for i in range(nb_epochs):
 
 ![img](https://ask.qcloudimg.com/http-save/yehe-1881084/2cxevj8bpb.png?imageView2/2/w/1620)
 
-#### ✅ 其他优化算法
+#### 其他优化算法
 
 - [ ] Momentum
 - [ ] Nesterov Accelerated Gradient
@@ -1042,7 +1084,7 @@ for i in range(nb_epochs):
 - [ ] RMSprop
 - [ ] Adam：Adaptive Moment Estimation
 
-#### ✅ 如何选择优化算法
+#### 如何选择优化算法
 
 **如果数据是稀疏的，就用自适用方法，即 Adagrad, Adadelta, RMSprop, Adam。**
 
@@ -1112,7 +1154,7 @@ Object Function（目标函数 ）定义为：Cost Function + 正则化项。
 
 ## 前沿研究
 
-### ✅ Sequence to Sequence
+### Sequence to Sequence
 
 ![这里写图片描述](https://img-blog.csdn.net/20171101103708217)
 
@@ -1126,7 +1168,7 @@ Object Function（目标函数 ）定义为：Cost Function + 正则化项。
 
 **问题**：Encoder是将输入内容压缩到一个固定长度的向量中，语义编码是固定长度，然后计算出内容进行Decoder
 
-### ✅ Attention Mechanism
+### Attention Mechanism
 
 《Sequence to Sequence Learning with Neural Networks》介绍了一种基于RNN的Seq2Seq模型，基于一个Encoder和一个Decoder来构建基于神经网络的End-to-End的机器翻译模型，其中，Encoder把输入X编码成一个固定长度的隐向量Z，Decoder基于隐向量Z解码出目标输出Y。这是一个非常经典的序列到序列的模型，但是却存在**两个明显的问题**：
 
@@ -1479,13 +1521,13 @@ if __name__ == '__main__':
 
 
 
-### ✅ 逻辑回归（Logistic Regression）
+### 逻辑回归（Logistic Regression）
 
 ![img](https://yuanxiaosc.github.io/2018/06/21/%E6%94%B9%E8%BF%9B%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C%E7%9A%84%E5%AD%A6%E4%B9%A0%E6%96%B9%E6%B3%95%E2%80%94%E2%80%94%E4%BA%A4%E5%8F%89%E7%86%B5/one_1.png)
 
 
 
-### ✅ SoftMax
+### SoftMax
 
 <img src="https://pic1.zhimg.com/v2-11758fbc2fc5bbbc60106926625b3a4f_1200x500.jpg" style="zoom:70%">
 
