@@ -11,15 +11,87 @@ tags:
 
 
 
-### 介绍部分
+## 介绍部分
 
-- [ ]  传统排料算法怎么做的：Algorithm for 2D irregular-shaped nesting problem based on the NFP algorithm and lowest-gravity-center principle
-- [ ]  阿里的输入与输出具体什么情况：通过传统算法进行排列，并选择最好的几个结果进行评估，然后可以训练出一个序列学习的模型，可以给出最优的加入策略
-- [ ]  阿里算法流程：输入箱子的参数，直接给出一个排序序列，按照这个序列把箱子给放进去，通过启发式算法（贪婪策略）进行箱子的排列
-- [ ]  **算法折中策略**：（1）对于输出的序列他们采用的是对输出的序列进行排序 （2）即使是几个箱子，算法采用的也是贪婪算法，更小的局部最优 （3）本质上对位置没有预测
-- [ ]  数据集的问题：http://euro-online.org/websites/esicup/data-sets/#1535972088237-bbcb74e3-b507
+**传统排料算法**：Algorithm for 2D irregular-shaped nesting problem based on the NFP algorithm and lowest-gravity-center principle
+
+**阿里的输入与输出**：通过传统算法进行排列，并选择最好的几个结果进行评估，然后可以训练出一个序列学习的模型，可以给出最优的加入策略
+
+**阿里算法流程**：输入箱子的参数，直接给出一个排序序列，按照这个序列把箱子给放进去，通过启发式算法（贪婪策略）进行箱子的排列
+
+**算法折中策略**：（1）对于输出的序列他们采用的是对输出的序列进行排序 （2）即使是几个箱子，算法采用的也是贪婪算法，更小的局部最优 （3）本质上对位置没有预测
 
 
+
+## 算法落实
+
+### 量化算法
+
+<img src="https://tva1.sinaimg.cn/large/006y8mN6ly1g8essqa7faj30u016740l.jpg" alt="image-20191029090930252" style="zoom:50%;" />
+
+**数据处理**：基于多边形的边界点，处理成成边界为2，内部为1的二维矩阵
+
+**一维嵌入**：将二维的矩阵通过区域关系，将其嵌入一个一维矩阵（正在研究）
+
+**参考**：计算几何、Graph/Word Embedding
+
+### 效果衡量
+
+<img src="https://tva1.sinaimg.cn/large/006y8mN6ly1g8et3fxpcsj30y20hy77u.jpg" alt="image-20191029091949521" style="zoom:50%;" />
+
+**单个对象**：最小外包凸多边形
+
+**多个对象**：样片并集的最小外包凸多边形
+
+**参考**：A new approach for sheet nesting problem using guided cuckoo search and pairwise clustering、计算几何
+
+### 数据集
+
+<img src="https://tva1.sinaimg.cn/large/006y8mN6ly1g8esoivq8gj30sq0soq8a.jpg" alt="image-20191029090528362" style="zoom:50%;" />
+
+**格式**：CVS格式
+
+**参考数据**：输入两个正方形，输出两个正方形
+
+**输入**：两个多边形，最大值为1（参考边界），输出样片排样后的重心位置
+
+**多选择输入**：同一组样片的组合可能会有不同的组合模式，并且有不同的利用率，所以需要将多个数据集及其评价输入，可能需要采用强化学习
+
+**参考**：Solving a New 3D Bin Packing Problem with Deep Reinforcement Learning Method、计算几何、Reinforcement Learning
+
+### 网络
+
+![image-20191029090447541](https://tva1.sinaimg.cn/large/006y8mN6ly1g8esnta2f1j31dc0u01hm.jpg)
+
+**网络**：激活函数采用relu函数，交叉熵损失函数，其他的暂时未确定，训练20轮，检测其效果，暂时采用的是最简单的网络模型
+
+**初步拟合效果**：拟合效果还可以，应该是因为数据是简单的线性回归
+
+**进一步**：需要尽快换成更正式的数据，进行2/3/4个样片的组合测试
+
+## 算法概述
+
+![矩形@3x](https://tva1.sinaimg.cn/large/006y8mN6ly1g8etee1u60j30u00zi4qq.jpg)
+
+## 参考代码
+
+### NFP-China
+
+概述：NFP算法+遗传算法
+
+数据读取：
+
+
+
+### Bottom-Left-Portugal
+
+概述：左底部算法+遗传算法
+
+
+
+
+
+## 10月初研究
 
 ### 整体说明
 
@@ -47,15 +119,7 @@ tags:
 
 
 
-### 学习网络-10.25
-
-- 输入必须是扁平化的输入，需要很多个神经元
-- 首先只考虑两个样片的排序
-- 只要你能够解决超小规模的matching就是胜利！能做几个都行！
-
-
-
-### 论文
+## 论文
 
 - [ ] Introduction
 
@@ -97,7 +161,7 @@ tags:
 
 
 
-### 刊物记录
+## 刊物记录
 
 Journal of Zhejiang University-SCIENCE：2016年来看审稿比较快，平均3个月，发表另计，SCI 3区，影响因子1.879，官网www.springer.com/biomed/journal/11585，投稿地址www.editorialmanager.com/zusb/，那篇二维排料论文就是发表在这里
 

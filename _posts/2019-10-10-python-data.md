@@ -53,7 +53,21 @@ for index, row in df.iterrows(): # 遍历行处理
 
 ```
 
+## Shapely
 
+| 函数类型 | 算子名称             | Shapely包提供的函数              |
+| -------- | -------------------- | -------------------------------- |
+| 获取属性 | 获取面积             | object.area                      |
+|          | 获取边界             | object.bounds                    |
+|          | 获取长度             | object.length                    |
+|          | 获取类型             | object.geom_type                 |
+|          | 获取距离             | object.distance(other)           |
+|          | 获取hausdorff距离    | object.hausdorff_distance(other) |
+|          | 获取representative点 | object.representative_point()    |
+|          |                      |                                  |
+|          |                      |                                  |
+
+参考：https://blog.csdn.net/wiborgite/article/details/85167397、https://shapely.readthedocs.io/en/latest/manual.html#introduction
 
 ## Open CV
 
