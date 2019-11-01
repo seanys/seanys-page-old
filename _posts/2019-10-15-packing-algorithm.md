@@ -55,7 +55,7 @@ tags:
 
 **输入**：两个多边形，最大值为1（参考边界），输出样片排样后的重心位置
 
-**多选择输入**：同一组样片的组合可能会有不同的组合模式，并且有不同的利用率，所以需要将多个数据集及其评价输入，可能需要采用强化学习
+**多选择输入**：同一组样片的组合可能会有不同的组合模式，并且有不同的利用率，所以需要将多个数据集及其评价输入
 
 **参考**：Solving a New 3D Bin Packing Problem with Deep Reinforcement Learning Method、计算几何、Reinforcement Learning
 
@@ -72,6 +72,54 @@ tags:
 ## 算法概述
 
 ![矩形@3x](https://tva1.sinaimg.cn/large/006y8mN6ly1g8etee1u60j30u00zi4qq.jpg)
+
+## Pairwise Clustering
+
+### 算法概述
+
+排样策略：左底部策略
+
+预处理：匹配算法
+
+优化策略：去除重叠、布谷鸟检索
+
+### 匹配算法
+
+<img src="https://tva1.sinaimg.cn/large/006y8mN6gy1g8gf0o2nenj30ps0iwq5m.jpg" alt="image-20191030184345828" style="zoom:50%;" />
+
+![image-20191030184410099](https://tva1.sinaimg.cn/large/006y8mN6gy1g8gf0zmqrsj31cc0gs77u.jpg)
+
+<img src="https://tva1.sinaimg.cn/large/006y8mN6gy1g8gf16hdfxj30pu0pa0wi.jpg" alt="image-20191030184421216" style="zoom:50%;" />
+
+<img src="https://tva1.sinaimg.cn/large/006y8mN6gy1g8gf1dz5ptj30xq0iwgpc.jpg" alt="image-20191030184433056" style="zoom:50%;" />
+
+
+
+
+
+## NFP+AG
+
+### SVGNester
+
+<img src="https://camo.githubusercontent.com/f7973d894432676e37c3489c3248c3a31cf3e945/687474703a2f2f7376676e6573742e636f6d2f6769746875622f6e6670322e706e67" alt="No Fit Polygon example" style="zoom:50%;" />
+
+In our GA the insertion order and the rotation of the parts form the gene. The fitness function follows these rules:
+
+1. Minimize the number of unplaceable parts (parts that cannot fit any bin due to its rotation)
+2. Minimize the number of bins used
+3. Minimize the *width* of all placed parts
+
+The third one is rather arbitrary, as we can also optimize for rectangular bounds or a minimal concave hull. In real-world use the material to be cut tends to be rectangular, and those options tend to result in long slivers of un-used material.
+
+Because small mutations in the gene cause potentially large changes in overall fitness, the individuals of the population can be very similar. By caching NFPs new individuals can be evaluated very quickly.
+
+说明：采用的也是GA算法，一个个放入形状，采用NFP算法计算可行位置，放入的顺序和旋转的角度组成了基因，然后采用变异和遗传来进行优化。
+
+### 刘胡瑶的算法
+
+<img src="https://tva1.sinaimg.cn/large/006y8mN6gy1g8g8b4oeklj316i0pi1fa.jpg" alt="image-20191030145134607" style="zoom:50%;" />
+
+<img src="https://tva1.sinaimg.cn/large/006y8mN6gy1g8g8b9cflvj312o0j0dvx.jpg" alt="image-20191030145151285" style="zoom:50%;" />
 
 ## 参考代码
 
