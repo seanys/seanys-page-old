@@ -11,15 +11,15 @@ tags:
 
 
 
-## 介绍部分
+## 11月11日投稿安排
 
-**传统排料算法**：Algorithm for 2D irregular-shaped nesting problem based on the NFP algorithm and lowest-gravity-center principle
+论文初稿：11月7日
 
-**阿里的输入与输出**：通过传统算法进行排列，并选择最好的几个结果进行评估，然后可以训练出一个序列学习的模型，可以给出最优的加入策略
+论文修改：11月8日
 
-**阿里算法流程**：输入箱子的参数，直接给出一个排序序列，按照这个序列把箱子给放进去，通过启发式算法（贪婪策略）进行箱子的排列
+论文二改：11月9日
 
-**算法折中策略**：（1）对于输出的序列他们采用的是对输出的序列进行排序 （2）即使是几个箱子，算法采用的也是贪婪算法，更小的局部最优 （3）本质上对位置没有预测
+主要目标：样片的匹配，先做最规则的匹配，再去做相对复杂的样片匹配，不要考虑用CNN提取特征，一步步来，或者单纯就做pairing！！！下一步再做放在底部的样片匹配，然后是底部bounded的匹配
 
 
 
@@ -120,22 +120,6 @@ Because small mutations in the gene cause potentially large changes in overall f
 <img src="https://tva1.sinaimg.cn/large/006y8mN6gy1g8g8b4oeklj316i0pi1fa.jpg" alt="image-20191030145134607" style="zoom:50%;" />
 
 <img src="https://tva1.sinaimg.cn/large/006y8mN6gy1g8g8b9cflvj312o0j0dvx.jpg" alt="image-20191030145151285" style="zoom:50%;" />
-
-## 参考代码
-
-### NFP-China
-
-概述：NFP算法+遗传算法
-
-数据读取：
-
-
-
-### Bottom-Left-Portugal
-
-概述：左底部算法+遗传算法
-
-
 
 
 
