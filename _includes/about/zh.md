@@ -6,11 +6,11 @@
 
 **参与论文：**
 
-Predicting the Matching Probability and Expected Ride/shared Distance of Enroute Ridepooling Orders - a Mathmatical Modelling Approach
+Predicting the Matching Probability and Expected Ride/shared Distance of Enroute Ridepooling Orders - a Mathmatical Modelling Approach [在审]
 
-A Fast Algorithm for 2D Irregular Packing Based on Pattern Evaluating and Neural Network
+Use modified penetration depth and guided search to solve nesting problem [待投]
 
-**主要擅长**：算法、运筹优化、网络建模与优化、网页前端开发（Vue.js/Sketch）、网络爬虫（Scrapy/大规模爬虫）、平面设计（PPT/UI）
+**主要擅长**：算法、建模仿真、网络建模与优化、网页前端开发（Vue.js/Sketch）、网络爬虫（Scrapy/大规模爬虫）、平面设计（PPT/UI）
 
 **良好掌握**：数据挖掘（TF/Numpy）、统计学基础、小程序开发、iOS开发（Swift）、后端开发（Node.js/PHP-CI/Nginx）、服务器（Ubuntu）等
 
@@ -57,16 +57,16 @@ A Fast Algorithm for 2D Irregular Packing Based on Pattern Evaluating and Neural
 
 ### **所获荣誉与奖项**
 
-#### **2020全国数学建模比赛全国一等奖：**
+**2020全国数学建模比赛全国一等奖：**
 
 - 本科组获奖比例0.70%
 - 基于动态规划、动态博弈、条件决策等模型求解最优决策与资源配置问题
 
-#### **上海高校学生创造发明“科技创业杯”市三等奖：**
+**上海高校学生创造发明“科技创业杯”市三等奖：**
 
 - 基于NLP与强化学习，为用户进行良好的时间安排推荐
 
-#### **同济大学“佳兆业”创新创业奖学金**：
+**同济大学“佳兆业”创新创业奖学金**：
 
 - 唯一获该奖本科生
 
@@ -89,7 +89,7 @@ A Fast Algorithm for 2D Irregular Packing Based on Pattern Evaluating and Neural
 
 ### 个人主要经历
 
-### 2020年
+#### 2020年
 
 编辑中
 
