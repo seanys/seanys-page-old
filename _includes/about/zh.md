@@ -1,8 +1,14 @@
 > 以有限的时间，换无限的世界
 
-你好，我是Sean Yang，[同济大学经济管理学院管理科学与工程系](http://sem.tongji.edu.cn/semch/学术科研/管理科学与工程系)本科在读，主要研究方向为网络建模与优化、共享交通，正在准备智能交通/交通优化方向的博士申请，欢迎交流 tjyangshan@qq.com！
+你好，我是Sean Yang，[同济大学经济管理学院管理科学与工程系](http://sem.tongji.edu.cn/semch/学术科研/管理科学与工程系)本科在读，主要研究方向为网络建模与优化、共享交通，正在准备智能交通/交通优化方向的博士申请，欢迎交流！
 
-现阶段在王晓蕾老师课题组研究Pricing Problem&Prediction&Dispatching in Dynamic Ridesharing，该方向亦为本科毕业设计选题方向。
+现阶段在[王晓蕾](https://sem.tongji.edu.cn/semch/34528.html)老师课题组研究Pricing Problem&Prediction&Dispatching in Dynamic Ridesharing，该方向亦为本科毕业设计选题方向。
+
+**参与论文：**
+
+Predicting the Matching Probability and Expected Ride/shared Distance of Enroute Ridepooling Orders - a Mathmatical Modelling Approach
+
+A Fast Algorithm for 2D Irregular Packing Based on Pattern Evaluating and Neural Network
 
 **主要擅长**：算法、运筹优化、网络建模与优化、网页前端开发（Vue.js/Sketch）、网络爬虫（Scrapy/大规模爬虫）、平面设计（PPT/UI）
 
@@ -16,7 +22,7 @@
 
 **其他技能**：产品营销、产品经理、PPT设计、演讲、互联网创业、风险投资项目评估、经济金融基础
 
-**曾经研究过**：A Fast Algorithm for 2D Irregular Packing Based on Pattern Evaluating and Neural Network、Image recognition based on 3D Reconstruction
+**曾经研究过**：Nesting Problem、Image recognition based on 3D Reconstruction
 
 ### 教育经历
 
@@ -30,20 +36,20 @@
 
 ### **研究经历**
 
-**动态拼车与网络建模**                                                   **当前研究**
+#### **动态拼车与网络建模**                                                   **当前研究**
 
 - 海口市交通网络建模 [[Github Link](https://github.com/seanys/Haikou-Network)]：基于OpenStreetMap、ArcGis及Python，建立海口市城区交通网络。 指导老师：王晓蕾
 - 拼车仿真及动态拼车实验 [Github Link]：基于滴滴数个月数据及海口市网络，进行派单、拼车等的仿真，并进行对应数据分析。指导老师：王晓蕾
 - Confirm the validity of the prediction model of dynamic ridesharing in a city [Working]: 验证新提出拼车预测模型在实际交通路网中的效果。指导老师：王晓蕾
 - Predict the matching probability based on OD clustering in large scale network [Working]：通过数据分析和机器学习，预测拼单概率及预期拼车距离。指导老师：王晓蕾
 
-**二维不规则排样问题**                                                 **本科生科研**
+#### **二维不规则排样问题**                                                 **本科生科研**
 
 - Use modified penetration depth and guided search to solve nesting problem [[Paper Profile Link](https://github.com/seanys/Use-Modified-Penetration-Depth-and-Guided-Search-to-Solve-Nesting-Problem)]：刷新多个数据集最佳记录，论文待投，负责人。指导老师：梁哲
 - Learn to pack with reinforcement learning [[Paper Profile Link](https://github.com/seanys/Learn-to-Pack)]：使用强化学习替代启发式排样标准，现阶段已在部分数据集实现了更好结果，合作者。
 - 二维排样算法实现 [[Github Link](https://github.com/seanys/2D-Irregular-Packing-Algorithm)]：使用Python&C++实现并开源了各类经典排样算法。
 
-**供应链&仿真&机器学习**                                          **本科生课程设计**
+#### **供应链&仿真&机器学习**                                          **本科生课程设计**
 
 - 智能航空维修助理 [[Github Link](https://github.com/seanys/Aircraft-Maintenance-Brain-Demo)]：新加坡航空APP Challenge 2019，以APP为载体，基于图像识别、数据预测、PDF处理等技术辅助飞机维修，负责人。 指导老师: [梁哲](http://www.apple.com/cn) 
 - 乘客飞机登机过程仿真 [[Github Link](https://github.com/seanys/Boarding-Simulation)]：基于乘客行为进行登机过程仿真，飞机登机仿真近年文献综述，负责人。指导老师: [胡照林](https://sem.tongji.edu.cn/semch/15347.html) 
@@ -51,16 +57,16 @@
 
 ### **所获荣誉与奖项**
 
-1. **2020全国数学建模比赛全国一等奖：**
+#### **2020全国数学建模比赛全国一等奖：**
 
 - 本科组获奖比例0.70%
 - 基于动态规划、动态博弈、条件决策等模型求解最优决策与资源配置问题
 
-2. **上海高校学生创造发明“科技创业杯”市三等奖：**
+#### **上海高校学生创造发明“科技创业杯”市三等奖：**
 
 - 基于NLP与强化学习，为用户进行良好的时间安排推荐
 
-3. **同济大学“佳兆业”创新创业奖学金**：
+#### **同济大学“佳兆业”创新创业奖学金**：
 
 - 唯一获该奖本科生
 
